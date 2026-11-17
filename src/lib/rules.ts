@@ -233,7 +233,7 @@ export function validateBooking(
       time.minute,
     );
     if (!getBookableDates(now).includes(booking.date))
-      errors.push('Date is outside the booking window or the cafe is closed.');
+      errors.push('Date is outside the booking window or the café is closed.');
     if (!getBookableTimes(booking.date, now).includes(booking.time))
       errors.push('Time is not available under the booking rules.');
     if (
@@ -246,41 +246,212 @@ export function validateBooking(
   return errors.length ? { valid: false, errors } : { valid: true };
 }
 
-export function getPickupWindow(now: Date): { earliest: Date; latest: Date } {
-  const earliest = new Date(
-    Math.ceil((now.getTime() + 20 * 60_000) / (5 * 60_000)) * 5 * 60_000,
+export const PICKUP_STEP_MINUTES = 15;
+export const MIN_PREP_MINUTES = 10;
+export const MAX_QUANTITY_PER_ITEM = 20;
+export const MAX_ITEMS_PER_ORDER = 40;
+const LAST_ORDER_BUFFER_MINUTES = 30;
+
+export type PickupOption = {
+  time: string;
+  label: string;
+  available: boolean;
+  reason?: string;
+};
+
+export type PickupDate = {
+  date: string;
+  available: boolean;
+  reason?: string;
+};
+
+export type OrderLine = {
+  id: string;
+  quantity: number;
+  /** Preparation minutes for the item. The server fills this from the menu table, never from the browser. */
+  prepMinutes?: number;
+};
+
+function hhmm(minutes: number): string {
+  return `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+}
+
+/** Longest prep time in the cart plus five minutes, never below ten. */
+export function estimatedPrepMinutes(prepMinutes: number[]): number {
+  const longest = prepMinutes.reduce(
+    (max, value) => (Number.isFinite(value) && value > max ? value : max),
+    0,
   );
-  const latest = new Date(now.getTime() + PICKUP_HORIZON_DAYS * 86_400_000);
-  return { earliest, latest };
+  return Math.max(MIN_PREP_MINUTES, longest + 5);
+}
+
+function roundUpToFive(date: Date): Date {
+  const step = 5 * 60_000;
+  return new Date(Math.ceil(date.getTime() / step) * step);
+}
+
+/** "As soon as possible": now plus prep time, rounded up to the next five minutes. */
+export function getAsapPickup(now: Date, estimatedPrep: number): Date {
+  return roundUpToFive(new Date(now.getTime() + estimatedPrep * 60_000));
+}
+
+/** Why a pickup moment can never work, ignoring the current time. Null means it falls inside opening hours. */
+function pickupHoursProblem(pickupAt: Date): string | null {
+  const hours = hoursFor(pickupAt);
+  if (!hours) return 'The café is closed on Mondays.';
+  const p = localParts(pickupAt);
+  const minutes = p.hour * 60 + p.minute;
+  if (minutes < hours.open)
+    return `The café opens at ${formatClock(hours.open)}.`;
+  if (minutes >= hours.close - LAST_ORDER_BUFFER_MINUTES)
+    return `Pickup must be before last orders at ${formatClock(hours.close - LAST_ORDER_BUFFER_MINUTES)}.`;
+  return null;
+}
+
+function pickupTimeProblem(
+  pickupAt: Date,
+  now: Date,
+  estimatedPrep: number,
+): string | null {
+  const hoursProblem = pickupHoursProblem(pickupAt);
+  if (hoursProblem) return hoursProblem;
+  const day = istDate(
+    localParts(pickupAt).year,
+    localParts(pickupAt).month,
+    localParts(pickupAt).day,
+  );
+  if (!pickupDateStrings(now).includes(isoLocal(day)))
+    return `Pickup can be up to ${PICKUP_HORIZON_DAYS} days ahead.`;
+  if (pickupAt.getTime() < now.getTime() + estimatedPrep * 60_000)
+    return `Too soon: the kitchen needs about ${estimatedPrep} minutes.`;
+  return null;
+}
+
+function pickupDateStrings(now: Date): string[] {
+  const p = localParts(now);
+  const start = istDate(p.year, p.month, p.day);
+  return Array.from({ length: PICKUP_HORIZON_DAYS + 1 }, (_, offset) =>
+    isoLocal(new Date(start.getTime() + offset * 86_400_000)),
+  );
+}
+
+/** Today plus the next seven days, with a reason when a day cannot take orders. */
+export function getPickupDates(
+  now: Date,
+  estimatedPrep: number = MIN_PREP_MINUTES,
+): PickupDate[] {
+  return pickupDateStrings(now).map((date) => {
+    const parsed = parseDate(date);
+    if (!parsed) return { date, available: false, reason: 'Invalid date.' };
+    if (!hoursFor(istDate(parsed.year, parsed.month, parsed.day)))
+      return {
+        date,
+        available: false,
+        reason: 'The café is closed on Mondays. Pick Tuesday.',
+      };
+    const anyTime = getPickupWindow(date, now, estimatedPrep).some(
+      (option) => option.available,
+    );
+    return anyTime
+      ? { date, available: true }
+      : {
+          date,
+          available: false,
+          reason: 'Last orders have passed. Pick another day.',
+        };
+  });
+}
+
+/** Pickup times for one date in 15-minute steps inside opening hours and before last orders. */
+export function getPickupWindow(
+  date: string,
+  now: Date,
+  estimatedPrep: number = MIN_PREP_MINUTES,
+): PickupOption[] {
+  const parsed = parseDate(date);
+  if (!parsed || !pickupDateStrings(now).includes(date)) return [];
+  const day = istDate(parsed.year, parsed.month, parsed.day);
+  const hours = hoursFor(day);
+  if (!hours) return [];
+  const options: PickupOption[] = [];
+  for (
+    let minutes = hours.open;
+    minutes < hours.close - LAST_ORDER_BUFFER_MINUTES;
+    minutes += PICKUP_STEP_MINUTES
+  ) {
+    const candidate = istDate(
+      parsed.year,
+      parsed.month,
+      parsed.day,
+      Math.floor(minutes / 60),
+      minutes % 60,
+    );
+    const problem = pickupTimeProblem(candidate, now, estimatedPrep);
+    options.push({
+      time: hhmm(minutes),
+      label: formatClock(minutes),
+      available: problem === null,
+      ...(problem ? { reason: problem } : {}),
+    });
+  }
+  return options;
+}
+
+/** The first valid pickup at or after the "as soon as possible" time. Used to correct a stale choice. */
+export function nearestValidPickup(now: Date, estimatedPrep: number): Date {
+  const start = getAsapPickup(now, estimatedPrep).getTime();
+  const step = 5 * 60_000;
+  for (
+    let t = start;
+    t <= start + (PICKUP_HORIZON_DAYS + 2) * 86_400_000;
+    t += step
+  ) {
+    if (pickupTimeProblem(new Date(t), now, estimatedPrep) === null)
+      return new Date(t);
+  }
+  throw new Error('No valid pickup time found.');
 }
 
 export function validateOrder(
-  order: { items: Array<{ id: string; quantity: number }>; pickupAt: Date },
+  order: { items: OrderLine[]; pickupAt: Date },
   now: Date,
 ): RuleResult {
   const errors: string[] = [];
   if (!order.items.length) errors.push('Add at least one item.');
-  if (
-    order.items.some(
-      (item) =>
-        !/^PH\d{4}$/.test(item.id) ||
-        !Number.isInteger(item.quantity) ||
-        item.quantity < 1 ||
-        item.quantity > 20,
-    )
-  ) {
-    errors.push(
-      'Each order item needs a valid menu ID and quantity from 1 to 20.',
-    );
+
+  const totals = new Map<string, number>();
+  let validLines = true;
+  for (const item of order.items) {
+    if (
+      !/^PH\d{4}$/.test(item.id) ||
+      !Number.isInteger(item.quantity) ||
+      item.quantity < 1
+    ) {
+      validLines = false;
+      continue;
+    }
+    totals.set(item.id, (totals.get(item.id) ?? 0) + item.quantity);
   }
-  const window = getPickupWindow(now);
+  if (!validLines)
+    errors.push('Each order item needs a valid menu ID and a whole quantity.');
+  if ([...totals.values()].some((quantity) => quantity > MAX_QUANTITY_PER_ITEM))
+    errors.push(`Order at most ${MAX_QUANTITY_PER_ITEM} of any one item.`);
+  const itemCount = [...totals.values()].reduce((sum, value) => sum + value, 0);
+  if (itemCount > MAX_ITEMS_PER_ORDER)
+    errors.push(`Order at most ${MAX_ITEMS_PER_ORDER} items in total.`);
+
   if (
     !(order.pickupAt instanceof Date) ||
     Number.isNaN(order.pickupAt.getTime())
-  )
+  ) {
     errors.push('Choose a valid pickup time.');
-  else if (order.pickupAt < window.earliest || order.pickupAt > window.latest)
-    errors.push('Pickup must be within the available window.');
+  } else {
+    const prep = estimatedPrepMinutes(
+      order.items.map((item) => item.prepMinutes ?? 0),
+    );
+    const problem = pickupTimeProblem(order.pickupAt, now, prep);
+    if (problem) errors.push(problem);
+  }
   return errors.length ? { valid: false, errors } : { valid: true };
 }
 

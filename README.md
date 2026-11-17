@@ -1,6 +1,6 @@
-# The Pigeonhole Cafe
+# The Pigeonhole Café
 
-A fictional cafe demo built with Astro, React, strict TypeScript, Tailwind CSS v4, Cloudflare Workers and Supabase. Phase 0 provides the shared design system, business rules, database clients and test foundation.
+A fictional café demo built with Astro, React, strict TypeScript, Tailwind CSS v4, Cloudflare Workers and Supabase. Phase 0 provides the shared design system, business rules, database clients and test foundation.
 
 ## Setup
 
@@ -23,7 +23,7 @@ The path contains `&`, so the direct Node commands below are the reliable comman
 - Browser checks: keep `node scripts/astro.mjs dev --host 127.0.0.1` running in one terminal, then run `node scripts/check-kit.mjs` in another
 - Verify menu seed: `node node_modules/tsx/dist/cli.mjs scripts/import-menu.ts`
 
-The internal `/_kit` route is an unlinked, noindex component reference. It is not a public cafe page.
+The internal `/_kit` route is an unlinked, noindex component reference. It is not a public café page.
 
 ## Environment variable names
 

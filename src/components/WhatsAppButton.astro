@@ -1,0 +1,20 @@
+---
+import { whatsAppRedirectPath } from '../lib/whatsapp';
+import Button from './Button.astro';
+
+interface Props {
+  /** Optional prefilled message, for example an order summary. */
+  text?: string;
+  variant?: 'solid' | 'outline' | 'stamp';
+}
+const { text, variant = 'outline' } = Astro.props;
+---
+
+<Button
+  href={whatsAppRedirectPath(text)}
+  variant={variant}
+  target="_blank"
+  rel="nofollow noopener noreferrer"
+>
+  <slot>WhatsApp</slot>
+</Button>

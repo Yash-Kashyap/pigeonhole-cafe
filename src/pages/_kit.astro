@@ -1,6 +1,7 @@
 ---
 import Accordion from '../components/Accordion.astro';
 import Button from '../components/Button.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
 import Chip from '../components/Chip.astro';
 import Dialog from '../components/Dialog';
 import DietBadges from '../components/DietBadges.astro';
@@ -17,8 +18,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout
-  title="Component Kit | The Pigeonhole Cafe"
-  description="Private component reference for the cafe demo."
+  title="Component Kit | The Pigeonhole Café"
+  description="Private component reference for the café demo."
   noindex
 >
   <div class="ph-container space-y-20 py-16">
@@ -26,7 +27,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <p class="ph-label text-stamp">Private reference</p>
       <h1 class="text-6xl">Component kit</h1>
       <p class="text-ink-2">
-        Shared pieces for the later cafe pages. This route is deliberately
+        Shared pieces for the later café pages. This route is deliberately
         absent from site navigation.
       </p>
     </header>
@@ -37,6 +38,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </h2>
       <div class="flex flex-wrap gap-3">
         <Button>Primary</Button>
+        <WhatsAppButton />
         <Button variant="outline">Outline</Button>
         <Button variant="stamp">Postmarked</Button>
         <Chip active>Selected chip</Chip>
@@ -129,7 +131,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <div class="grid gap-8 sm:grid-cols-2">
         <MoodPhoto
           base="books-cafe"
-          alt="Books and cups arranged on warm wooden cafe shelves"
+          alt="Books and cups arranged on warm wooden café shelves"
           width={1200}
           height={800}
         />
