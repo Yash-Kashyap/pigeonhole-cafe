@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import OrderFlow from '../components/OrderFlow';
+import { loadMenu } from '../lib/menu-data';
+
+export const prerender = true;
+
+const items = loadMenu();
+---
+
+<BaseLayout
+  title="Order takeaway | The Pigeonhole Café (demo)"
+  description="Build a takeaway order, pick a time, pay at pickup. Demo only."
+  noindex={true}
+>
+  <div class="ph-container">
+    <OrderFlow client:load items={items} />
+  </div>
+</BaseLayout>

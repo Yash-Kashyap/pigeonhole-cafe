@@ -198,6 +198,16 @@
   }
 }
 
+/* Cart peek assistant lift (Phase 2) */
+body[data-cart-peek='true'] aside[aria-label='Café assistant preview'] {
+  bottom: 5.5rem;
+}
+@media (min-width: 40rem) {
+  body[data-cart-peek='true'] aside[aria-label='Café assistant preview'] {
+    bottom: 1.5rem;
+  }
+}
+
 .outline-brass-highlight {
   outline: 3px solid var(--brass) !important;
   outline-offset: 4px !important;

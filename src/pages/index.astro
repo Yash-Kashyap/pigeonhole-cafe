@@ -436,4 +436,53 @@ const safeJsonLd = JSON.stringify(homeJsonLd).replaceAll('<', '\\u003c');
       </div>
     </div>
   </section>
+
+  <!-- Add to cart toast -->
+  <div
+    id="cart-toast"
+    class="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 border border-ink bg-ink px-5 py-3 text-sm font-semibold text-paper shadow-ledger opacity-0 pointer-events-none transition-opacity duration-200"
+    role="status"
+    aria-live="polite"
+  >
+    <span>Added to order.</span>
+    <a
+      href="/order"
+      class="ml-3 underline underline-offset-4 text-brass hover:text-paper"
+    >
+      View order &rarr;
+    </a>
+  </div>
+
+  <script>
+    import { addToCart } from '../lib/cart';
+
+    const toast = document.getElementById('cart-toast');
+    let timeoutId: number | undefined;
+
+    function showToast(name: string) {
+      if (!toast) return;
+      const textSpan = toast.querySelector('span');
+      if (textSpan) textSpan.textContent = `Added ${name}.`;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+      window.clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 4000);
+    }
+
+    document
+      .querySelectorAll<HTMLButtonElement>('button[data-add-to-cart]')
+      .forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-add-to-cart');
+          const name = btn.getAttribute('data-item-name') || 'item';
+          if (id) {
+            addToCart(id, 1);
+            showToast(name);
+          }
+        });
+      });
+  </script>
 </BaseLayout>

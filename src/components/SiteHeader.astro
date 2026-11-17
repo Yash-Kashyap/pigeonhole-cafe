@@ -39,18 +39,23 @@ const isCurrent = (href: string) => {
       <span class="hidden sm:block">
         <Postmark size={48} decorative />
       </span>
-      <span class="font-display text-xl leading-none">The Pigeonhole Café</span>
+      <span class="font-display text-xl leading-none xl:whitespace-nowrap">
+        The Pigeonhole Café
+      </span>
       <span class="ph-label border border-stamp px-2 py-1 text-stamp">
         Demo
       </span>
     </a>
-    <nav class="hidden items-center gap-5 md:flex" aria-label="Main navigation">
+    <nav
+      class="hidden items-center gap-4 md:flex xl:gap-5"
+      aria-label="Main navigation"
+    >
       {links.map(([label, href]) => {
         const active = isCurrent(href);
         return (
           <a
             class:list={[
-              'text-sm transition-colors',
+              'text-sm whitespace-nowrap transition-colors',
               active
                 ? 'font-semibold text-ink underline decoration-brass decoration-2 underline-offset-8'
                 : 'text-ink-2 hover:text-ink hover:underline hover:underline-offset-4',
@@ -64,7 +69,9 @@ const isCurrent = (href: string) => {
       })}
     </nav>
     <div class="hidden items-center gap-3 lg:flex">
-      <OpenStatus client:load />
+      <span class="hidden xl:inline-flex">
+        <OpenStatus client:load />
+      </span>
       <CartButton client:load />
     </div>
     <details class="relative md:hidden">

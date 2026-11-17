@@ -61,17 +61,21 @@ const shownTags = tags.filter((tag) =>
       <Price value={price} />
     </span>
     <button
-      class="min-h-11 border border-ink/40 px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
+      class:list={[
+        'min-h-11 border px-4 text-sm font-semibold transition',
+        unavailable
+          ? 'border-ink/40 opacity-60 cursor-not-allowed'
+          : 'border-ink bg-transparent text-ink hover:bg-ink hover:text-paper',
+      ]}
       type="button"
-      disabled
-      aria-describedby={`phase-note-${id}`}
+      disabled={unavailable}
+      data-add-to-cart={id}
+      data-item-name={name}
+      aria-label={
+        unavailable ? `${name} is sold out today` : `Add ${name} to cart`
+      }
     >
       {unavailable ? 'Sold out today' : 'Add'}
     </button>
-    <span class="sr-only" id={`phase-note-${id}`}>
-      {unavailable
-        ? 'This item is unavailable.'
-        : 'Ordering becomes available in Phase 2.'}
-    </span>
   </div>
 </article>

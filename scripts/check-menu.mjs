@@ -64,8 +64,8 @@ await page
 const total = await cards.count();
 ok('all 240 items render on All', total === 240, `count ${total}`);
 ok(
-  'Add buttons are disabled in Phase 1',
-  (await page.locator('.menu-card button:not([disabled])').count()) === 0,
+  'Add buttons are enabled in Phase 2',
+  (await page.locator('.menu-card button:not([disabled])').count()) > 0,
 );
 ok(
   'h1 reads "The menu"',

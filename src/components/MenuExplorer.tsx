@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  addToCart,
+  computeCartDetails,
+  readCart,
+  removeFromCart,
+  setQuantity,
+  type CartItem,
+} from '../lib/cart';
+import {
   ALLERGENS,
   DEFAULT_FILTERS,
   MENU_CATEGORIES,
@@ -23,9 +31,17 @@ function money(value: number) {
 function ItemCard({
   item,
   unavailable,
+  quantity,
+  onAdd,
+  onIncrement,
+  onDecrement,
 }: {
   item: MenuItem;
   unavailable: boolean;
+  quantity: number;
+  onAdd: (id: string) => void;
+  onIncrement: (id: string) => void;
+  onDecrement: (id: string) => void;
 }) {
   const tags = item.tags.filter((tag) =>
     ['signature', 'popular', 'seasonal', 'offer', 'kids'].includes(tag),
@@ -81,13 +97,51 @@ function ItemCard({
           ))}
         </div>
       )}
-      <button
-        className="mt-5 min-h-11 w-full border border-ink/40 px-4 font-semibold disabled:cursor-not-allowed disabled:opacity-60"
-        type="button"
-        disabled
-      >
-        {unavailable ? 'Sold out today' : 'Add'}
-      </button>
+      {unavailable ? (
+        <button
+          className="mt-5 min-h-11 w-full border border-ink/40 px-4 font-semibold opacity-60 cursor-not-allowed"
+          type="button"
+          disabled
+        >
+          Sold out today
+        </button>
+      ) : quantity > 0 ? (
+        <div className="mt-5 flex min-h-11 items-center justify-between border border-ink bg-paper-2">
+          <button
+            type="button"
+            className="flex h-11 w-11 items-center justify-center border-r border-ink text-xl font-bold transition hover:bg-ink hover:text-paper"
+            onClick={() => onDecrement(item.id)}
+            aria-label={`Decrease quantity of ${item.name}`}
+          >
+            &minus;
+          </button>
+          <span
+            className="font-mono text-base font-semibold tabular-nums"
+            aria-live="polite"
+            aria-label={`${item.name} quantity: ${quantity}`}
+          >
+            {quantity}
+          </span>
+          <button
+            type="button"
+            className="flex h-11 w-11 items-center justify-center border-l border-ink text-xl font-bold transition hover:bg-ink hover:text-paper disabled:opacity-40 disabled:cursor-not-allowed"
+            onClick={() => onIncrement(item.id)}
+            disabled={quantity >= 20}
+            aria-label={`Increase quantity of ${item.name}`}
+          >
+            +
+          </button>
+        </div>
+      ) : (
+        <button
+          className="mt-5 min-h-11 w-full border border-ink bg-transparent px-4 font-semibold text-ink transition hover:bg-ink hover:text-paper"
+          type="button"
+          onClick={() => onAdd(item.id)}
+          aria-label={`Add ${item.name} to cart`}
+        >
+          Add
+        </button>
+      )}
     </article>
   );
 }
@@ -231,7 +285,51 @@ export default function MenuExplorer({ items }: Props) {
   const [hydrated, setHydrated] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [unavailable, setUnavailable] = useState<Set<string>>(new Set());
+  const [cart, setCart] = useState<CartItem[]>([]);
   const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const sync = () => setCart(readCart());
+    sync();
+    window.addEventListener('storage', sync);
+    window.addEventListener('ph-cart-change', sync);
+    return () => {
+      window.removeEventListener('storage', sync);
+      window.removeEventListener('ph-cart-change', sync);
+    };
+  }, []);
+
+  const cartQuantities = useMemo(
+    () => new Map(cart.map((c) => [c.id, c.quantity])),
+    [cart],
+  );
+
+  const cartDetails = useMemo(
+    () => computeCartDetails(cart, items),
+    [cart, items],
+  );
+
+  useEffect(() => {
+    if (cartDetails.itemCount > 0) {
+      document.body.setAttribute('data-cart-peek', 'true');
+    } else {
+      document.body.removeAttribute('data-cart-peek');
+    }
+    return () => {
+      document.body.removeAttribute('data-cart-peek');
+    };
+  }, [cartDetails.itemCount]);
+
+  const handleAdd = (id: string) => addToCart(id, 1);
+  const handleIncrement = (id: string) => {
+    const q = cartQuantities.get(id) ?? 0;
+    setQuantity(id, q + 1);
+  };
+  const handleDecrement = (id: string) => {
+    const q = cartQuantities.get(id) ?? 0;
+    if (q <= 1) removeFromCart(id);
+    else setQuantity(id, q - 1);
+  };
 
   useEffect(() => {
     const read = () => {
@@ -568,6 +666,10 @@ export default function MenuExplorer({ items }: Props) {
                               key={item.id}
                               item={item}
                               unavailable={unavailable.has(item.id)}
+                              quantity={cartQuantities.get(item.id) ?? 0}
+                              onAdd={handleAdd}
+                              onIncrement={handleIncrement}
+                              onDecrement={handleDecrement}
                             />
                           ))}
                       </div>
@@ -581,6 +683,10 @@ export default function MenuExplorer({ items }: Props) {
                       key={item.id}
                       item={item}
                       unavailable={unavailable.has(item.id)}
+                      quantity={cartQuantities.get(item.id) ?? 0}
+                      onAdd={handleAdd}
+                      onIncrement={handleIncrement}
+                      onDecrement={handleDecrement}
                     />
                   ))}
                 </div>
@@ -588,6 +694,65 @@ export default function MenuExplorer({ items }: Props) {
             </section>
           ))}
         </div>
+      )}
+      {cartDetails.itemCount > 0 && (
+        <>
+          {/* Mobile bottom bar */}
+          <div
+            data-cart-peek="mobile"
+            className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between border-t border-ink bg-ink px-4 py-3 text-paper shadow-ledger sm:hidden"
+            role="region"
+            aria-label="Cart summary"
+          >
+            <div className="flex flex-col">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-brass">
+                Your slip
+              </span>
+              <span
+                className="font-mono text-sm font-semibold tabular-nums"
+                aria-live="polite"
+              >
+                {cartDetails.itemCount}{' '}
+                {cartDetails.itemCount === 1 ? 'item' : 'items'}, $
+                {cartDetails.subtotal.toFixed(2)}
+              </span>
+            </div>
+            <a
+              href="/order"
+              className="inline-flex min-h-11 items-center border border-paper bg-paper px-4 text-sm font-semibold text-ink no-underline transition hover:bg-brass hover:text-paper"
+            >
+              Go to order &rarr;
+            </a>
+          </div>
+
+          {/* Desktop fixed card */}
+          <div
+            data-cart-peek="desktop"
+            className="hidden sm:fixed sm:bottom-6 sm:left-6 sm:z-30 sm:flex sm:items-center sm:gap-6 sm:border sm:border-ink sm:bg-ink sm:px-6 sm:py-4 sm:text-paper sm:shadow-ledger"
+            role="region"
+            aria-label="Cart summary"
+          >
+            <div>
+              <p className="font-mono text-xs uppercase tracking-wider text-brass">
+                Your slip
+              </p>
+              <p
+                className="mt-1 font-mono text-base font-semibold tabular-nums"
+                aria-live="polite"
+              >
+                {cartDetails.itemCount}{' '}
+                {cartDetails.itemCount === 1 ? 'item' : 'items'}, $
+                {cartDetails.subtotal.toFixed(2)}
+              </p>
+            </div>
+            <a
+              href="/order"
+              className="inline-flex min-h-11 items-center border border-paper bg-paper px-5 text-sm font-semibold text-ink no-underline transition hover:bg-brass hover:text-paper"
+            >
+              Go to order &rarr;
+            </a>
+          </div>
+        </>
       )}
       {filtersOpen && (
         <div
