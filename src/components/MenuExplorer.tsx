@@ -266,10 +266,18 @@ export default function MenuExplorer({ items }: Props) {
     );
     return () => clearTimeout(timer);
   }, [queryInput, hydrated]);
+  const lastQueryRef = useRef(state.query);
   useEffect(() => {
     if (!hydrated) return;
     const next = `${window.location.pathname}${serializeFilters(state)}`;
-    window.history.replaceState({}, '', next);
+    if (window.location.search !== serializeFilters(state)) {
+      if (lastQueryRef.current !== state.query) {
+        window.history.replaceState({}, '', next);
+      } else {
+        window.history.pushState({}, '', next);
+      }
+    }
+    lastQueryRef.current = state.query;
   }, [state, hydrated]);
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
@@ -435,24 +443,103 @@ export default function MenuExplorer({ items }: Props) {
         {visible.length} {visible.length === 1 ? 'item' : 'items'}
       </p>
       {visible.length === 0 ? (
-        <section className="mt-6 border border-ink bg-card p-6">
+        <section className="mt-6 border border-ink bg-card p-6 shadow-ledger">
           <h2 className="text-3xl">Nothing matches those filters.</h2>
+          <p className="mt-2 text-sm text-ink-2">
+            Remove a filter below or clear all filters to see more dishes.
+          </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            {[
-              state.query && `Search: ${state.query}`,
-              state.category,
-              ...state.avoid.map((item) => `Avoid ${item}`),
-            ]
-              .filter(Boolean)
-              .slice(0, 3)
-              .map((label) => (
-                <span className="filter-chip" key={label as string}>
-                  {label}
-                </span>
-              ))}
+            {state.query && (
+              <button
+                type="button"
+                className="filter-chip inline-flex items-center gap-2"
+                onClick={() => {
+                  setState((old) => ({ ...old, query: '' }));
+                  setQueryInput('');
+                }}
+                aria-label={`Remove search filter "${state.query}"`}
+              >
+                <span>Search: {state.query}</span>
+                <span aria-hidden="true">&times;</span>
+              </button>
+            )}
+            {state.category && (
+              <button
+                type="button"
+                className="filter-chip inline-flex items-center gap-2"
+                onClick={() => setState((old) => ({ ...old, category: '' }))}
+                aria-label={`Remove category filter "${state.category}"`}
+              >
+                <span>{state.category}</span>
+                <span aria-hidden="true">&times;</span>
+              </button>
+            )}
+            {state.avoid.map((allergen) => (
+              <button
+                key={allergen}
+                type="button"
+                className="filter-chip inline-flex items-center gap-2 capitalize"
+                onClick={() =>
+                  setState((old) => ({
+                    ...old,
+                    avoid: old.avoid.filter((a) => a !== allergen),
+                  }))
+                }
+                aria-label={`Remove avoid ${allergen} filter`}
+              >
+                <span>Avoid {allergen}</span>
+                <span aria-hidden="true">&times;</span>
+              </button>
+            ))}
+            {state.vegan && (
+              <button
+                type="button"
+                className="filter-chip inline-flex items-center gap-2"
+                onClick={() => setState((old) => ({ ...old, vegan: false }))}
+                aria-label="Remove vegan filter"
+              >
+                <span>Vegan</span>
+                <span aria-hidden="true">&times;</span>
+              </button>
+            )}
+            {state.jain && (
+              <button
+                type="button"
+                className="filter-chip inline-flex items-center gap-2"
+                onClick={() => setState((old) => ({ ...old, jain: false }))}
+                aria-label="Remove Jain filter"
+              >
+                <span>Jain option</span>
+                <span aria-hidden="true">&times;</span>
+              </button>
+            )}
+            {state.glutenFree && (
+              <button
+                type="button"
+                className="filter-chip inline-flex items-center gap-2"
+                onClick={() =>
+                  setState((old) => ({ ...old, glutenFree: false }))
+                }
+                aria-label="Remove gluten-free filter"
+              >
+                <span>Gluten-free</span>
+                <span aria-hidden="true">&times;</span>
+              </button>
+            )}
+            {state.maxPrice !== null && (
+              <button
+                type="button"
+                className="filter-chip inline-flex items-center gap-2"
+                onClick={() => setState((old) => ({ ...old, maxPrice: null }))}
+                aria-label={`Remove max price filter $${state.maxPrice}`}
+              >
+                <span>Under ${state.maxPrice}</span>
+                <span aria-hidden="true">&times;</span>
+              </button>
+            )}
           </div>
           <button
-            className="mt-5 min-h-11 border border-ink px-4"
+            className="mt-5 min-h-11 border border-ink px-4 font-semibold transition hover:bg-ink hover:text-paper"
             type="button"
             onClick={clear}
           >
