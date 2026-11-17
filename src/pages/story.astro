@@ -1,0 +1,411 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DietBadges from '../components/DietBadges.astro';
+import MoodPhoto from '../components/MoodPhoto.astro';
+import PigeonholeGrid from '../components/PigeonholeGrid.astro';
+import Postmark from '../components/Postmark.astro';
+import Price from '../components/Price.astro';
+import { SIGNATURE_DISHES } from '../data/signatures';
+
+const postChai = SIGNATURE_DISHES.find((dish) => dish.id === 'PH0003')!;
+
+// Decorative wide pigeonhole grid for header strip: 2 rows x 12 cols (24 cells) with 3 decorative filled icons
+const decorativeGridCells = [
+  { index: 3, label: 'Mug', icon: 'mug' as const },
+  { index: 11, label: 'Book', icon: 'book' as const },
+  { index: 18, label: 'Tea jar', icon: 'jar' as const },
+];
+---
+
+<BaseLayout
+  title="Our story | The Pigeonhole Café (demo)"
+  description="A café in a former post office sorting room, with a wall of 48 pigeonholes and tables called slots. A fictional demo café."
+>
+  <!-- 1. Opening -->
+  <header class="border-b border-ink/20 py-12 md:py-20">
+    <div class="ph-container space-y-6">
+      <p class="ph-label text-stamp">Our story</p>
+      <h1 class="text-5xl sm:text-6xl lg:text-7xl">
+        A room built for sorting letters.
+      </h1>
+      <p class="max-w-[62ch] text-xl text-ink-2">
+        This room once decided where the post went. Now it decides where you
+        sit.
+      </p>
+
+      <div class="pt-6">
+        <div class="mb-3 flex items-center justify-between">
+          <span class="ph-label text-brass">The sorting grid</span>
+          <span class="font-mono text-xs text-ink-2 uppercase tracking-widest">
+            48 pigeonholes
+          </span>
+        </div>
+        <div class="overflow-hidden border border-ink bg-walnut p-3 shadow-ledger">
+          <PigeonholeGrid
+            rows={2}
+            cols={12}
+            aspect="5/1"
+            filledCells={decorativeGridCells}
+            decorative
+          />
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. The room (long-form, two columns on desktop) -->
+  <section
+    class="border-b border-ink/20 py-16 md:py-24"
+    aria-labelledby="sorting-room-heading"
+  >
+    <div class="ph-container grid items-start gap-12 lg:grid-cols-12 lg:gap-16">
+      <!-- Left column: sticky mood photo -->
+      <div class="space-y-6 lg:sticky lg:top-8 lg:col-span-5">
+        <MoodPhoto
+          base="mug-wall"
+          alt="Rows of ceramic mugs on rustic wooden shelves against a wall"
+          width={640}
+          height={520}
+        />
+        <div class="hidden space-y-6 lg:block">
+          <MoodPhoto
+            base="kettle-tea"
+            alt="Cup of hot spiced tea on a wooden tray with a brass kettle"
+            width={640}
+            height={420}
+          />
+        </div>
+      </div>
+
+      <!-- Right column: four narrative sections -->
+      <div class="space-y-12 lg:col-span-7">
+        <article class="reveal-paragraph space-y-3">
+          <h2 id="sorting-room-heading" class="text-3xl sm:text-4xl">
+            The sorting room
+          </h2>
+          <p class="max-w-[62ch] text-lg text-ink-2">
+            The building was a small colonial-era post office. The room where
+            letters were sorted had a wall of 48 wooden pigeonholes. When the
+            post office closed, the wall stayed.
+          </p>
+        </article>
+
+        <article class="reveal-paragraph space-y-3 border-t border-ink/15 pt-8">
+          <h2 class="text-3xl sm:text-4xl">Ira</h2>
+          <p class="max-w-[62ch] text-lg text-ink-2">
+            Ira Thakur is the granddaughter of the last postmaster. She did not
+            want the wall to become decoration. She wanted people to use it.
+          </p>
+        </article>
+
+        <article class="reveal-paragraph space-y-3 border-t border-ink/15 pt-8">
+          <h2 class="text-3xl sm:text-4xl">Slots, not tables</h2>
+          <p class="max-w-[62ch] text-lg text-ink-2">
+            Every pigeonhole holds a mug, a book or a jar of tea. Every table
+            has a slot number. When you book, you book a slot. When your order
+            is ready, we call your slot.
+          </p>
+        </article>
+
+        <article class="reveal-paragraph space-y-3 border-t border-ink/15 pt-8">
+          <h2 class="text-3xl sm:text-4xl">Slow on purpose</h2>
+          <p class="max-w-[62ch] text-lg text-ink-2">
+            The room is quiet and wooden. There is no AC. In winter a wood-fired
+            heater does the work. We cook vegetarian and eggless. We keep the
+            menu long enough to be generous and short enough to be honest.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. How the café works (practical story) -->
+  <section
+    class="border-b border-ink/20 bg-paper-2 py-16 md:py-24"
+    aria-labelledby="how-it-works-heading"
+  >
+    <div class="ph-container space-y-10">
+      <div class="max-w-xl space-y-2">
+        <p class="ph-label text-brass">A simple process</p>
+        <h2 id="how-it-works-heading" class="text-4xl sm:text-5xl">
+          How the café works
+        </h2>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-3">
+        <!-- Step 1 -->
+        <article class="border border-ink bg-card p-6 shadow-ledger">
+          <div class="flex items-center justify-between border-b border-ink/20 pb-3">
+            <span class="ph-label text-ink">STEP 01</span>
+            <span class="ph-label text-brass">Booking</span>
+          </div>
+          <h3 class="mt-4 text-2xl">1. Choose a slot</h3>
+          <p class="mt-2 text-sm text-ink-2">
+            Reserve a table for two, four or six. Your slot is held for fifteen
+            minutes.
+          </p>
+          <div class="mt-5">
+            <a
+              class="ph-label text-brass underline underline-offset-4 hover:text-ink"
+              href="/reserve"
+            >
+              Reserve a slot &rarr;
+            </a>
+          </div>
+        </article>
+
+        <!-- Step 2 -->
+        <article class="border border-ink bg-card p-6 shadow-ledger">
+          <div class="flex items-center justify-between border-b border-ink/20 pb-3">
+            <span class="ph-label text-ink">STEP 02</span>
+            <span class="ph-label text-brass">Ordering</span>
+          </div>
+          <h3 class="mt-4 text-2xl">2. Order from your slot</h3>
+          <p class="mt-2 text-sm text-ink-2">
+            Choose from 240 pure-vegetarian items. Chai, siddu, momos and fresh
+            bakes.
+          </p>
+          <div class="mt-5">
+            <a
+              class="ph-label text-brass underline underline-offset-4 hover:text-ink"
+              href="/menu"
+            >
+              Browse the menu &rarr;
+            </a>
+          </div>
+        </article>
+
+        <!-- Step 3 -->
+        <article class="border border-ink bg-card p-6 shadow-ledger">
+          <div class="flex items-center justify-between border-b border-ink/20 pb-3">
+            <span class="ph-label text-ink">STEP 03</span>
+            <span class="ph-label text-brass">Pickup</span>
+          </div>
+          <h3 class="mt-4 text-2xl">3. We call your slot</h3>
+          <p class="mt-2 text-sm text-ink-2">
+            Takeaway orders are dispatched promptly. Pay at the counter when you
+            collect.
+          </p>
+          <div class="mt-5">
+            <a
+              class="ph-label text-brass underline underline-offset-4 hover:text-ink"
+              href="/order"
+            >
+              Order takeaway &rarr;
+            </a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. The thing everyone orders: Post Chai -->
+  <section
+    class="border-b border-ink/20 py-16 md:py-24"
+    aria-labelledby="chai-feature-heading"
+  >
+    <div class="ph-container grid items-center gap-10 md:grid-cols-12 md:gap-12">
+      <div class="space-y-6 md:col-span-7">
+        <p class="ph-label text-stamp">The signature cup</p>
+        <h2 id="chai-feature-heading" class="text-4xl sm:text-5xl">
+          The thing everyone orders: Post Chai
+        </h2>
+        <p class="max-w-[54ch] text-lg text-ink-2">
+          Smoked cardamom and jaggery in strong chai, served in a kulhad. It was
+          the first drink created when the doors opened.
+        </p>
+
+        <div class="border border-ink bg-card p-6 shadow-ledger">
+          <div class="flex flex-wrap items-baseline justify-between gap-4">
+            <h3 class="text-2xl font-normal">{postChai.name}</h3>
+            <Price value={postChai.price} />
+          </div>
+          <p class="mt-2 text-sm text-ink-2">{postChai.description}</p>
+          <div class="mt-3">
+            <DietBadges
+              vegan={postChai.vegan}
+              jain={postChai.jain}
+              glutenFree={postChai.glutenFree}
+              spice={postChai.spice}
+            />
+          </div>
+          <div class="mt-4 flex items-center gap-3">
+            <button
+              class="min-h-11 border border-ink/40 px-5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
+              type="button"
+              disabled
+            >
+              Add to order
+            </button>
+            <span class="text-xs text-ink-2">
+              Available for ordering in Phase 2.
+            </span>
+          </div>
+        </div>
+
+        <p class="text-sm text-ink-2">
+          <strong class="font-semibold text-ink">Everyone orders:</strong> Post
+          Chai, Maska Pav, Paneer Momos.
+        </p>
+      </div>
+
+      <div class="md:col-span-5">
+        <MoodPhoto
+          base="books-cafe"
+          alt="A quiet reading corner with a bookshelf and wooden table"
+          width={600}
+          height={480}
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Values in three lines (not a mission statement) -->
+  <section
+    class="border-b border-ink/20 py-16 md:py-24"
+    aria-labelledby="values-heading"
+  >
+    <div class="ph-container space-y-8">
+      <p class="ph-label text-brass">Our principles</p>
+      <h2 id="values-heading" class="text-4xl sm:text-5xl">
+        Values in three lines
+      </h2>
+
+      <div class="grid gap-6 sm:grid-cols-3">
+        <div class="flex items-start gap-4 border border-ink bg-card p-6 shadow-ledger">
+          <span class="flex size-10 shrink-0 items-center justify-center border border-stamp font-mono text-xs font-semibold text-stamp uppercase">
+            01
+          </span>
+          <div>
+            <h3 class="text-xl">Pure vegetarian, no eggs.</h3>
+            <p class="mt-2 text-sm text-ink-2">
+              Every dish is strictly vegetarian and prepared without eggs.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4 border border-ink bg-card p-6 shadow-ledger">
+          <span class="flex size-10 shrink-0 items-center justify-center border border-stamp font-mono text-xs font-semibold text-stamp uppercase">
+            02
+          </span>
+          <div>
+            <h3 class="text-xl">Allergens listed on every dish.</h3>
+            <p class="mt-2 text-sm text-ink-2">
+              Full transparency on gluten, dairy, nuts, soy and honey.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4 border border-ink bg-card p-6 shadow-ledger">
+          <span class="flex size-10 shrink-0 items-center justify-center border border-stamp font-mono text-xs font-semibold text-stamp uppercase">
+            03
+          </span>
+          <div>
+            <h3 class="text-xl">Quiet by design.</h3>
+            <p class="mt-2 text-sm text-ink-2">
+              Wi-Fi and plug points at every table for those who work.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Meet the assistant (soft intro) -->
+  <section
+    class="border-b border-ink/20 bg-paper-2 py-16 md:py-20"
+    aria-labelledby="assistant-intro-heading"
+  >
+    <div class="ph-container max-w-3xl text-center space-y-6">
+      <p class="ph-label text-stamp">The digital assistant</p>
+      <h2 id="assistant-intro-heading" class="text-4xl sm:text-5xl">
+        Meet the assistant
+      </h2>
+      <p class="mx-auto max-w-[54ch] text-lg text-ink-2">
+        Ask the café anything. The assistant only answers from what we have
+        written down, and says so when it does not know.
+      </p>
+      <div class="pt-2">
+        <button
+          class="inline-flex min-h-11 items-center justify-center border border-ink bg-ink px-6 font-semibold text-paper transition hover:bg-ink-2 cursor-pointer"
+          type="button"
+          data-open-assistant
+        >
+          Ask the assistant
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Closing CTA -->
+  <section class="py-16 md:py-24 text-center">
+    <div class="ph-container max-w-2xl space-y-6">
+      <div class="flex justify-center">
+        <Postmark size={96} text="THE PIGEONHOLE CAFE · KOTHI BAGH" />
+      </div>
+      <h2 class="text-4xl sm:text-5xl">Your slot is waiting.</h2>
+      <p class="text-ink-2">
+        Reserve a table in advance or browse the full menu for takeaway.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4 pt-2">
+        <a
+          class="inline-flex min-h-11 items-center justify-center border border-ink bg-ink px-6 font-semibold text-paper no-underline transition hover:bg-ink-2"
+          href="/reserve"
+        >
+          Reserve a slot
+        </a>
+        <a
+          class="inline-flex min-h-11 items-center justify-center border border-ink bg-transparent px-6 font-semibold text-ink no-underline transition hover:bg-ink hover:text-paper"
+          href="/menu"
+        >
+          Explore the menu
+        </a>
+      </div>
+
+      <div class="pt-8">
+        <p class="ph-label border border-ink/30 p-3 text-ink-2">
+          This café is fictional. Created as an architectural and engineering
+          demo.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Reveal paragraphs on scroll using IntersectionObserver (respects prefers-reduced-motion)
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    if (!prefersReducedMotion && 'IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('revealed');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15 },
+      );
+      document.querySelectorAll('.reveal-paragraph').forEach((el) => {
+        el.classList.add('reveal-init');
+        observer.observe(el);
+      });
+    }
+  </script>
+
+  <style>
+    :global(.reveal-init) {
+      opacity: 0;
+      transform: translateY(12px);
+      transition:
+        opacity 0.3s ease-out,
+        transform 0.3s ease-out;
+    }
+    :global(.reveal-init.revealed) {
+      opacity: 1;
+      transform: none;
+    }
+  </style>
+</BaseLayout>

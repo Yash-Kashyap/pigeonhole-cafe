@@ -1,0 +1,681 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import { FAQ_ITEMS } from '../data/faq';
+import { CAFE_TIME_ZONE, getOpenState } from '../lib/rules';
+
+const now = new Date();
+const openState = getOpenState(now);
+
+const currentMonthNumber = Number(
+  new Intl.DateTimeFormat('en-CA', {
+    timeZone: CAFE_TIME_ZONE,
+    month: 'numeric',
+  }).format(now),
+);
+const isTrekSeason = currentMonthNumber === 10 || currentMonthNumber === 11;
+
+// Weekly hours data from rules
+const weeklyHours = [
+  { day: 'Monday', hours: 'Closed', isClosed: true, dayIndex: 1 },
+  { day: 'Tuesday', hours: '8:00 AM to 9:30 PM', isClosed: false, dayIndex: 2 },
+  {
+    day: 'Wednesday',
+    hours: '8:00 AM to 9:30 PM',
+    isClosed: false,
+    dayIndex: 3,
+  },
+  {
+    day: 'Thursday',
+    hours: '8:00 AM to 9:30 PM',
+    isClosed: false,
+    dayIndex: 4,
+  },
+  { day: 'Friday', hours: '8:00 AM to 9:30 PM', isClosed: false, dayIndex: 5 },
+  {
+    day: 'Saturday',
+    hours: '8:00 AM to 11:00 PM',
+    isClosed: false,
+    dayIndex: 6,
+  },
+  {
+    day: 'Sunday',
+    hours: isTrekSeason
+      ? '7:00 AM to 11:00 PM (Trek season)'
+      : '8:00 AM to 11:00 PM',
+    isClosed: false,
+    dayIndex: 0,
+  },
+];
+
+// Current local weekday index in IST:
+const istDayOfWeek = new Date(
+  now.toLocaleString('en-US', { timeZone: CAFE_TIME_ZONE }),
+).getDay();
+
+// JSON-LD CafeOrCoffeeShop and FAQPage
+const visitJsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CafeOrCoffeeShop',
+    name: 'The Pigeonhole Café',
+    description:
+      'Hours, facilities, allergen information and answers to common questions about The Pigeonhole Café. Fictional demo.',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Old Sorting Room, Post Office Lane',
+      addressLocality: 'Kothi Bagh',
+      addressRegion: 'Himachal Pradesh',
+      addressCountry: 'IN',
+    },
+    telephone: '+91 00000 00000',
+    servesCuisine: 'Vegetarian',
+    priceRange: '$',
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        opens: '08:00',
+        closes: '21:30',
+      },
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Saturday', 'Sunday'],
+        opens: '08:00',
+        closes: '23:00',
+      },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQ_ITEMS.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  },
+];
+const safeJsonLd = JSON.stringify(visitJsonLd).replaceAll('<', '\\u003c');
+
+const facilities = [
+  { title: 'Wi-Fi & power', desc: 'Wi-Fi and plug points at every table' },
+  {
+    title: 'Work friendly',
+    desc: 'Laptop-friendly zone (Tuesday to Friday daytime)',
+  },
+  { title: 'Heating', desc: 'Wood-fired heater in winter (AC-free)' },
+  { title: 'Seating', desc: 'Outdoor seating on the stone steps' },
+  { title: 'Families', desc: 'Kid-friendly: colouring paper and stamp card' },
+  { title: 'Pets', desc: 'Pets: outdoors only' },
+  { title: 'Parking', desc: 'Street parking: about 5 cars' },
+  { title: 'Accessibility', desc: 'Steps at the entrance, no ramp yet' },
+  { title: 'Clean air', desc: 'No smoking area' },
+  { title: 'Payment', desc: 'Payments: UPI, cards, cash' },
+  { title: 'Dining', desc: 'Dine-in and takeaway; no delivery; no catering' },
+];
+---
+
+<BaseLayout
+  title="Visit and FAQ | The Pigeonhole Café (demo)"
+  description="Hours, facilities, allergen information and answers to common questions about The Pigeonhole Café. Fictional demo."
+>
+  <script type="application/ld+json" set:html={safeJsonLd} />
+  <!-- 1. Header -->
+  <header class="border-b border-ink/20 py-12 md:py-20">
+    <div class="ph-container space-y-6">
+      <p class="ph-label text-stamp">Visit & help</p>
+      <h1 class="text-5xl sm:text-6xl lg:text-7xl">Visit</h1>
+
+      <div class="inline-flex items-center gap-3 border border-ink bg-card px-4 py-2 font-mono text-sm uppercase">
+        <span
+          class:list={[
+            'size-2.5 rounded-full',
+            openState.state === 'open'
+              ? 'bg-ok'
+              : openState.state === 'last-orders-passed'
+                ? 'bg-warn'
+                : 'bg-ink-2',
+          ]}
+          aria-hidden="true"
+        />
+        <span class="font-medium text-ink">{openState.label}</span>
+      </div>
+
+      <div class="space-y-1">
+        <p class="text-xl text-ink">
+          Old Sorting Room, Post Office Lane, Kothi Bagh, Himachal Pradesh
+        </p>
+        <p class="ph-label text-stamp">Fictional address</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. Hours -->
+  <section
+    class="border-b border-ink/20 py-12 md:py-20"
+    aria-labelledby="hours-heading"
+  >
+    <div class="ph-container grid gap-10 md:grid-cols-12 md:gap-12">
+      <div class="space-y-4 md:col-span-5">
+        <p class="ph-label text-brass">Schedule</p>
+        <h2 id="hours-heading" class="text-4xl sm:text-5xl">
+          Weekly hours
+        </h2>
+        <p class="text-ink-2">
+          Times are shown in Asia/Kolkata timezone. Last orders are called 30
+          minutes before closing.
+        </p>
+        {isTrekSeason && (
+          <div class="border-l-4 border-stamp bg-card p-4 text-sm text-ink-2">
+            <strong class="font-semibold text-ink">Trek season notice:</strong>{' '}
+            Sunday mornings open at 7:00 AM through October and November.
+          </div>
+        )}
+      </div>
+
+      <div class="md:col-span-7">
+        <table class="w-full border-collapse border border-ink bg-card text-left text-sm shadow-ledger">
+          <caption class="sr-only">Weekly opening hours</caption>
+          <thead>
+            <tr class="border-b border-ink bg-paper-2 font-mono text-xs uppercase tracking-wider text-ink">
+              <th scope="col" class="p-4">
+                Day
+              </th>
+              <th scope="col" class="p-4">
+                Hours
+              </th>
+              <th scope="col" class="p-4 text-right">
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {weeklyHours.map((row) => {
+              const isToday = row.dayIndex === istDayOfWeek;
+              return (
+                <tr
+                  class:list={[
+                    'border-b border-ink/15 transition-colors',
+                    isToday
+                      ? 'bg-brass/15 font-semibold text-ink'
+                      : 'text-ink-2',
+                  ]}
+                >
+                  <th scope="row" class="p-4 font-medium text-ink">
+                    {row.day}
+                    {isToday && (
+                      <span class="ml-2 inline-block border border-ink bg-paper px-2 py-0.5 font-mono text-[10px] uppercase text-ink">
+                        Today
+                      </span>
+                    )}
+                  </th>
+                  <td class="p-4">{row.hours}</td>
+                  <td class="p-4 text-right font-mono text-xs uppercase">
+                    {row.isClosed ? (
+                      <span class="text-stamp">Closed</span>
+                    ) : (
+                      <span class="text-ok">Open</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <p class="mt-3 text-xs text-ink-2">
+          Last orders 30 minutes before closing.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Finding us (illustrated SVG street map) -->
+  <section
+    class="border-b border-ink/20 py-12 md:py-20"
+    aria-labelledby="map-heading"
+  >
+    <div class="ph-container space-y-8">
+      <div class="max-w-xl space-y-2">
+        <p class="ph-label text-brass">Location</p>
+        <h2 id="map-heading" class="text-4xl sm:text-5xl">
+          Finding us
+        </h2>
+      </div>
+
+      <div class="relative overflow-hidden border border-ink bg-paper-2 p-6 shadow-ledger md:p-10">
+        <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-ink/20">
+          <div>
+            <p class="font-display text-2xl">Old Sorting Room</p>
+            <p class="text-sm text-ink-2">Post Office Lane, Kothi Bagh</p>
+          </div>
+          <button
+            id="map-route-btn"
+            class="inline-flex min-h-11 items-center justify-center border border-ink bg-card px-5 font-semibold text-ink transition hover:bg-ink hover:text-paper cursor-pointer"
+            type="button"
+          >
+            Show me the way
+          </button>
+        </div>
+
+        <!-- Illustrated SVG Street Map -->
+        <div class="relative mt-6 aspect-[16/9] w-full border border-ink bg-card">
+          <svg
+            id="map-svg"
+            viewBox="0 0 800 450"
+            class="h-full w-full"
+            role="img"
+            aria-label="Illustrative map of Kothi Bagh showing Post Office Lane and The Pigeonhole Café"
+          >
+            <!-- Map background / subtle grid -->
+            <rect width="800" height="450" fill="#FBF8F1" />
+            <path
+              d="M0 100h800M0 200h800M0 300h800M0 400h800M150 0v450M300 0v450M450 0v450M600 0v450M750 0v450"
+              stroke="#EAE0CD"
+              stroke-width="1"
+            />
+
+            <!-- Hills contour lines (illustrative) -->
+            <path
+              d="M0 60 Q 200 20, 400 80 T 800 50"
+              fill="none"
+              stroke="#C5CBD6"
+              stroke-width="1.5"
+              stroke-dasharray="4 4"
+            />
+            <path
+              d="M0 120 Q 300 60, 600 140 T 800 100"
+              fill="none"
+              stroke="#C5CBD6"
+              stroke-width="1.5"
+              stroke-dasharray="4 4"
+            />
+
+            <!-- Ridge Road -->
+            <path d="M50 150 L 750 150" stroke="#1B2430" stroke-width="8" />
+            <text
+              x="60"
+              y="135"
+              font-family="'DM Mono', monospace"
+              font-size="12"
+              fill="#3A4658"
+              letter-spacing="2"
+            >
+              RIDGE ROAD
+            </text>
+
+            <!-- Post Office Lane -->
+            <path d="M400 150 L 400 380" stroke="#1B2430" stroke-width="8" />
+            <text
+              x="415"
+              y="240"
+              font-family="'DM Mono', monospace"
+              font-size="12"
+              fill="#3A4658"
+              letter-spacing="2"
+            >
+              POST OFFICE LANE
+            </text>
+
+            <!-- Bazaar Steps -->
+            <path
+              d="M150 350 L 650 350"
+              stroke="#1B2430"
+              stroke-width="6"
+              stroke-dasharray="8 6"
+            />
+            <text
+              x="160"
+              y="340"
+              font-family="'DM Mono', monospace"
+              font-size="11"
+              fill="#3A4658"
+              letter-spacing="2"
+            >
+              BAZAAR STEPS
+            </text>
+
+            <!-- Route path (highlighted on click) -->
+            <path
+              id="map-route-path"
+              d="M 120 150 L 400 150 L 400 280"
+              fill="none"
+              stroke="#B08D3C"
+              stroke-width="5"
+              stroke-dasharray="6 6"
+              class="opacity-0 transition-opacity duration-300"
+            />
+
+            <!-- Starting Point Marker -->
+            <g
+              id="map-start-pin"
+              class="opacity-0 transition-opacity duration-300"
+            >
+              <circle cx="120" cy="150" r="10" fill="#8E2F2A" />
+              <circle cx="120" cy="150" r="4" fill="#F4EDE0" />
+              <rect x="80" y="100" width="80" height="24" fill="#1B2430" />
+              <text
+                x="120"
+                y="116"
+                font-family="'DM Mono', monospace"
+                font-size="10"
+                fill="#F4EDE0"
+                text-anchor="middle"
+                font-weight="600"
+              >
+                YOU ARE HERE
+              </text>
+            </g>
+
+            <!-- The Café Building -->
+            <g transform="translate(350, 270)">
+              <rect
+                width="100"
+                height="80"
+                fill="#F4EDE0"
+                stroke="#1B2430"
+                stroke-width="2"
+              />
+              <rect
+                x="5"
+                y="5"
+                width="90"
+                height="70"
+                fill="#EAE0CD"
+                stroke="#B08D3C"
+                stroke-width="1"
+              />
+              <!-- Mini pigeonhole icon -->
+              <path
+                d="M20 20 h60 v40 h-60 z M40 20 v40 M60 20 v40 M20 40 h60"
+                stroke="#4A3426"
+                stroke-width="1"
+                fill="none"
+              />
+              <text
+                x="50"
+                y="70"
+                font-family="'Fraunces Variable', serif"
+                font-size="10"
+                fill="#1B2430"
+                text-anchor="middle"
+                font-weight="600"
+              >
+                THE PIGEONHOLE
+              </text>
+            </g>
+
+            <!-- Destination pin -->
+            <circle
+              cx="400"
+              cy="270"
+              r="8"
+              fill="#B08D3C"
+              stroke="#1B2430"
+              stroke-width="2"
+            />
+            <circle cx="400" cy="270" r="3" fill="#1B2430" />
+          </svg>
+        </div>
+
+        <p class="ph-label mt-4 text-center text-ink-2">
+          Illustrative map of a fictional place.
+        </p>
+
+        <div class="mt-6 border-t border-ink/20 pt-4">
+          <p class="font-semibold text-ink">How to find us</p>
+          <p class="mt-1 text-sm text-ink-2">
+            Look for the old post office with the brass letterbox. We are
+            situated at the corner of Post Office Lane and the stone steps.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Know before you come (facilities grid) -->
+  <section
+    class="border-b border-ink/20 py-12 md:py-20"
+    aria-labelledby="facilities-heading"
+  >
+    <div class="ph-container space-y-8">
+      <div class="max-w-xl space-y-2">
+        <p class="ph-label text-brass">Facilities & house policies</p>
+        <h2 id="facilities-heading" class="text-4xl sm:text-5xl">
+          Know before you come
+        </h2>
+      </div>
+
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {facilities.map((item, idx) => (
+          <div class="border border-ink bg-card p-6 shadow-ledger">
+            <span class="font-mono text-xs font-semibold text-stamp uppercase">
+              {String(idx + 1).padStart(2, '0')}
+            </span>
+            <h3 class="mt-2 text-xl font-normal">{item.title}</h3>
+            <p class="mt-2 text-sm text-ink-2">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Allergies and dietary (important) -->
+  <section
+    class="border-b border-ink/20 bg-card py-12 md:py-20"
+    aria-labelledby="allergies-heading"
+  >
+    <div class="ph-container max-w-3xl space-y-6">
+      <div class="inline-block border border-stamp px-3 py-1 font-mono text-xs uppercase text-stamp">
+        Dietary & allergen care
+      </div>
+      <h2 id="allergies-heading" class="text-4xl sm:text-5xl">
+        Allergies and kitchen policy
+      </h2>
+      <p class="text-lg text-ink-2">
+        Everything is vegetarian and eggless. Allergens are listed on every
+        dish.
+      </p>
+      <p class="text-ink-2">
+        The kitchen also handles gluten, dairy, nuts, soy and honey, so
+        cross-contact is possible. For an allergy emergency or a complaint,
+        speak to the team.
+      </p>
+
+      <div class="flex flex-wrap gap-4 pt-4">
+        <a
+          class="inline-flex min-h-11 items-center justify-center border border-ink bg-ink px-6 font-semibold text-paper no-underline transition hover:bg-ink-2"
+          href="/menu?vegan=1"
+        >
+          Browse by diet
+        </a>
+        <button
+          class="inline-flex min-h-11 items-center justify-center border border-ink bg-transparent px-6 font-semibold text-ink transition hover:bg-ink hover:text-paper cursor-pointer"
+          type="button"
+          data-open-assistant
+        >
+          Ask the assistant
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. FAQ (Searchable & Deep-linkable) -->
+  <section
+    class="border-b border-ink/20 py-12 md:py-20"
+    aria-labelledby="faq-heading"
+  >
+    <div class="ph-container space-y-8">
+      <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div>
+          <p class="ph-label text-brass">Common questions</p>
+          <h2 id="faq-heading" class="text-4xl sm:text-5xl">
+            FAQ
+          </h2>
+        </div>
+        <div class="w-full sm:max-w-xs">
+          <label for="faq-filter" class="ph-label text-ink-2">
+            Filter questions
+          </label>
+          <input
+            id="faq-filter"
+            type="search"
+            class="mt-1 w-full border border-ink bg-card px-4 py-2.5 text-sm text-ink placeholder:text-ink-2 focus:outline-none focus:ring-2 focus:ring-brass"
+            placeholder="Search FAQ (e.g. parking, vegan, bookings)..."
+          />
+        </div>
+      </div>
+
+      <div id="faq-list" class="space-y-4">
+        {FAQ_ITEMS.map((item) => (
+          <details
+            id={item.id}
+            class="faq-card group border border-ink bg-card shadow-ledger transition-colors"
+          >
+            <summary class="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 p-5 font-display text-xl">
+              <span>{item.question}</span>
+              <span
+                class="font-mono text-xl transition-transform group-open:rotate-45"
+                aria-hidden="true"
+              >
+                +
+              </span>
+            </summary>
+            <div class="border-t border-ink/15 p-5 pt-4 text-ink-2">
+              <p class="max-w-[62ch] text-base">{item.answer}</p>
+              {item.linkHref && (
+                <div class="mt-4">
+                  <a
+                    class="ph-label text-brass underline underline-offset-4 hover:text-ink"
+                    href={item.linkHref}
+                  >
+                    {item.linkText} &rarr;
+                  </a>
+                </div>
+              )}
+            </div>
+          </details>
+        ))}
+      </div>
+
+      <p id="faq-empty-state" class="hidden text-center text-ink-2 py-8">
+        No questions matched your search query. Try another term or ask the
+        assistant.
+      </p>
+    </div>
+  </section>
+
+  <!-- 7. Talk to a human -->
+  <section class="py-16 md:py-24" aria-labelledby="contact-heading">
+    <div class="ph-container max-w-3xl space-y-8">
+      <div class="space-y-3">
+        <p class="ph-label text-stamp">Direct assistance</p>
+        <h2 id="contact-heading" class="text-4xl sm:text-5xl">
+          Talk to a human
+        </h2>
+        <p class="text-ink-2">The team will reply as soon as they can.</p>
+      </div>
+
+      <div class="border border-ink bg-card p-8 shadow-ledger space-y-6">
+        <div class="space-y-4">
+          <p class="font-semibold text-ink">When to speak to the team:</p>
+          <ul class="list-disc pl-5 space-y-1 text-sm text-ink-2">
+            <li>Allergy emergencies and kitchen safety queries</li>
+            <li>Customer feedback and complaints</li>
+            <li>Refund requests</li>
+            <li>Private groups and gatherings above 12 guests</li>
+          </ul>
+        </div>
+
+        <div class="border-t border-ink/20 pt-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="ph-label text-ink">Contacts</span>
+            <span class="ph-label text-stamp">Placeholder contacts</span>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2 text-sm">
+            <div>
+              <p class="ph-label text-ink-2">Phone</p>
+              <p class="mt-1 font-mono text-ink">+91 00000 00000</p>
+            </div>
+            <div>
+              <p class="ph-label text-ink-2">Email</p>
+              <p class="mt-1 font-mono text-ink">
+                hello@pigeonhole-demo.example
+              </p>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <WhatsAppButton
+              text="Hello, I have an enquiry regarding The Pigeonhole Café."
+              variant="outline"
+            >
+              Message on WhatsApp
+            </WhatsAppButton>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ client script: interactive search & deep link handling -->
+  <script>
+    // 1. Deep link handling: open matching item if hash exists in URL
+    function openHashedFaq() {
+      const hash = window.location.hash;
+      if (hash && hash.startsWith('#faq-')) {
+        const target = document.querySelector<HTMLDetailsElement>(hash);
+        if (target && target.tagName.toLowerCase() === 'details') {
+          target.open = true;
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }
+    openHashedFaq();
+    window.addEventListener('hashchange', openHashedFaq);
+
+    // 2. Search filter in real time
+    const searchInput = document.querySelector<HTMLInputElement>('#faq-filter');
+    const faqCards = document.querySelectorAll<HTMLDetailsElement>('.faq-card');
+    const emptyState = document.querySelector<HTMLElement>('#faq-empty-state');
+
+    searchInput?.addEventListener('input', () => {
+      const query = searchInput.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      faqCards.forEach((card) => {
+        const text = card.textContent?.toLowerCase() ?? '';
+        const match = !query || text.includes(query);
+        card.style.display = match ? '' : 'none';
+        if (match) {
+          visibleCount += 1;
+        }
+      });
+
+      if (emptyState) {
+        emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
+    });
+
+    // 3. Illustrated map interactive toggle
+    const mapBtn = document.querySelector<HTMLButtonElement>('#map-route-btn');
+    const mapPath = document.querySelector<SVGElement>('#map-route-path');
+    const startPin = document.querySelector<SVGElement>('#map-start-pin');
+    let routeShown = false;
+
+    mapBtn?.addEventListener('click', () => {
+      routeShown = !routeShown;
+      if (mapPath && startPin) {
+        mapPath.classList.toggle('opacity-0', !routeShown);
+        startPin.classList.toggle('opacity-0', !routeShown);
+      }
+      if (mapBtn) {
+        mapBtn.textContent = routeShown ? 'Hide route' : 'Show me the way';
+      }
+    });
+  </script>
+</BaseLayout>

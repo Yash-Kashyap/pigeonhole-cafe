@@ -23,7 +23,14 @@ export default [
       'vitest.config.ts',
     ],
     languageOptions: {
-      globals: { console: 'readonly', process: 'readonly' },
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        // used inside page.evaluate callbacks in the browser check scripts
+        document: 'readonly',
+        window: 'readonly',
+        getComputedStyle: 'readonly',
+      },
     },
   },
   {

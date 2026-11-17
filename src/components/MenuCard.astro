@@ -11,6 +11,10 @@ interface Props {
   glutenFree?: boolean;
   spice?: 0 | 1 | 2 | 3;
   allergens?: string[];
+  prepMinutes?: number;
+  tags?: string[];
+  addOn?: boolean;
+  unavailable?: boolean;
 }
 const {
   id,
@@ -22,7 +26,14 @@ const {
   glutenFree,
   spice = 0,
   allergens = [],
+  prepMinutes,
+  tags = [],
+  addOn = false,
+  unavailable = false,
 } = Astro.props;
+const shownTags = tags.filter((tag) =>
+  ['signature', 'popular', 'seasonal', 'offer', 'kids'].includes(tag),
+);
 ---
 
 <article class="grid gap-4 border-t border-ink py-5 sm:grid-cols-[1fr_auto]">
@@ -31,28 +42,36 @@ const {
     <p class="max-w-2xl text-sm text-ink-2">{description}</p>
     <DietBadges {vegan} {jain} {glutenFree} {spice} />
     <p class="text-xs text-ink-2">
-      Allergens: {allergens.length ? allergens.join(', ') : 'none listed'}
+      {allergens.length
+        ? `Contains: ${allergens.join(', ')}`
+        : 'No listed allergens'}
     </p>
+    {prepMinutes && <p class="text-xs text-ink-2">about {prepMinutes} min</p>}
+    {shownTags.length > 0 && (
+      <p class="flex flex-wrap gap-2">
+        {shownTags.map((tag) => (
+          <span class="ph-label border border-ink/30 px-2 py-1">{tag}</span>
+        ))}
+      </p>
+    )}
   </div>
   <div class="flex items-start justify-between gap-4 sm:flex-col sm:items-end">
-    <Price value={price} />
+    <span>
+      {addOn && '+ '}
+      <Price value={price} />
+    </span>
     <button
-      class="min-h-11 border border-ink px-4 text-sm font-semibold hover:bg-ink hover:text-paper"
+      class="min-h-11 border border-ink/40 px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
       type="button"
-      data-add-item={id}
+      disabled
+      aria-describedby={`phase-note-${id}`}
     >
-      Add
+      {unavailable ? 'Sold out today' : 'Add'}
     </button>
+    <span class="sr-only" id={`phase-note-${id}`}>
+      {unavailable
+        ? 'This item is unavailable.'
+        : 'Ordering becomes available in Phase 2.'}
+    </span>
   </div>
 </article>
-
-<script>
-  import { addToCart } from '../lib/cart';
-  document.addEventListener('click', (event) => {
-    const target =
-      event.target instanceof Element
-        ? event.target.closest<HTMLElement>('[data-add-item]')
-        : null;
-    if (target?.dataset.addItem) addToCart(target.dataset.addItem);
-  });
-</script>

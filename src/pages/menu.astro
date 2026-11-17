@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MenuExplorer from '../components/MenuExplorer';
+import { MENU_CATEGORIES } from '../lib/menu';
+import { loadMenu } from '../lib/menu-data';
+
+export const prerender = true;
+const items = loadMenu();
+const menuJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Menu',
+  name: 'The Pigeonhole Café menu',
+  hasMenuSection: MENU_CATEGORIES.map((category) => ({
+    '@type': 'MenuSection',
+    name: category,
+    hasMenuItem: items
+      .filter((item) => item.category === category)
+      .slice(0, 5)
+      .map((item) => ({
+        '@type': 'MenuItem',
+        name: item.name,
+        description: item.description,
+        offers: {
+          '@type': 'Offer',
+          price: item.price_usd.toFixed(2),
+          priceCurrency: 'USD',
+        },
+      })),
+  })),
+};
+const safeJsonLd = JSON.stringify(menuJsonLd).replaceAll('<', '\\u003c');
+---
+
+<BaseLayout
+  title="Menu | The Pigeonhole Café (demo)"
+  description="Browse 240 vegetarian, eggless dishes with vegan, Jain and gluten-free filters. Demo menu in US dollars."
+>
+  <script type="application/ld+json" set:html={safeJsonLd} />
+  <header class="border-b border-ink bg-paper-2">
+    <div class="ph-container py-12 md:py-16">
+      <p class="ph-label text-stamp">Menu · Demo</p>
+      <h1 class="mt-4 text-6xl sm:text-7xl">The menu</h1>
+      <p class="mt-5 max-w-2xl text-lg">
+        240 items. All vegetarian, all eggless. Prices in US dollars.
+      </p>
+      <p class="mt-4 max-w-3xl border-l-4 border-brass pl-4 text-sm text-ink-2">
+        Allergens are listed per dish. The kitchen also handles gluten, dairy,
+        nuts, soy and honey, so cross-contact is possible.
+      </p>
+    </div>
+  </header>
+  <section class="ph-container py-10">
+    <MenuExplorer items={items} client:load />
+  </section>
+</BaseLayout>

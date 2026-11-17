@@ -107,6 +107,80 @@
   text-transform: uppercase;
 }
 
+@layer components {
+  .menu-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: end;
+    gap: 16px;
+    border-block: 1px solid var(--ink);
+    background: var(--paper);
+    padding-block: 16px;
+  }
+  .category-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-block: 16px 8px;
+    scrollbar-width: thin;
+  }
+  .category-tabs button,
+  .filter-chip {
+    min-height: 44px;
+    flex: none;
+    border: 1px solid color-mix(in srgb, var(--ink) 45%, transparent);
+    background: transparent;
+    padding: 8px 12px;
+  }
+  .category-tabs button[aria-selected='true'],
+  .filter-chip[aria-pressed='true'] {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .menu-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .menu-card {
+    min-width: 0;
+    border: 1px solid var(--ink);
+    background: var(--card);
+    padding: 20px;
+    box-shadow: var(--shadow-1);
+  }
+  .menu-badge {
+    display: inline-flex;
+    min-width: 32px;
+    min-height: 32px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid currentColor;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .menu-group {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 800px;
+  }
+}
+
+@media (min-width: 40rem) {
+  .menu-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 75rem) {
+  .menu-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (min-width: 40rem) {
   .ph-container {
     width: min(100% - 48px, 1160px);
@@ -122,4 +196,10 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+.outline-brass-highlight {
+  outline: 3px solid var(--brass) !important;
+  outline-offset: 4px !important;
+  transition: outline 0.2s ease-in-out;
 }

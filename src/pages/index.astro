@@ -1,29 +1,439 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import MenuCard from '../components/MenuCard.astro';
+import MoodPhoto from '../components/MoodPhoto.astro';
 import PigeonholeGrid from '../components/PigeonholeGrid.astro';
+import Postmark from '../components/Postmark.astro';
+import { SIGNATURE_DISHES } from '../data/signatures';
+import {
+  CAFE_TIME_ZONE,
+  getOpenState,
+  isStudentHourNow,
+  nextFirstSaturday,
+} from '../lib/rules';
+
+const now = new Date();
+const openState = getOpenState(now);
+const studentHourActive = isStudentHourNow(now);
+
+// Month in Asia/Kolkata timezone
+const currentMonthNumber = Number(
+  new Intl.DateTimeFormat('en-CA', {
+    timeZone: CAFE_TIME_ZONE,
+    month: 'numeric',
+  }).format(now),
+);
+const isTrekSeason = currentMonthNumber === 10 || currentMonthNumber === 11;
+
+const nextSaturdayDate = nextFirstSaturday(now);
+const formattedNextSaturday = new Intl.DateTimeFormat('en-GB', {
+  timeZone: CAFE_TIME_ZONE,
+  weekday: 'long',
+  day: 'numeric',
+  month: 'short',
+}).format(nextSaturdayDate);
+
+// Map filled cells for PigeonholeGrid (6 signature dishes placed in cells 0-15 for mobile visibility)
+const mobileIndices = [2, 5, 8, 10, 13, 15] as const;
+const filledGridCells = SIGNATURE_DISHES.map((dish, i) => {
+  return {
+    index: mobileIndices[i] ?? i,
+    label: dish.name,
+    price: dish.price,
+    itemId: dish.id,
+    icon: dish.icon,
+  };
+});
+
+const homeJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CafeOrCoffeeShop',
+  name: 'The Pigeonhole Café',
+  description:
+    'A fictional café in an old post office sorting room in Kothi Bagh. Demo site.',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Old Sorting Room, Post Office Lane',
+    addressLocality: 'Kothi Bagh',
+    addressRegion: 'Himachal Pradesh',
+    addressCountry: 'IN',
+  },
+  telephone: '+91 00000 00000',
+  servesCuisine: 'Vegetarian',
+  priceRange: '$',
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '08:00',
+      closes: '21:30',
+    },
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Saturday', 'Sunday'],
+      opens: '08:00',
+      closes: '23:00',
+    },
+  ],
+};
+const safeJsonLd = JSON.stringify(homeJsonLd).replaceAll('<', '\\u003c');
 ---
 
 <BaseLayout
-  title="The Pigeonhole Café | Foundation"
-  description="The foundation for a fictional café demo in Kothi Bagh."
+  title="The Pigeonhole Café | Sorted over chai (demo)"
+  description="A fictional café in an old post office sorting room. Menu, takeaway orders, slot booking and an AI assistant. Demo site."
 >
-  <section class="ph-container grid items-center gap-10 py-16 md:grid-cols-2 md:py-24">
-    <div class="space-y-6">
-      <p class="ph-label text-stamp">Foundation dispatch</p>
-      <h1 class="text-6xl sm:text-7xl">Sorted over chai.</h1>
-      <p class="max-w-xl text-ink-2">
-        The shared design system is ready. Public café pages arrive in the next
-        phase.
-      </p>
+  <script type="application/ld+json" set:html={safeJsonLd} />
+  <!-- 1. Hero: The wall -->
+  <section
+    class="border-b border-ink/20 py-12 md:py-20"
+    aria-labelledby="hero-title"
+  >
+    <div class="ph-container grid items-center gap-10 md:grid-cols-12 md:gap-8">
+      <div class="space-y-6 md:col-span-6 lg:col-span-7">
+        <p class="ph-label text-stamp">Kothi Bagh, Himachal Pradesh</p>
+        <h1 id="hero-title" class="text-5xl sm:text-6xl lg:text-7xl">
+          Sorted over chai.
+        </h1>
+        <p class="max-w-xl text-lg text-ink-2">
+          A café in an old post office sorting room. Forty-eight pigeonholes,
+          one slow menu.
+        </p>
+
+        <div class="inline-flex items-center gap-3 border border-ink bg-card px-4 py-2 font-mono text-xs tracking-wider uppercase">
+          <span
+            class:list={[
+              'size-2.5 rounded-full',
+              openState.state === 'open'
+                ? 'bg-ok'
+                : openState.state === 'last-orders-passed'
+                  ? 'bg-warn'
+                  : 'bg-ink-2',
+            ]}
+            aria-hidden="true"
+          />
+          <span class="font-medium text-ink">{openState.label}</span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+          <a
+            class="inline-flex min-h-11 items-center justify-center border border-ink bg-ink px-6 font-semibold text-paper no-underline transition hover:bg-ink-2"
+            href="/reserve"
+          >
+            Reserve a slot
+          </a>
+          <a
+            class="inline-flex min-h-11 items-center justify-center border border-ink bg-transparent px-6 font-semibold text-ink no-underline transition hover:bg-ink hover:text-paper"
+            href="/order"
+          >
+            Order takeaway
+          </a>
+          <button
+            class="inline-flex min-h-11 items-center justify-center px-4 font-semibold text-ink underline underline-offset-4 transition hover:text-brass"
+            type="button"
+            data-open-assistant
+          >
+            Ask the assistant
+          </button>
+        </div>
+      </div>
+
+      <div class="md:col-span-6 lg:col-span-5">
+        <div class="sr-only">
+          Interactive pigeonhole wall displaying signature dishes.
+        </div>
+        <PigeonholeGrid
+          rows={6}
+          cols={8}
+          filledCells={filledGridCells}
+          interactive
+          caption="The original wall, as we kept it."
+        />
+      </div>
     </div>
-    <PigeonholeGrid
-      rows={6}
-      cols={8}
-      filledCells={[
-        { index: 4, label: 'Mug', icon: 'mug' },
-        { index: 21, label: 'Book', icon: 'book' },
-        { index: 38, label: 'Tea jar', icon: 'jar' },
-      ]}
-    />
+  </section>
+
+  <!-- 2. Three ways in (action cards) -->
+  <section
+    class="border-b border-ink/20 py-12 md:py-16"
+    aria-labelledby="ways-in-heading"
+  >
+    <div class="ph-container">
+      <h2 id="ways-in-heading" class="sr-only">
+        Ways into the café
+      </h2>
+      <div class="grid gap-6 md:grid-cols-3">
+        <a
+          class="group block border border-ink bg-card p-6 no-underline shadow-ledger transition hover:-translate-y-1"
+          href="/reserve"
+        >
+          <div class="flex items-center justify-between border-b border-ink/20 pb-3">
+            <span class="ph-label text-ink">SLOT 01</span>
+            <span class="ph-label text-brass group-hover:underline">
+              Reserve &rarr;
+            </span>
+          </div>
+          <h3 class="mt-4 text-2xl font-normal">Reserve a slot</h3>
+          <p class="mt-2 text-sm text-ink-2">
+            Pick a day and a slot for 2, 4 or 6.
+          </p>
+        </a>
+
+        <a
+          class="group block border border-ink bg-card p-6 no-underline shadow-ledger transition hover:-translate-y-1"
+          href="/order"
+        >
+          <div class="flex items-center justify-between border-b border-ink/20 pb-3">
+            <span class="ph-label text-ink">SLOT 02</span>
+            <span class="ph-label text-brass group-hover:underline">
+              Order &rarr;
+            </span>
+          </div>
+          <h3 class="mt-4 text-2xl font-normal">Order takeaway</h3>
+          <p class="mt-2 text-sm text-ink-2">
+            Takeaway from 240 items. Ready in 15 to 20 minutes.
+          </p>
+        </a>
+
+        <button
+          class="group block w-full text-left border border-ink bg-card p-6 shadow-ledger transition hover:-translate-y-1 cursor-pointer"
+          type="button"
+          data-open-assistant
+        >
+          <div class="flex items-center justify-between border-b border-ink/20 pb-3">
+            <span class="ph-label text-ink">SLOT 03</span>
+            <span class="ph-label text-brass group-hover:underline">
+              Ask &rarr;
+            </span>
+          </div>
+          <h3 class="mt-4 text-2xl font-normal">Ask the assistant</h3>
+          <p class="mt-2 text-sm text-ink-2">
+            Allergies, Jain options, hours. Ask in plain English.
+          </p>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Signature six -->
+  <section
+    class="border-b border-ink/20 py-12 md:py-20"
+    aria-labelledby="signatures-heading"
+  >
+    <div class="ph-container">
+      <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div>
+          <p class="ph-label text-stamp">Signature menu</p>
+          <h2 id="signatures-heading" class="mt-2 text-4xl sm:text-5xl">
+            What gets sorted first
+          </h2>
+        </div>
+        <a
+          class="inline-flex min-h-11 items-center gap-2 font-semibold text-ink underline underline-offset-4 hover:text-brass"
+          href="/menu"
+        >
+          See all 240 items &rarr;
+        </a>
+      </div>
+
+      <div class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {SIGNATURE_DISHES.map((dish) => (
+          <div
+            id={`card-${dish.id}`}
+            class="border border-ink bg-card p-5 shadow-ledger transition-all focus:outline-none"
+            tabindex="-1"
+          >
+            <MenuCard
+              id={dish.id}
+              name={dish.name}
+              description={dish.description}
+              price={dish.price}
+              vegan={dish.vegan}
+              jain={dish.jain}
+              glutenFree={dish.glutenFree}
+              spice={dish.spice}
+              allergens={dish.allergens}
+              prepMinutes={dish.prepMinutes}
+              tags={dish.tags}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. The room (story teaser) -->
+  <section
+    class="border-b border-ink/20 py-12 md:py-20"
+    aria-labelledby="room-heading"
+  >
+    <div class="ph-container grid items-center gap-10 md:grid-cols-12 md:gap-12">
+      <div class="space-y-5 md:col-span-6">
+        <p class="ph-label text-brass">The former sorting room</p>
+        <h2 id="room-heading" class="text-4xl sm:text-5xl">
+          Built for sorting letters.
+        </h2>
+        <p class="text-ink-2">
+          The café sits in the former sorting room of a small colonial-era post
+          office. The wall where letters were once sorted stayed.
+        </p>
+        <p class="text-ink-2">
+          Today every pigeonhole holds a mug, a book or a jar of tea. Every
+          table has a slot number instead of a table number.
+        </p>
+        <div class="pt-2">
+          <a
+            class="inline-flex min-h-11 items-center gap-2 border border-ink bg-transparent px-5 font-semibold text-ink no-underline transition hover:bg-ink hover:text-paper"
+            href="/story"
+          >
+            Read the story &rarr;
+          </a>
+        </div>
+      </div>
+
+      <div class="md:col-span-6">
+        <MoodPhoto
+          base="chai-glass"
+          alt="A glass of hot milk tea on a dark wooden table"
+          width={640}
+          height={480}
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Right now (live strip) -->
+  <section
+    class="border-b border-ink/20 bg-paper-2 py-10"
+    aria-labelledby="live-heading"
+  >
+    <div class="ph-container">
+      <div class="flex items-center justify-between border-b border-ink/20 pb-4">
+        <h2 id="live-heading" class="ph-label text-ink">
+          Right now at the café
+        </h2>
+        <span class="ph-label text-ink-2">Asia/Kolkata</span>
+      </div>
+      <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Student Hour -->
+        <div class="border border-ink bg-card p-5 shadow-ledger">
+          <div class="flex items-center justify-between">
+            <span class="ph-label text-ink">Student Hour</span>
+            {studentHourActive ? (
+              <span class="border border-ok bg-ok/10 px-2 py-0.5 font-mono text-[11px] text-ok uppercase">
+                Active now
+              </span>
+            ) : (
+              <span class="ph-label text-ink-2">Tue–Thu 3–6 PM</span>
+            )}
+          </div>
+          <p class="mt-3 text-sm text-ink-2">
+            Show a student ID for 10% off chai and snacks at the counter.
+          </p>
+        </div>
+
+        <!-- Next Open-mic -->
+        <a
+          class="block border border-ink bg-card p-5 no-underline shadow-ledger transition hover:-translate-y-0.5"
+          href="/gatherings"
+        >
+          <div class="flex items-center justify-between">
+            <span class="ph-label text-ink">Monthly Gathering</span>
+            <span class="ph-label text-brass">Gatherings &rarr;</span>
+          </div>
+          <h3 class="mt-3 text-lg font-normal text-ink">
+            Next open-mic: {formattedNextSaturday}
+          </h3>
+          <p class="mt-1 text-sm text-ink-2">
+            First Saturday of every month. Acoustic sets and poetry.
+          </p>
+        </a>
+
+        <!-- Trek Sunday (October & November only) -->
+        {isTrekSeason && (
+          <a
+            class="block border border-ink bg-card p-5 no-underline shadow-ledger transition hover:-translate-y-0.5 sm:col-span-2 lg:col-span-1"
+            href="/trek-stop"
+          >
+            <div class="flex items-center justify-between">
+              <span class="ph-label text-stamp">Trek Season</span>
+              <span class="ph-label text-stamp">Trek Stop &rarr;</span>
+            </div>
+            <h3 class="mt-3 text-lg font-normal text-ink">
+              Trek Sundays open at 7:00 AM
+            </h3>
+            <p class="mt-1 text-sm text-ink-2">
+              Early chai and breakfast for trail walkers during autumn.
+            </p>
+          </a>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Demo figures strip -->
+  <section class="border-b border-ink/20 py-8" aria-label="Demo figures">
+    <div class="ph-container flex flex-wrap items-center justify-between gap-4 text-sm text-ink-2">
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="font-mono text-base font-semibold text-ink">
+          Rating 4.6
+        </span>
+        <span>from 212 reviews</span>
+        <span class="border border-ink/30 px-2 py-0.5 font-mono text-[10px] tracking-wider uppercase text-ink-2">
+          demo figures, not real reviews
+        </span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="font-mono font-medium text-ink">Zomato 4.4</span>
+        <span class="border border-ink/30 px-2 py-0.5 font-mono text-[10px] tracking-wider uppercase text-ink-2">
+          demo
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Closing band -->
+  <section class="py-16 md:py-24" aria-labelledby="closing-heading">
+    <div class="ph-container grid items-center gap-10 md:grid-cols-12 md:gap-12">
+      <div class="flex justify-center md:col-span-4">
+        <Postmark size={140} text="THE PIGEONHOLE CAFE · KOTHI BAGH" />
+      </div>
+
+      <div class="space-y-6 md:col-span-8">
+        <h2 id="closing-heading" class="text-4xl sm:text-5xl">
+          Your slot is waiting.
+        </h2>
+        <div class="flex flex-wrap items-center gap-4">
+          <a
+            class="inline-flex min-h-11 items-center justify-center border border-ink bg-ink px-6 font-semibold text-paper no-underline transition hover:bg-ink-2"
+            href="/reserve"
+          >
+            Reserve a slot
+          </a>
+          <a
+            class="inline-flex min-h-11 items-center justify-center border border-ink bg-transparent px-6 font-semibold text-ink no-underline transition hover:bg-ink hover:text-paper"
+            href="/order"
+          >
+            Order takeaway
+          </a>
+        </div>
+
+        <div class="grid gap-6 border-t border-ink/20 pt-6 sm:grid-cols-2 text-sm text-ink-2">
+          <div>
+            <p class="ph-label text-ink">Address</p>
+            <p class="mt-2 text-ink">Old Sorting Room, Post Office Lane</p>
+            <p>Kothi Bagh, Himachal Pradesh</p>
+            <p class="mt-1 text-xs text-stamp">Fictional address</p>
+          </div>
+          <div>
+            <p class="ph-label text-ink">Hours</p>
+            <p class="mt-2 text-ink">Tue–Fri: 8:00 AM to 9:30 PM</p>
+            <p class="text-ink">Sat–Sun: 8:00 AM to 11:00 PM</p>
+            <p>Monday closed</p>
+            <p class="mt-1 text-xs">Last orders 30 minutes before closing.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 </BaseLayout>

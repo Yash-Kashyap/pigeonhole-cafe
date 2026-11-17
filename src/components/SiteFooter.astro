@@ -1,3 +1,11 @@
+---
+const currentPath = Astro.url.pathname;
+const isCurrent = (href: string) => {
+  if (href === '/') return currentPath === '/' || currentPath === '';
+  return currentPath.startsWith(href);
+};
+---
+
 <footer class="mt-20 bg-ink text-paper">
   <div class="ph-container grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
     <div>
@@ -13,24 +21,76 @@
         <br />
         Monday closed
       </p>
+      <p class="mt-2 text-xs text-paper/70">
+        Last orders 30 minutes before closing.
+      </p>
     </div>
     <div>
       <p class="ph-label text-brass">Find a slot</p>
-      <nav class="mt-3 grid gap-2 text-sm" aria-label="Footer">
-        <a href="/menu">Menu</a>
-        <a href="/reserve">Reserve</a>
-        <a href="/visit">Visit and help</a>
+      <nav class="mt-3 grid gap-2 text-sm" aria-label="Footer navigation">
+        <a
+          class:list={[
+            'transition-colors hover:underline',
+            isCurrent('/menu') ? 'font-semibold text-brass' : '',
+          ]}
+          href="/menu"
+          aria-current={isCurrent('/menu') ? 'page' : undefined}
+        >
+          Menu
+        </a>
+        <a
+          class:list={[
+            'transition-colors hover:underline',
+            isCurrent('/order') ? 'font-semibold text-brass' : '',
+          ]}
+          href="/order"
+          aria-current={isCurrent('/order') ? 'page' : undefined}
+        >
+          Order takeaway
+        </a>
+        <a
+          class:list={[
+            'transition-colors hover:underline',
+            isCurrent('/reserve') ? 'font-semibold text-brass' : '',
+          ]}
+          href="/reserve"
+          aria-current={isCurrent('/reserve') ? 'page' : undefined}
+        >
+          Reserve a slot
+        </a>
+        <a
+          class:list={[
+            'transition-colors hover:underline',
+            isCurrent('/story') ? 'font-semibold text-brass' : '',
+          ]}
+          href="/story"
+          aria-current={isCurrent('/story') ? 'page' : undefined}
+        >
+          Our story
+        </a>
+        <a
+          class:list={[
+            'transition-colors hover:underline',
+            isCurrent('/visit') ? 'font-semibold text-brass' : '',
+          ]}
+          href="/visit"
+          aria-current={isCurrent('/visit') ? 'page' : undefined}
+        >
+          Visit and help
+        </a>
       </nav>
     </div>
     <div>
       <span class="ph-label border border-paper px-2 py-1">Demo</span>
       <p class="mt-4 text-sm">
-        <a href="/owner">Owner login</a>
+        <a class="hover:underline" href="/owner">
+          Owner login
+        </a>
       </p>
     </div>
   </div>
   <div class="border-t border-paper/20">
-    <p class="ph-container py-5 text-sm">
+    <p class="ph-container py-5 text-sm text-paper/90">
       Demo concept: The Pigeonhole Café is a fictional business, made to show
       what a café website with an AI assistant can do.
     </p>

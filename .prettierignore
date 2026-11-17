@@ -9,13 +9,15 @@ supabase
 functions
 C[L]AUDE.md
 AGENTS.md
-GEMINI.md
+GEMIN[I].md
 DECISIONS.md
 pigeonhole-build-plan-ALL.md
 C[O]DEX-PHASE0-PROMPT.md
 .agents
 .c[l]aude
 .c[o]dex
-.gemini
+.gemin[i]
 DESIGN.md
 SECURITY_STATUS.md
+GEMIN[I]-*.md
+C[O]DEX-*.md
