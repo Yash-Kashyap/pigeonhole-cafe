@@ -1,0 +1,13 @@
+---
+interface Props {
+  value: number | string;
+}
+const { value } = Astro.props;
+const formatted = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+}).format(Number(value));
+---
+
+<span class="font-mono tabular-nums">{formatted}</span>

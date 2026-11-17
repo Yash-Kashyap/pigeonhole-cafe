@@ -1,0 +1,140 @@
+---
+import Accordion from '../components/Accordion.astro';
+import Button from '../components/Button.astro';
+import Chip from '../components/Chip.astro';
+import Dialog from '../components/Dialog';
+import DietBadges from '../components/DietBadges.astro';
+import Field from '../components/Field.astro';
+import ImagePlaceholder from '../components/ImagePlaceholder.astro';
+import MenuCard from '../components/MenuCard.astro';
+import MoodPhoto from '../components/MoodPhoto.astro';
+import PigeonholeGrid from '../components/PigeonholeGrid.astro';
+import Postmark from '../components/Postmark.astro';
+import Price from '../components/Price.astro';
+import SlotTicket from '../components/SlotTicket.astro';
+import Toast from '../components/Toast.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Component Kit | The Pigeonhole Cafe"
+  description="Private component reference for the cafe demo."
+  noindex
+>
+  <div class="ph-container space-y-20 py-16">
+    <header class="max-w-3xl space-y-4">
+      <p class="ph-label text-stamp">Private reference</p>
+      <h1 class="text-6xl">Component kit</h1>
+      <p class="text-ink-2">
+        Shared pieces for the later cafe pages. This route is deliberately
+        absent from site navigation.
+      </p>
+    </header>
+
+    <section class="space-y-6" aria-labelledby="kit-actions">
+      <h2 class="text-4xl" id="kit-actions">
+        Actions and fields
+      </h2>
+      <div class="flex flex-wrap gap-3">
+        <Button>Primary</Button>
+        <Button variant="outline">Outline</Button>
+        <Button variant="stamp">Postmarked</Button>
+        <Chip active>Selected chip</Chip>
+        <Chip>Quiet chip</Chip>
+      </div>
+      <div class="grid max-w-2xl gap-5 sm:grid-cols-2">
+        <Field label="Guest name" name="kit-name" required />
+        <Field
+          label="Phone"
+          name="kit-phone"
+          type="tel"
+          hint="Used only for the booking."
+        />
+      </div>
+      <Dialog client:load />
+    </section>
+
+    <section class="space-y-6" aria-labelledby="kit-messages">
+      <h2 class="text-4xl" id="kit-messages">
+        Messages and disclosure
+      </h2>
+      <div class="grid gap-3 sm:grid-cols-3">
+        <Toast>Order note saved.</Toast>
+        <Toast tone="success">Slot is available.</Toast>
+        <Toast tone="error">Choose another time.</Toast>
+      </div>
+      <div>
+        <Accordion summary="Do you offer delivery?" open>
+          <p>No. Takeaway orders are paid at pickup.</p>
+        </Accordion>
+        <Accordion summary="Are pets allowed?">
+          <p>Pets are welcome outdoors only.</p>
+        </Accordion>
+      </div>
+    </section>
+
+    <section class="space-y-6" aria-labelledby="kit-postal">
+      <h2 class="text-4xl" id="kit-postal">
+        Postal signatures
+      </h2>
+      <div class="grid items-start gap-8 md:grid-cols-2">
+        <PigeonholeGrid
+          rows={6}
+          cols={8}
+          filledCells={[
+            { index: 3, label: 'Mug', icon: 'mug' },
+            { index: 17, label: 'Book', icon: 'book' },
+            { index: 42, label: 'Jar', icon: 'jar' },
+          ]}
+        />
+        <div class="grid place-items-center gap-8 bg-paper-2 p-8">
+          <Postmark variant="stamp" />
+          <SlotTicket
+            code="PH-BK-1048"
+            slot="SLOT 07"
+            date="21 Nov 2026"
+            time="7:00 PM"
+            partySize={4}
+            status="confirmed"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="space-y-6" aria-labelledby="kit-menu">
+      <h2 class="text-4xl" id="kit-menu">
+        Menu pieces
+      </h2>
+      <div class="flex flex-wrap items-center justify-between gap-4 border-y border-ink py-5">
+        <DietBadges vegan jain glutenFree spice={2} />
+        <p class="text-3xl">
+          <Price value={3.4} />
+        </p>
+      </div>
+      <MenuCard
+        id="PH0003"
+        name="Post Chai"
+        description="Signature chai with smoked cardamom and jaggery."
+        price={1.4}
+        jain
+        glutenFree
+        allergens={['dairy']}
+      />
+    </section>
+
+    <section class="space-y-6" aria-labelledby="kit-images">
+      <h2 class="text-4xl" id="kit-images">
+        Image frames
+      </h2>
+      <div class="grid gap-8 sm:grid-cols-2">
+        <MoodPhoto
+          base="books-cafe"
+          alt="Books and cups arranged on warm wooden cafe shelves"
+          width={1200}
+          height={800}
+        />
+        <ImagePlaceholder shot="The brass labels on the original pigeonhole wall" />
+      </div>
+    </section>
+  </div>
+</BaseLayout>

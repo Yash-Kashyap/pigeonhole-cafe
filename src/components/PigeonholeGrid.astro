@@ -1,0 +1,107 @@
+---
+type FilledCell = {
+  index: number;
+  label: string;
+  icon?: 'mug' | 'book' | 'jar';
+};
+interface Props {
+  rows?: number;
+  cols?: number;
+  filledCells?: FilledCell[];
+  label?: string;
+  decorative?: boolean;
+}
+const {
+  rows = 6,
+  cols = 8,
+  filledCells = [],
+  label = 'A wall of wooden pigeonholes',
+  decorative = false,
+} = Astro.props;
+const filled = new Map(filledCells.map((cell) => [cell.index, cell]));
+const total = rows * cols;
+---
+
+<div
+  class="wall"
+  style={`--rows:${rows};--cols:${cols}`}
+  role={decorative ? undefined : 'img'}
+  aria-hidden={decorative ? 'true' : undefined}
+  aria-label={decorative ? undefined : label}
+>
+  {Array.from({ length: total }, (_, index) => {
+    const cell = filled.get(index);
+    return (
+      <span
+        class:list={['cell', cell && 'filled']}
+        style={`--delay:${index * 20}ms`}
+        aria-hidden="true"
+      >
+        {cell?.icon === 'mug' && (
+          <svg viewBox="0 0 24 24">
+            <path d="M6 8h11v9a3 3 0 0 1-3 3h-5a3 3 0 0 1-3-3zM17 11h2a2 2 0 0 1 0 4h-2M9 3c0 2 2 2 2 4M13 3c0 2 2 2 2 4" />
+          </svg>
+        )}
+        {cell?.icon === 'book' && (
+          <svg viewBox="0 0 24 24">
+            <path d="M5 5h12a2 2 0 0 1 2 2v12H7a2 2 0 0 1-2-2zM8 5v14" />
+          </svg>
+        )}
+        {cell?.icon === 'jar' && (
+          <svg viewBox="0 0 24 24">
+            <path d="M7 4h10v3H7zM6 7h12v13H6zM9 12h6" />
+          </svg>
+        )}
+        {cell && <span class="sr-only">{cell.label}</span>}
+      </span>
+    );
+  })}
+</div>
+
+<style>
+  .wall {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--rows), minmax(0, 1fr));
+    aspect-ratio: 4/3;
+    gap: clamp(5px, 1vw, 10px);
+    padding: clamp(10px, 2vw, 20px);
+    background: var(--walnut);
+    border: 1px solid var(--ink);
+    box-shadow: inset 0 0 0 8px rgba(0, 0, 0, 0.12);
+  }
+  .cell {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    background: #2f2119;
+    border: 1px solid rgba(244, 237, 224, 0.14);
+    box-shadow: inset 0 5px 12px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transform: translateY(5px);
+    animation: cell-in 0.35s ease-out var(--delay) forwards;
+  }
+  .cell.filled {
+    background: var(--paper-2);
+    color: var(--ink);
+  }
+  svg {
+    width: 48%;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.3;
+  }
+  @keyframes cell-in {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (max-width: 39.99rem) {
+    .wall {
+      aspect-ratio: 1;
+    }
+  }
+</style>

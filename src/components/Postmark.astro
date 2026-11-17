@@ -1,0 +1,81 @@
+---
+interface Props {
+  text?: string;
+  size?: number;
+  variant?: 'ink' | 'stamp' | 'brass';
+  decorative?: boolean;
+}
+const {
+  text = 'THE PIGEONHOLE CAFE · KOTHI BAGH · SORTED OVER CHAI ·',
+  size = 144,
+  variant = 'ink',
+  decorative = false,
+} = Astro.props;
+const colour =
+  variant === 'stamp'
+    ? 'text-stamp'
+    : variant === 'brass'
+      ? 'text-brass-dark'
+      : 'text-ink';
+const pathId = `postmark-${Math.random().toString(36).slice(2)}`;
+---
+
+<svg
+  class:list={['block', colour]}
+  width={size}
+  height={size}
+  viewBox="0 0 144 144"
+  role={decorative ? undefined : 'img'}
+  aria-hidden={decorative ? 'true' : undefined}
+  aria-label={decorative ? undefined : `Postmark: ${text}`}
+>
+  <defs>
+    <path
+      id={pathId}
+      d="M 72,72 m -54,0 a 54,54 0 1,1 108,0 a 54,54 0 1,1 -108,0"
+    />
+  </defs>
+  <circle
+    cx="72"
+    cy="72"
+    r="65"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+  />
+  <circle
+    cx="72"
+    cy="72"
+    r="51"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1"
+  />
+  <text
+    fill="currentColor"
+    font-family="DM Mono, monospace"
+    font-size="8.8"
+    font-weight="500"
+    letter-spacing="1"
+  >
+    <textPath href={`#${pathId}`} textLength="338" lengthAdjust="spacing">
+      {text}
+    </textPath>
+  </text>
+  <text
+    x="72"
+    y="80"
+    text-anchor="middle"
+    fill="currentColor"
+    font-family="Fraunces Variable, serif"
+    font-size="23"
+  >
+    PH
+  </text>
+  <path
+    d="M39 91h66M44 98h56M51 105h43"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1"
+  />
+</svg>

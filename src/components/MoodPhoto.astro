@@ -1,0 +1,28 @@
+---
+interface Props {
+  base: string;
+  alt: string;
+  width: number;
+  height: number;
+  eager?: boolean;
+}
+const { base, alt, width, height, eager = false } = Astro.props;
+---
+
+<figure class="border border-ink bg-card p-3 shadow-ledger">
+  <picture>
+    <source srcset={`/img/mood/${base}.avif`} type="image/avif" />
+    <source srcset={`/img/mood/${base}.webp`} type="image/webp" />
+    <img
+      class="h-auto w-full object-cover"
+      src={`/img/mood/${base}.jpg`}
+      {alt}
+      {width}
+      {height}
+      loading={eager ? 'eager' : 'lazy'}
+    />
+  </picture>
+  <figcaption class="ph-label mt-3 text-ink-2">
+    Mood photo, not the cafe.
+  </figcaption>
+</figure>

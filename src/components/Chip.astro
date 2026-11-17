@@ -1,0 +1,17 @@
+---
+interface Props {
+  active?: boolean;
+}
+const { active = false } = Astro.props;
+---
+
+<button
+  class:list={[
+    'min-h-11 border border-ink px-4 text-sm font-medium transition',
+    active ? 'bg-ink text-paper' : 'bg-transparent text-ink hover:bg-paper-2',
+  ]}
+  type="button"
+  aria-pressed={active}
+>
+  <slot />
+</button>

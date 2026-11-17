@@ -1,0 +1,29 @@
+---
+type FieldType = 'text' | 'tel' | 'email' | 'password' | 'search' | 'url';
+interface Props {
+  label: string;
+  name: string;
+  type?: FieldType;
+  hint?: string;
+  required?: boolean;
+}
+const { label, name, type = 'text', hint, required = false } = Astro.props;
+const hintId = hint ? `${name}-hint` : undefined;
+---
+
+<label class="grid gap-2" for={name}>
+  <span class="ph-label">{label}</span>
+  <input
+    class="min-h-12 w-full border border-ink bg-card px-4 text-base"
+    id={name}
+    name={name}
+    type={type}
+    required={required}
+    aria-describedby={hintId}
+  />
+  {hint && (
+    <span class="text-sm text-ink-2" id={hintId}>
+      {hint}
+    </span>
+  )}
+</label>

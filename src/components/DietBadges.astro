@@ -1,0 +1,49 @@
+---
+interface Props {
+  vegan?: boolean;
+  jain?: boolean;
+  glutenFree?: boolean;
+  spice?: 0 | 1 | 2 | 3;
+}
+const {
+  vegan = false,
+  jain = false,
+  glutenFree = false,
+  spice = 0,
+} = Astro.props;
+---
+
+<span class="flex flex-wrap items-center gap-2">
+  {vegan && (
+    <span
+      class="ph-label border border-ok px-2 py-1 text-ok"
+      aria-label="Vegan"
+    >
+      V
+    </span>
+  )}
+  {jain && (
+    <span
+      class="ph-label border border-brass-dark px-2 py-1 text-brass-dark"
+      aria-label="Jain option available"
+    >
+      J
+    </span>
+  )}
+  {glutenFree && (
+    <span class="ph-label border border-ink px-2 py-1" aria-label="Gluten-free">
+      GF
+    </span>
+  )}
+  <span class="inline-flex gap-1" aria-label={`Spice level ${spice} of 3`}>
+    {[1, 2, 3].map((level) => (
+      <span
+        class:list={[
+          'size-2 rounded-full border border-stamp',
+          level <= spice && 'bg-stamp',
+        ]}
+        aria-hidden="true"
+      ></span>
+    ))}
+  </span>
+</span>

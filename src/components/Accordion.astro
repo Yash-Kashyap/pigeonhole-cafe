@@ -1,0 +1,19 @@
+---
+interface Props {
+  summary: string;
+  open?: boolean;
+}
+const { summary, open = false } = Astro.props;
+---
+
+<details class="group border-t border-ink" open={open}>
+  <summary class="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 font-display text-xl">
+    <span>{summary}</span>
+    <span class="font-mono transition group-open:rotate-45" aria-hidden="true">
+      +
+    </span>
+  </summary>
+  <div class="max-w-prose pb-6 text-ink-2">
+    <slot />
+  </div>
+</details>

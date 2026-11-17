@@ -1,0 +1,241 @@
+id,category,subcategory,name,description,price_usd,diet,vegan,jain_option,gluten_free,allergens,spice_level,prep_minutes,tags,available
+PH0001,Chai & Tea,Chai,Masala Chai (Kulhad),"Strong tea simmered with milk and the house spice mix, served in a clay cup",1.00,vegetarian,no,yes,yes,dairy,1,5,popular,yes
+PH0002,Chai & Tea,Chai,Adrak Elaichi Chai,Ginger and green cardamom chai,0.90,vegetarian,no,yes,yes,dairy,1,5,,yes
+PH0003,Chai & Tea,Chai,Post Chai,Signature chai with smoked cardamom and jaggery,1.40,vegetarian,no,yes,yes,dairy,0,5,signature,yes
+PH0004,Chai & Tea,Chai,Kesar Chai,Milk tea infused with saffron,1.60,vegetarian,no,yes,yes,dairy,0,5,,yes
+PH0005,Chai & Tea,Chai,Tulsi Ginger Chai,Holy basil and ginger chai,1.10,vegetarian,no,yes,yes,dairy,0,5,,yes
+PH0006,Chai & Tea,Chai,Lemongrass Chai,Fresh lemongrass simmered with tea and milk,1.10,vegetarian,no,yes,yes,dairy,0,5,,yes
+PH0007,Chai & Tea,Leaf tea,Assam Black Tea,"Malty, full-bodied black tea",1.50,vegetarian,yes,yes,yes,none,0,5,,yes
+PH0008,Chai & Tea,Leaf tea,Darjeeling Tea,Light and floral hill tea,1.80,vegetarian,yes,yes,yes,none,0,5,,yes
+PH0009,Chai & Tea,Leaf tea,Nilgiri Tea,"Bright, fragrant tea from southern hills",1.50,vegetarian,yes,yes,yes,none,0,5,,yes
+PH0010,Chai & Tea,Leaf tea,Earl Grey,Black tea scented with bergamot,1.60,vegetarian,yes,yes,yes,none,0,5,,yes
+PH0011,Chai & Tea,Leaf tea,English Breakfast,"Robust blend, good with milk",1.50,vegetarian,yes,yes,yes,none,0,5,,yes
+PH0012,Chai & Tea,Iced tea,Iced Lemon Tea,Chilled black tea shaken with lemon and ice,1.90,vegetarian,yes,yes,yes,none,0,5,,yes
+PH0013,Chai & Tea,Iced tea,Iced Peach Tea,Chilled black tea shaken with peach and ice,1.90,vegetarian,yes,yes,yes,none,0,5,,yes
+PH0014,Chai & Tea,Iced tea,Iced Mint Tea,Chilled black tea shaken with mint and ice,1.90,vegetarian,yes,yes,yes,none,0,5,,yes
+PH0015,Coffee & Hot Drinks,Hot coffee,Espresso (Single),One shot of house espresso,1.40,vegetarian,yes,yes,yes,none,0,6,quick,yes
+PH0016,Coffee & Hot Drinks,Hot coffee,Espresso (Double),Two shots of house espresso,1.90,vegetarian,yes,yes,yes,none,0,6,quick,yes
+PH0017,Coffee & Hot Drinks,Hot coffee,Ristretto,"Short, concentrated espresso shot",1.50,vegetarian,yes,yes,yes,none,0,6,quick,yes
+PH0018,Coffee & Hot Drinks,Hot coffee,Americano,Espresso topped with hot water,1.80,vegetarian,yes,yes,yes,none,0,6,,yes
+PH0019,Coffee & Hot Drinks,Hot coffee,Cappuccino,Espresso with steamed milk and thick foam,2.50,vegetarian,no,yes,yes,dairy,0,6,popular,yes
+PH0020,Coffee & Hot Drinks,Hot coffee,South Indian Filter Coffee,"Decoction coffee with frothy milk, in a steel tumbler",1.20,vegetarian,no,yes,yes,dairy,0,6,popular,yes
+PH0021,Coffee & Hot Drinks,Cold coffee,Iced Americano,Espresso over cold water and ice,2.20,vegetarian,yes,yes,yes,none,0,6,,yes
+PH0022,Coffee & Hot Drinks,Cold coffee,Iced Latte,Espresso with cold milk over ice,2.90,vegetarian,no,yes,yes,dairy,0,6,,yes
+PH0023,Coffee & Hot Drinks,Cold coffee,Iced Mocha,"Espresso, chocolate and cold milk over ice",3.30,vegetarian,no,yes,yes,dairy,0,6,,yes
+PH0024,Coffee & Hot Drinks,Cold coffee,Cold Coffee Classic,"Blended coffee and milk, thick and cold",2.60,vegetarian,no,yes,yes,dairy,0,6,popular,yes
+PH0025,Coffee & Hot Drinks,Hot chocolate and milk,Classic Hot Chocolate,Rich cocoa and steamed milk,2.80,vegetarian,no,yes,yes,dairy,0,6,,yes
+PH0026,Coffee & Hot Drinks,Hot chocolate and milk,Dark Hot Chocolate,"70 percent dark chocolate, thick and bittersweet",3.00,vegetarian,no,yes,yes,dairy,0,6,,yes
+PH0027,Coffee & Hot Drinks,Hot chocolate and milk,White Hot Chocolate,Creamy white chocolate and steamed milk,3.00,vegetarian,no,yes,yes,dairy,0,6,,yes
+PH0028,Cold Drinks,Milkshakes,Chocolate Milkshake,Thick chocolate milkshake blended with ice cream,3.20,vegetarian,no,no,yes,dairy,0,6,,yes
+PH0029,Cold Drinks,Milkshakes,Vanilla Milkshake,Thick vanilla milkshake blended with ice cream,3.20,vegetarian,no,no,yes,dairy,0,6,,yes
+PH0030,Cold Drinks,Milkshakes,Strawberry Milkshake,Thick strawberry milkshake blended with ice cream,3.20,vegetarian,no,no,yes,dairy,0,6,,yes
+PH0031,Cold Drinks,Milkshakes,Mango Milkshake,Thick mango milkshake blended with ice cream,3.20,vegetarian,no,no,yes,dairy,0,6,,yes
+PH0032,Cold Drinks,Smoothies,Berry Blast Smoothie,Mixed berries blended with yogurt,3.40,vegetarian,no,no,yes,dairy,0,6,,yes
+PH0033,Cold Drinks,Smoothies,Green Detox Smoothie,"Spinach, cucumber, apple and lemon",3.40,vegetarian,yes,no,yes,none,0,6,,yes
+PH0034,Cold Drinks,Smoothies,Banana Oat Smoothie,"Banana, oats and dates with oat milk",3.20,vegetarian,yes,no,no,gluten,0,6,,yes
+PH0035,Cold Drinks,Fresh juices,Orange Juice,Fresh-pressed oranges,2.60,vegetarian,yes,yes,yes,none,0,6,,yes
+PH0036,Cold Drinks,Fresh juices,Watermelon Juice,Fresh watermelon with a pinch of black salt,2.20,vegetarian,yes,yes,yes,none,0,6,,yes
+PH0037,Cold Drinks,Fresh juices,Pineapple Juice,Fresh pineapple,2.40,vegetarian,yes,yes,yes,none,0,6,,yes
+PH0038,Cold Drinks,Mocktails,Virgin Mojito,"Lime, mint and soda",2.80,vegetarian,yes,yes,yes,none,0,6,,yes
+PH0039,Cold Drinks,Mocktails,Blue Lagoon,"Blue curacao syrup, lemon and soda",2.90,vegetarian,yes,yes,yes,none,0,6,,yes
+PH0040,Cold Drinks,Mocktails,Fruit Punch,Mixed fruit juices with a splash of soda,2.90,vegetarian,yes,yes,yes,none,0,6,,yes
+PH0041,Cold Drinks,Mocktails,Virgin Pina Colada,Pineapple and coconut cream,3.20,vegetarian,yes,yes,yes,none,0,6,,yes
+PH0042,Cold Drinks,Mocktails,Mint Cooler,"Mint, lime and chilled soda",2.60,vegetarian,yes,yes,yes,none,0,6,,yes
+PH0043,Cold Drinks,Lemonades,Classic Lemonade,"Fresh lime, sugar and soda",2.20,vegetarian,yes,yes,yes,none,0,5,,yes
+PH0044,Cold Drinks,Lemonades,Mint Lemonade,Lemonade with crushed mint,2.40,vegetarian,yes,yes,yes,none,0,5,,yes
+PH0045,Cold Drinks,Lemonades,Masala Shikanji,Indian spiced lemonade with cumin and black salt,2.20,vegetarian,yes,yes,yes,none,1,5,popular,yes
+PH0046,Cold Drinks,Lassi and chaas,Sweet Lassi,Thick sweet yogurt drink,2.20,vegetarian,no,yes,yes,dairy,0,5,,yes
+PH0047,Cold Drinks,Lassi and chaas,Salted Lassi,"Yogurt, cumin and salt",2.20,vegetarian,no,yes,yes,dairy,0,5,,yes
+PH0048,Cold Drinks,Lassi and chaas,Mango Lassi,Yogurt blended with mango,2.80,vegetarian,no,yes,yes,dairy,0,5,,yes
+PH0049,Cold Drinks,Sharbats,Buransh Sharbat,"Rhododendron squash from the hills, served over ice",2.00,vegetarian,yes,yes,yes,none,0,5,signature;seasonal,yes
+PH0050,Cold Drinks,Sharbats,Aam Panna,Raw mango cooler,2.00,vegetarian,yes,yes,yes,none,0,5,seasonal,yes
+PH0051,Cold Drinks,Sharbats,Thandai,"Milk with almonds, fennel and rose",2.60,vegetarian,no,no,yes,dairy;nuts,0,5,seasonal,yes
+PH0052,Cold Drinks,Water and soda,Mineral Water (500 ml),Still mineral water,0.60,vegetarian,yes,yes,yes,none,0,2,quick,yes
+PH0053,Cold Drinks,Water and soda,Sparkling Water (330 ml),Sparkling mineral water,1.80,vegetarian,yes,yes,yes,none,0,2,quick,yes
+PH0054,Cold Drinks,Water and soda,Cola,Chilled cola,1.20,vegetarian,yes,yes,yes,none,0,2,quick,yes
+PH0055,Breakfast,Parathas,Aloo Paratha,"Whole wheat paratha stuffed with spiced potato, served with curd, pickle and butter",2.40,vegetarian,no,no,no,dairy;gluten,1,12,,yes
+PH0056,Breakfast,Parathas,Gobi Paratha,"Whole wheat paratha stuffed with spiced cauliflower, served with curd, pickle and butter",2.50,vegetarian,no,no,no,dairy;gluten,1,12,,yes
+PH0057,Breakfast,Parathas,Paneer Paratha,"Whole wheat paratha stuffed with cottage cheese, served with curd, pickle and butter",3.00,vegetarian,no,no,no,dairy;gluten,1,12,,yes
+PH0058,Breakfast,Indian breakfast,Chole Bhature,Chickpea curry with two fluffy bhature,3.60,vegetarian,yes,no,no,gluten,2,12,popular;spicy,yes
+PH0059,Breakfast,Indian breakfast,Pav Bhaji,Mashed vegetable curry with buttered pav,3.40,vegetarian,no,yes,no,dairy;gluten,2,12,popular;spicy,yes
+PH0060,Breakfast,Indian breakfast,Maska Pav,Toasted pav with plenty of butter,1.40,vegetarian,no,yes,no,dairy;gluten,0,12,signature;popular,yes
+PH0061,Breakfast,Indian breakfast,Samosa (2 pcs),Crisp pastry with spiced potato and peas,1.60,vegetarian,yes,yes,no,gluten,1,12,popular,yes
+PH0062,Breakfast,South Indian,Idli (2 pcs),Steamed rice cakes with sambar and chutney,1.80,vegetarian,yes,yes,yes,none,0,12,,yes
+PH0063,Breakfast,South Indian,Idli Sambar Bowl,Idli dunked in hot sambar,2.00,vegetarian,yes,yes,yes,none,1,12,,yes
+PH0064,Breakfast,South Indian,Mini Idli Sambar,Bite-size idli in sambar with ghee,2.40,vegetarian,no,yes,yes,dairy,1,12,,yes
+PH0065,Breakfast,South Indian,Ghee Podi Idli,Idli tossed in gunpowder spice and ghee,2.60,vegetarian,no,yes,yes,dairy,1,12,,yes
+PH0066,Breakfast,South Indian,Masala Dosa,Dosa filled with spiced potato,2.80,vegetarian,yes,yes,yes,none,1,12,popular,yes
+PH0067,Breakfast,Western breakfast,Classic Pancakes,Stack of three with maple syrup and butter,3.20,vegetarian,no,no,no,dairy;gluten,0,12,,yes
+PH0068,Breakfast,Western breakfast,Banana Pancakes,Pancakes with sliced banana,3.50,vegetarian,no,no,no,dairy;gluten,0,12,,yes
+PH0069,Breakfast,Western breakfast,Blueberry Pancakes,Pancakes with blueberry compote,3.70,vegetarian,no,no,no,dairy;gluten,0,12,,yes
+PH0070,Breakfast,Himachali breakfast,Patande (2 pcs),Himachali wheat pancakes with jaggery syrup,2.40,vegetarian,yes,no,no,gluten,0,12,,yes
+PH0071,Breakfast,Himachali breakfast,Aktori,Buckwheat pancakes with ghee,2.40,vegetarian,no,no,yes,dairy,0,12,,yes
+PH0072,Breakfast,Himachali breakfast,Babru (2 pcs),Stuffed fried bread with tamarind chutney,2.60,vegetarian,yes,no,no,gluten,1,12,,yes
+PH0073,Breakfast,Himachali breakfast,Siddu Breakfast Plate,Steamed siddu with ghee and green chutney,3.20,vegetarian,no,no,no,dairy;gluten,0,12,,yes
+PH0074,Snacks & Small Plates,Fries,Classic Salted Fries,Skin-on fries with sea salt,2.20,vegetarian,yes,yes,yes,none,0,12,popular,yes
+PH0075,Snacks & Small Plates,Fries,Peri-Peri Fries,Fries tossed in peri-peri seasoning,2.60,vegetarian,yes,yes,yes,none,2,12,popular;spicy,yes
+PH0076,Snacks & Small Plates,Fries,Cheesy Fries,Fries with warm cheese sauce,3.20,vegetarian,no,no,yes,dairy,0,12,,yes
+PH0077,Snacks & Small Plates,Nachos,Classic Nachos,Corn chips with salsa and cheese sauce,3.40,vegetarian,no,no,yes,dairy,1,12,,yes
+PH0078,Snacks & Small Plates,Nachos,Cheese Nachos,Corn chips under melted cheese,3.60,vegetarian,no,no,yes,dairy,0,12,,yes
+PH0079,Snacks & Small Plates,Nachos,Loaded Bean Nachos,"Nachos with refried beans, salsa and sour cream",4.00,vegetarian,no,no,yes,dairy,1,12,,yes
+PH0080,Snacks & Small Plates,Pakoras and fritters,Onion Bhaji,Crispy onion fritters,2.60,vegetarian,yes,no,yes,none,1,12,,yes
+PH0081,Snacks & Small Plates,Pakoras and fritters,Paneer Pakora,Gram flour battered paneer,3.40,vegetarian,no,no,yes,dairy,1,12,,yes
+PH0082,Snacks & Small Plates,Pakoras and fritters,Mixed Veg Pakora,Seasonal vegetable fritters,2.80,vegetarian,yes,no,yes,none,1,12,,yes
+PH0083,Snacks & Small Plates,Chaat,Samosa Chaat,"Crushed samosa with chickpeas, yogurt and chutneys",3.00,vegetarian,no,no,no,dairy;gluten,2,10,spicy,yes
+PH0084,Snacks & Small Plates,Chaat,Aloo Tikki Chaat,Potato patties with yogurt and chutneys,3.00,vegetarian,no,no,yes,dairy,2,10,spicy,yes
+PH0085,Snacks & Small Plates,Chaat,Pani Puri (6 pcs),Hollow puris with spiced mint water,2.20,vegetarian,yes,yes,no,gluten,2,10,popular;spicy,yes
+PH0086,Snacks & Small Plates,Tandoor and kebabs,Hara Bhara Kebab,Spinach and pea patties,3.80,vegetarian,yes,no,yes,none,1,15,,yes
+PH0087,Snacks & Small Plates,Tandoor and kebabs,Veg Seekh Kebab,Minced vegetable kebabs from the tandoor,4.00,vegetarian,no,no,yes,dairy,2,15,spicy,yes
+PH0088,Snacks & Small Plates,Tandoor and kebabs,Paneer Tikka,"Marinated paneer, peppers and onion from the tandoor",4.60,vegetarian,no,no,yes,dairy,2,15,popular;spicy,yes
+PH0089,Snacks & Small Plates,Rolls and garlic bread,Veg Spring Rolls (4 pcs),Crisp rolls with cabbage and carrot,3.20,vegetarian,yes,no,no,gluten;soy,1,12,,yes
+PH0090,Snacks & Small Plates,Rolls and garlic bread,Paneer Spring Rolls (4 pcs),Crisp rolls with paneer and vegetables,3.60,vegetarian,no,no,no,dairy;gluten;soy,1,12,,yes
+PH0091,Snacks & Small Plates,Rolls and garlic bread,Cheese Corn Rolls (4 pcs),Crisp rolls with corn and cheese,3.60,vegetarian,no,no,no,dairy;gluten,0,12,,yes
+PH0092,Snacks & Small Plates,Momos,Steamed Veg Momos (8 pcs),"steamed momos filled with veg, with red chilli chutney and mint dip",2.20,vegetarian,yes,no,no,gluten;soy,1,14,,yes
+PH0093,Snacks & Small Plates,Momos,Steamed Paneer Momos (8 pcs),"steamed momos filled with paneer, with red chilli chutney and mint dip",2.60,vegetarian,no,no,no,dairy;gluten;soy,1,14,,yes
+PH0094,Snacks & Small Plates,Momos,Steamed Cheese Corn Momos (8 pcs),"steamed momos filled with cheese corn, with red chilli chutney and mint dip",2.80,vegetarian,no,no,no,dairy;gluten;soy,1,14,,yes
+PH0095,Snacks & Small Plates,Momos,Steamed Mushroom Momos (8 pcs),"steamed momos filled with mushroom, with red chilli chutney and mint dip",2.60,vegetarian,yes,no,no,gluten;soy,1,14,,yes
+PH0096,Snacks & Small Plates,Momos,Steamed Spinach and Cheese Momos (8 pcs),"steamed momos filled with spinach and cheese, with red chilli chutney and mint dip",2.80,vegetarian,no,no,no,dairy;gluten;soy,1,14,,yes
+PH0097,Snacks & Small Plates,Momos,Pan-Fried Paneer Momos (8 pcs),"pan-fried momos filled with paneer, with red chilli chutney and mint dip",3.10,vegetarian,no,no,no,dairy;gluten;soy,2,14,signature;popular;spicy,yes
+PH0098,"Sandwiches, Burgers & Wraps",Sandwiches,Grilled Veg Sandwich,"Grilled vegetables, cheese and mint chutney",2.80,vegetarian,no,yes,no,dairy;gluten,0,10,popular,yes
+PH0099,"Sandwiches, Burgers & Wraps",Sandwiches,Paneer Tikka Sandwich,Tandoori paneer with onion and mint mayo,3.20,vegetarian,no,no,no,dairy;gluten,1,10,,yes
+PH0100,"Sandwiches, Burgers & Wraps",Sandwiches,Club Veg Sandwich,"Triple-decker with veg, cheese and tomato",3.60,vegetarian,no,no,no,dairy;gluten,0,10,,yes
+PH0101,"Sandwiches, Burgers & Wraps",Sandwiches,Corn and Cheese Sandwich,"Sweet corn, cheese and herbs",3.00,vegetarian,no,no,no,dairy;gluten,0,10,,yes
+PH0102,"Sandwiches, Burgers & Wraps",Sandwiches,Mushroom Melt Sandwich,Garlic mushrooms with melted cheese,3.40,vegetarian,no,no,no,dairy;gluten,0,10,,yes
+PH0103,"Sandwiches, Burgers & Wraps",Burgers,Classic Aloo Tikki Burger,"Potato patty, lettuce and tomato in a toasted bun",2.80,vegetarian,yes,no,no,gluten,1,12,,yes
+PH0104,"Sandwiches, Burgers & Wraps",Burgers,Cheese Aloo Tikki Burger,Potato patty with melted cheese,3.20,vegetarian,no,no,no,dairy;gluten,1,12,,yes
+PH0105,"Sandwiches, Burgers & Wraps",Burgers,Paneer Crunch Burger,Crumb-fried paneer with slaw,3.80,vegetarian,no,no,no,dairy;gluten,1,12,,yes
+PH0106,"Sandwiches, Burgers & Wraps",Wraps and rolls,Paneer Tikka Wrap,Tandoori paneer in a soft wrap,3.60,vegetarian,no,no,no,dairy;gluten,2,10,spicy,yes
+PH0107,"Sandwiches, Burgers & Wraps",Wraps and rolls,Falafel Wrap,"Falafel, hummus and salad",3.60,vegetarian,yes,no,no,gluten,0,10,,yes
+PH0108,"Sandwiches, Burgers & Wraps",Wraps and rolls,Veg Kathi Roll,Street-style roll with spiced vegetables,3.00,vegetarian,yes,no,no,gluten,1,10,,yes
+PH0109,Pizza & Pasta,Pizza,Margherita Pizza (8 inch),"Tomato, mozzarella and basil on a hand-stretched base",5.20,vegetarian,no,no,no,dairy;gluten,0,18,popular,yes
+PH0110,Pizza & Pasta,Pizza,Margherita Pizza (12 inch),"Tomato, mozzarella and basil on a hand-stretched base",8.84,vegetarian,no,no,no,dairy;gluten,0,18,,yes
+PH0111,Pizza & Pasta,Pizza,Farmhouse Pizza (8 inch),"Onion, capsicum, mushroom and tomato on a hand-stretched base",6.20,vegetarian,no,no,no,dairy;gluten,0,18,,yes
+PH0112,Pizza & Pasta,Pizza,Farmhouse Pizza (12 inch),"Onion, capsicum, mushroom and tomato on a hand-stretched base",10.54,vegetarian,no,no,no,dairy;gluten,0,18,,yes
+PH0113,Pizza & Pasta,Pizza,Paneer Tikka Pizza (8 inch),"Tandoori paneer, onion and capsicum on a hand-stretched base",6.60,vegetarian,no,no,no,dairy;gluten,2,18,popular;spicy,yes
+PH0114,Pizza & Pasta,Pizza,Paneer Tikka Pizza (12 inch),"Tandoori paneer, onion and capsicum on a hand-stretched base",11.22,vegetarian,no,no,no,dairy;gluten,2,18,spicy,yes
+PH0115,Pizza & Pasta,Flatbreads and calzone,Garlic Herb Flatbread,Thin crust with garlic butter and herbs,4.20,vegetarian,no,no,no,dairy;gluten,0,16,,yes
+PH0116,Pizza & Pasta,Flatbreads and calzone,Paneer Tikka Flatbread,Tandoori paneer on thin crust,5.20,vegetarian,no,no,no,dairy;gluten,2,16,spicy,yes
+PH0117,Pizza & Pasta,Flatbreads and calzone,Veg Calzone,Folded pizza with vegetables and cheese,5.40,vegetarian,no,no,no,dairy;gluten,0,16,,yes
+PH0118,Pizza & Pasta,Pasta,Penne in White Sauce,"Penne pasta in creamy béchamel with herbs, with garlic bread",4.60,vegetarian,no,no,no,dairy;gluten,0,16,popular,yes
+PH0119,Pizza & Pasta,Pasta,Penne in Red Sauce,"Penne pasta in tomato, garlic and basil, with garlic bread",4.20,vegetarian,yes,yes,no,gluten,0,16,popular,yes
+PH0120,Pizza & Pasta,Pasta,Penne in Pink Sauce,"Penne pasta in tomato and cream sauce, with garlic bread",4.60,vegetarian,no,no,no,dairy;gluten,1,16,,yes
+PH0121,Pizza & Pasta,Pasta,Penne in Pesto,"Penne pasta in basil, pine nut and parmesan, with garlic bread",5.00,vegetarian,no,no,no,dairy;gluten;nuts,0,16,,yes
+PH0122,Pizza & Pasta,Pasta,Penne in Arrabbiata,"Penne pasta in spicy tomato and chilli, with garlic bread",4.40,vegetarian,yes,no,no,gluten,3,16,spicy,yes
+PH0123,Pizza & Pasta,Baked pasta,Baked Veg Lasagne,"Layers of pasta, vegetables and white sauce",5.80,vegetarian,no,no,no,dairy;gluten,0,20,,yes
+PH0124,Pizza & Pasta,Baked pasta,Baked Penne Gratin,Penne baked under a golden cheese crust,5.20,vegetarian,no,no,no,dairy;gluten,0,20,,yes
+PH0125,Pizza & Pasta,Baked pasta,Spinach Ricotta Cannelloni,Pasta tubes filled with spinach and ricotta,6.00,vegetarian,no,no,no,dairy;gluten,0,20,,yes
+PH0126,Indian Mains,Paneer,Paneer Butter Masala,Paneer in a rich tomato and cashew gravy,5.20,vegetarian,no,no,yes,dairy;nuts,1,18,popular,yes
+PH0127,Indian Mains,Paneer,Shahi Paneer,Mild and creamy royal gravy,5.40,vegetarian,no,no,yes,dairy;nuts,0,18,,yes
+PH0128,Indian Mains,Paneer,Kadai Paneer,Paneer with peppers in a spiced kadai masala,5.20,vegetarian,no,no,yes,dairy,2,18,spicy,yes
+PH0129,Indian Mains,Vegetable curries,Mixed Veg Curry,Seasonal vegetables in onion and tomato gravy,4.20,vegetarian,yes,no,yes,none,1,18,,yes
+PH0130,Indian Mains,Vegetable curries,Veg Jalfrezi,Stir-fried vegetables in a tangy masala,4.40,vegetarian,yes,no,yes,none,2,18,spicy,yes
+PH0131,Indian Mains,Vegetable curries,Chana Masala,Chickpeas in a tangy masala,4.20,vegetarian,yes,no,yes,none,2,18,popular;spicy,yes
+PH0132,Indian Mains,Vegetable curries,Sarson Ka Saag,Mustard greens slow-cooked with makki roti,4.80,vegetarian,no,no,yes,dairy,1,18,seasonal,yes
+PH0133,Indian Mains,Dal and legumes,Dal Makhani,Black lentils slow-cooked overnight with butter and cream,4.60,vegetarian,no,no,yes,dairy,1,16,popular,yes
+PH0134,Indian Mains,Dal and legumes,Dal Tadka,Yellow lentils tempered with cumin and garlic,3.80,vegetarian,no,yes,yes,dairy,1,16,,yes
+PH0135,Indian Mains,Dal and legumes,Dal Fry,Lentils fried with onion and tomato,3.80,vegetarian,no,no,yes,dairy,1,16,,yes
+PH0136,Indian Mains,Rice and biryani,Steamed Rice,Plain basmati rice,2.00,vegetarian,yes,yes,yes,none,0,18,quick,yes
+PH0137,Indian Mains,Rice and biryani,Veg Biryani,"Layered basmati and vegetables, cooked dum",4.80,vegetarian,no,no,yes,dairy,2,18,popular;spicy,yes
+PH0138,Indian Mains,Rice and biryani,Rajma Chawal,Kidney bean curry with steamed rice,3.80,vegetarian,yes,no,yes,none,1,18,popular,yes
+PH0139,Indian Mains,Indian breads,Tandoori Roti,Whole wheat bread from the clay oven,0.80,vegetarian,yes,yes,no,gluten,0,8,quick,yes
+PH0140,Indian Mains,Indian breads,Butter Roti,Tandoori roti with butter,0.90,vegetarian,no,yes,no,dairy;gluten,0,8,quick,yes
+PH0141,Indian Mains,Indian breads,Butter Naan,Naan brushed with butter,1.40,vegetarian,no,yes,no,dairy;gluten,0,8,popular,yes
+PH0142,Indian Mains,Indian breads,Makki Di Roti,Cornmeal flatbread,1.60,vegetarian,yes,yes,yes,none,0,8,seasonal,yes
+PH0143,Indian Mains,Sides and raita,Boondi Raita,Yogurt with crisp gram flour pearls,1.80,vegetarian,no,yes,yes,dairy,0,4,,yes
+PH0144,Indian Mains,Sides and raita,Mixed Veg Raita,"Yogurt with cucumber, onion and tomato",1.80,vegetarian,no,no,yes,dairy,0,4,,yes
+PH0145,Indian Mains,Sides and raita,Pineapple Raita,Sweet yogurt with pineapple,2.00,vegetarian,no,yes,yes,dairy,0,4,,yes
+PH0146,Indian Mains,Thalis,Himachali Thali,"Siddu, rajma madra, mah ki dal, rice, sepu vadi and a sweet",7.20,vegetarian,no,no,no,dairy;gluten,1,18,,yes
+PH0147,Indian Mains,Thalis,North Indian Thali,"Paneer, dal, seasonal veg, rice, roti, raita and sweet",7.00,vegetarian,no,no,no,dairy;gluten,1,18,popular,yes
+PH0148,Indian Mains,Thalis,Trekker's Thali,"Big plate: rajma, dal, rice, rotis, paneer and kheer",8.00,vegetarian,no,no,no,dairy;gluten,1,18,popular,yes
+PH0149,Indian Mains,Thalis,Mini Thali,"Smaller version with one curry, dal, rice and roti",5.20,vegetarian,no,no,no,dairy;gluten,1,18,,yes
+PH0150,Indian Mains,Thalis,Jain Thali,"No onion, garlic or root vegetables",6.80,vegetarian,no,yes,no,dairy;gluten,0,18,,yes
+PH0151,Indian Mains,Thalis,Kids Thali,"Mild dal, rice, roti and a sweet",4.20,vegetarian,no,no,no,dairy;gluten,0,18,kids,yes
+PH0152,Indian Mains,Himachali kitchen,Himachali Siddu,Steamed wheat bread with ghee and mint chutney. Siddu is a Himachali speciality,2.40,vegetarian,no,no,no,dairy;gluten,0,20,signature;popular,yes
+PH0153,Indian Mains,Himachali kitchen,Walnut Siddu,Siddu stuffed with walnut and poppy seed,2.80,vegetarian,no,no,no,dairy;gluten;nuts,0,20,,yes
+PH0154,Indian Mains,Himachali kitchen,Chana Madra,Chickpeas in a slow-cooked yogurt gravy,4.40,vegetarian,no,no,yes,dairy,1,20,,yes
+PH0155,Indian Mains,Himachali kitchen,Rajma Madra,Kidney beans in a yogurt gravy,4.40,vegetarian,no,no,yes,dairy,1,20,,yes
+PH0156,Indian Mains,Himachali kitchen,Mah Ki Dal,Black gram dal cooked with ghee,4.00,vegetarian,no,no,yes,dairy,1,20,,yes
+PH0157,Indian Mains,Himachali kitchen,Sepu Vadi,Lentil dumplings in a spiced yogurt curry,4.60,vegetarian,no,no,yes,dairy,1,20,,yes
+PH0158,Indian Mains,Himachali kitchen,Tudkiya Bhath,Rice cooked with lentil dumplings and vegetables,4.20,vegetarian,no,no,yes,dairy,1,20,,yes
+PH0159,Indian Mains,Himachali kitchen,Lingdi Sabzi,"Wild fern vegetable, seasonal",3.80,vegetarian,yes,no,yes,none,1,20,seasonal,yes
+PH0160,Indo-Chinese & Asian,Noodles,Veg Hakka Noodles,Wok-tossed noodles with vegetables,4.00,vegetarian,yes,no,no,gluten;soy,1,14,,yes
+PH0161,Indo-Chinese & Asian,Noodles,Schezwan Noodles,Wok-tossed noodles with vegetables,4.40,vegetarian,yes,no,no,gluten;soy,3,14,spicy,yes
+PH0162,Indo-Chinese & Asian,Noodles,Singapore Noodles,Wok-tossed noodles with vegetables,4.40,vegetarian,yes,no,no,gluten;nuts;soy,2,14,spicy,yes
+PH0163,Indo-Chinese & Asian,Fried rice,Veg Fried Rice,Wok-fried basmati rice with vegetables,3.80,vegetarian,yes,no,yes,soy,1,14,,yes
+PH0164,Indo-Chinese & Asian,Fried rice,Schezwan Fried Rice,Wok-fried basmati rice with vegetables,4.20,vegetarian,yes,no,yes,soy,3,14,spicy,yes
+PH0165,Indo-Chinese & Asian,Fried rice,Paneer Fried Rice,Wok-fried basmati rice with vegetables,4.60,vegetarian,no,no,yes,dairy;soy,1,14,,yes
+PH0166,Indo-Chinese & Asian,Starters and gravies,Veg Manchurian Dry,Fried vegetable balls in a soy-garlic glaze,4.20,vegetarian,yes,no,no,gluten;soy,2,14,spicy,yes
+PH0167,Indo-Chinese & Asian,Starters and gravies,Veg Manchurian Gravy,Vegetable balls in manchurian gravy,4.40,vegetarian,yes,no,no,gluten;soy,2,14,spicy,yes
+PH0168,Indo-Chinese & Asian,Starters and gravies,Gobi Manchurian,Crisp cauliflower in manchurian sauce,4.20,vegetarian,yes,no,no,gluten;soy,2,14,popular;spicy,yes
+PH0169,Indo-Chinese & Asian,Starters and gravies,Chilli Paneer Dry,"Paneer, peppers and onion in chilli sauce",5.20,vegetarian,no,no,no,dairy;gluten;soy,3,14,popular;spicy,yes
+PH0170,Indo-Chinese & Asian,Soups,Hot and Sour Soup,"Pepper-sharp, vinegar-tangy broth",2.80,vegetarian,yes,no,yes,soy,2,8,popular;spicy,yes
+PH0171,Indo-Chinese & Asian,Soups,Manchow Soup,Thick soup with crispy noodles,2.80,vegetarian,yes,no,no,gluten;soy,2,8,spicy,yes
+PH0172,Indo-Chinese & Asian,Soups,Sweet Corn Soup,Silky corn and vegetable soup,2.60,vegetarian,yes,no,yes,soy,0,8,,yes
+PH0173,"Continental, Mexican & Salads",Bowls,Burrito Bowl,"Rice, black beans, corn, salsa and guacamole",5.60,vegetarian,no,no,yes,dairy,1,14,,yes
+PH0174,"Continental, Mexican & Salads",Bowls,Buddha Bowl,"Quinoa, roasted vegetables, hummus and tahini",5.80,vegetarian,yes,no,yes,nuts,0,14,,yes
+PH0175,"Continental, Mexican & Salads",Bowls,Teriyaki Tofu Bowl,Glazed tofu with rice and greens,5.80,vegetarian,yes,no,no,gluten;soy,0,14,,yes
+PH0176,"Continental, Mexican & Salads",Mexican,Bean and Cheese Burrito,"Refried beans, rice and cheese in a flour tortilla",4.60,vegetarian,no,no,no,dairy;gluten,1,14,,yes
+PH0177,"Continental, Mexican & Salads",Mexican,Paneer Burrito,"Spiced paneer, rice and beans",5.00,vegetarian,no,no,no,dairy;gluten,2,14,spicy,yes
+PH0178,"Continental, Mexican & Salads",Mexican,Veg Fajita Burrito,Grilled peppers and onion with salsa,4.80,vegetarian,no,no,no,dairy;gluten,1,14,,yes
+PH0179,"Continental, Mexican & Salads",Continental plates,Cauliflower Steak,Roasted cauliflower with herb butter and mash,5.80,vegetarian,no,no,yes,dairy,1,18,,yes
+PH0180,"Continental, Mexican & Salads",Continental plates,Stuffed Mushrooms,Baked mushrooms with cheese and herbs,4.80,vegetarian,no,no,yes,dairy,0,18,,yes
+PH0181,"Continental, Mexican & Salads",Continental plates,Grilled Veg Platter,Seasonal vegetables with herb oil and dips,5.60,vegetarian,yes,no,yes,none,0,18,,yes
+PH0182,"Continental, Mexican & Salads",Salads,Greek Salad,"Cucumber, tomato, olives and feta",4.20,vegetarian,no,no,yes,dairy,0,8,,yes
+PH0183,"Continental, Mexican & Salads",Salads,Veg Caesar Salad,"Romaine, parmesan and croutons",4.40,vegetarian,no,no,no,dairy;gluten,0,8,,yes
+PH0184,"Continental, Mexican & Salads",Salads,Caprese Salad,"Mozzarella, tomato and basil",4.40,vegetarian,no,no,yes,dairy,0,8,,yes
+PH0185,"Continental, Mexican & Salads",Continental soups,Tomato Basil Soup,Slow-roasted tomato with basil,3.00,vegetarian,no,no,yes,dairy,0,8,,yes
+PH0186,"Continental, Mexican & Salads",Continental soups,Cream of Mushroom Soup,Silky mushroom soup with garlic croutons,3.20,vegetarian,no,no,no,dairy;gluten,0,8,,yes
+PH0187,"Continental, Mexican & Salads",Continental soups,Pumpkin Soup,Roasted pumpkin and cream,3.00,vegetarian,no,no,yes,dairy,0,8,seasonal,yes
+PH0188,Desserts,Cakes and slices,Chocolate Truffle Cake,"Dark chocolate ganache cake, eggless",3.60,vegetarian,no,no,no,dairy;gluten,0,4,,yes
+PH0189,Desserts,Cakes and slices,Red Velvet Cake,"Cream cheese frosting, eggless",3.80,vegetarian,no,no,no,dairy;gluten,0,4,,yes
+PH0190,Desserts,Cakes and slices,Baked Cheesecake Slice,Classic baked cheesecake,4.00,vegetarian,no,no,no,dairy;gluten,0,4,popular,yes
+PH0191,Desserts,Brownies and cookies,Walnut Brownie,Fudgy brownie with walnuts,2.60,vegetarian,no,no,no,dairy;gluten;nuts,0,6,popular,yes
+PH0192,Desserts,Brownies and cookies,Fudge Brownie,Dense chocolate brownie,2.60,vegetarian,no,no,no,dairy;gluten,0,6,,yes
+PH0193,Desserts,Brownies and cookies,Sizzling Brownie with Ice Cream,Hot brownie on a sizzler with vanilla ice cream and chocolate sauce,4.40,vegetarian,no,no,no,dairy;gluten;nuts,0,6,popular,yes
+PH0194,Desserts,Waffles and pancakes,Chocolate Waffle,Waffle with chocolate sauce and sprinkles,3.40,vegetarian,no,no,no,dairy;gluten,0,12,popular,yes
+PH0195,Desserts,Waffles and pancakes,Nutella-Style Hazelnut Waffle,Waffle with hazelnut chocolate spread,3.80,vegetarian,no,no,no,dairy;gluten;nuts,0,12,,yes
+PH0196,Desserts,Waffles and pancakes,Banana Caramel Waffle,Waffle with banana and caramel,3.80,vegetarian,no,no,no,dairy;gluten,0,12,,yes
+PH0197,Desserts,Ice cream and sundaes,Vanilla Ice Cream (2 scoops),Classic vanilla,2.40,vegetarian,no,no,yes,dairy,0,4,,yes
+PH0198,Desserts,Ice cream and sundaes,Mango Sundae,"Mango ice cream, fresh mango and nuts",3.40,vegetarian,no,no,yes,dairy;nuts,0,4,seasonal,yes
+PH0199,Desserts,Ice cream and sundaes,Mango Kulfi,Mango kulfi,2.80,vegetarian,no,no,yes,dairy,0,4,seasonal,yes
+PH0200,Desserts,Indian sweets,Gulab Jamun (2 pcs),Soft milk dumplings in rose syrup,2.00,vegetarian,no,no,no,dairy;gluten;nuts,0,4,popular,yes
+PH0201,Desserts,Indian sweets,Gajar Halwa,Slow-cooked carrot halwa with nuts,2.80,vegetarian,no,no,yes,dairy;nuts,0,4,seasonal,yes
+PH0202,Desserts,Indian sweets,Moong Dal Halwa,Rich lentil halwa with ghee,3.00,vegetarian,no,no,yes,dairy;nuts,0,4,seasonal,yes
+PH0203,Desserts,Indian sweets,Jaggery Kheer,Rice pudding sweetened with jaggery,2.40,vegetarian,no,no,yes,dairy;nuts,0,4,signature,yes
+PH0204,Desserts,Hot desserts,Apple Crumble,Warm apples with a buttery crumble and custard,3.80,vegetarian,no,no,no,dairy;gluten;nuts,0,14,,yes
+PH0205,Desserts,Hot desserts,Sticky Toffee Pudding,Date pudding with toffee sauce,4.00,vegetarian,no,no,no,dairy;gluten,0,14,,yes
+PH0206,Desserts,Hot desserts,Chocolate Lava Cake,Warm cake with a molten centre,4.20,vegetarian,no,no,no,dairy;gluten,0,14,,yes
+PH0207,Kids Menu,Kids,Mini Cheese Sandwich,Small toasted cheese sandwich,2.40,vegetarian,no,no,no,dairy;gluten,0,10,kids,yes
+PH0208,Kids Menu,Kids,Mini Pizza,6-inch cheese pizza,3.00,vegetarian,no,no,no,dairy;gluten,0,10,kids,yes
+PH0209,Kids Menu,Kids,Pasta Cup,Mild pasta in white or red sauce,3.20,vegetarian,no,no,no,dairy;gluten,0,10,kids,yes
+PH0210,Kids Menu,Kids,Veg Nuggets (6 pcs),Crisp vegetable nuggets with ketchup,3.00,vegetarian,yes,no,no,gluten,0,10,kids,yes
+PH0211,Kids Menu,Kids,Fries and Ketchup,Small portion of fries,2.00,vegetarian,yes,no,yes,none,0,10,kids,yes
+PH0212,Kids Menu,Kids,Mini Burger,Slider-size veg burger,2.80,vegetarian,no,no,no,dairy;gluten,0,10,kids,yes
+PH0213,Kids Menu,Kids,Kids Fruit Bowl,Cut seasonal fruit,2.40,vegetarian,yes,no,yes,none,0,10,kids,yes
+PH0214,Kids Menu,Kids,Chocolate Milk,Cold chocolate milk,1.60,vegetarian,no,no,yes,dairy,0,10,kids,yes
+PH0215,Combos & Offers,Combos,Postmark Combo (Chai + Maska Pav),Any chai up to 1.40 dollars with a Maska Pav,1.80,vegetarian,no,yes,no,dairy;gluten,0,10,offer;popular,yes
+PH0216,Combos & Offers,Combos,Samosa and Chai Combo,Two samosas with masala chai,2.40,vegetarian,no,yes,no,dairy;gluten,1,10,offer,yes
+PH0217,Combos & Offers,Combos,Sandwich and Cold Coffee Combo,Any veg sandwich with a cold coffee,5.20,vegetarian,no,no,no,dairy;gluten,0,10,offer,yes
+PH0218,Combos & Offers,Combos,Momos and Soda Combo,Steamed veg momos with a masala lemon soda,3.80,vegetarian,yes,no,no,gluten;soy,1,10,offer,yes
+PH0219,Combos & Offers,Combos,Pasta and Mocktail Combo,Any pasta with a mocktail,6.40,vegetarian,no,no,no,dairy;gluten,0,10,offer,yes
+PH0220,Combos & Offers,Combos,Pizza and Shake Combo,8-inch pizza with a milkshake,8.40,vegetarian,no,no,no,dairy;gluten,0,10,offer,yes
+PH0221,Combos & Offers,Combos,Burger and Fries Combo,Any burger with fries and a cola,5.60,vegetarian,no,no,no,dairy;gluten,1,10,offer,yes
+PH0222,Combos & Offers,Combos,Thali and Lassi Combo,North Indian Thali with a sweet lassi,8.80,vegetarian,no,no,no,dairy;gluten,1,10,offer,yes
+PH0223,Combos & Offers,Combos,Study Pack,"Filter coffee, a sandwich and a cookie",4.00,vegetarian,no,no,no,dairy;gluten,0,10,offer,yes
+PH0224,Combos & Offers,Combos,Date Night Slot,"Two mains, one dessert to share and two drinks",14.00,vegetarian,no,no,no,dairy;gluten,0,10,offer;sharing,yes
+PH0225,Combos & Offers,Combos,Breakfast Combo,"Paratha, chai and curd",3.60,vegetarian,no,no,no,dairy;gluten,0,10,offer,yes
+PH0226,Combos & Offers,Combos,Family Feast (4 people),"Two curries, dal, rice, breads, raita and a dessert",24.00,vegetarian,no,no,no,dairy;gluten,1,10,offer;sharing,yes
+PH0227,Combos & Offers,Combos,Trek Fuel Pack,"Siddu, kheer and a flask of chai to go",6.00,vegetarian,no,no,no,dairy;gluten;nuts,0,10,offer,yes
+PH0228,Combos & Offers,Combos,Tea Time Platter,"Samosas, pakoras, sandwich and a pot of chai for two",7.00,vegetarian,no,no,no,dairy;gluten,1,10,offer;sharing,yes
+PH0229,Add-ons,Extras,Extra Cheese,Added to any dish,0.80,vegetarian,no,no,yes,dairy,0,2,,yes
+PH0230,Add-ons,Extras,Extra Butter,Added to any bread dish,0.50,vegetarian,no,no,yes,dairy,0,2,,yes
+PH0231,Add-ons,Extras,Extra Espresso Shot,Added to any coffee,0.80,vegetarian,yes,no,yes,none,0,2,,yes
+PH0232,Add-ons,Extras,Oat Milk Swap,Replace dairy milk with oat milk,0.70,vegetarian,yes,no,no,gluten,0,2,,yes
+PH0233,Add-ons,Extras,Soy Milk Swap,Replace dairy milk with soy milk,0.60,vegetarian,yes,no,yes,soy,0,2,,yes
+PH0234,Add-ons,Extras,Almond Milk Swap,Replace dairy milk with almond milk,0.80,vegetarian,yes,no,yes,nuts,0,2,,yes
+PH0235,Add-ons,Extras,Extra Pav,One extra buttered pav,0.50,vegetarian,yes,no,no,gluten,0,2,,yes
+PH0236,Add-ons,Extras,Extra Roti,One extra tandoori roti,0.60,vegetarian,yes,no,no,gluten,0,2,,yes
+PH0237,Bakery,Breads and bakes,Butter Croissant,Flaky all-butter croissant,2.40,vegetarian,no,no,no,dairy;gluten,0,4,,yes
+PH0238,Bakery,Breads and bakes,Chocolate Croissant,Croissant with dark chocolate,2.80,vegetarian,no,no,no,dairy;gluten,0,4,,yes
+PH0239,Bakery,Breads and bakes,Almond Croissant,Filled with almond cream,3.20,vegetarian,no,no,no,dairy;gluten;nuts,0,4,,yes
+PH0240,Bakery,Breads and bakes,Cinnamon Roll,Soft roll with cream cheese icing,2.80,vegetarian,no,no,no,dairy;gluten,0,4,,yes

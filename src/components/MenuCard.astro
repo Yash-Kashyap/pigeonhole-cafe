@@ -1,0 +1,58 @@
+---
+import DietBadges from './DietBadges.astro';
+import Price from './Price.astro';
+interface Props {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  vegan?: boolean;
+  jain?: boolean;
+  glutenFree?: boolean;
+  spice?: 0 | 1 | 2 | 3;
+  allergens?: string[];
+}
+const {
+  id,
+  name,
+  description,
+  price,
+  vegan,
+  jain,
+  glutenFree,
+  spice = 0,
+  allergens = [],
+} = Astro.props;
+---
+
+<article class="grid gap-4 border-t border-ink py-5 sm:grid-cols-[1fr_auto]">
+  <div class="space-y-2">
+    <h3 class="text-2xl">{name}</h3>
+    <p class="max-w-2xl text-sm text-ink-2">{description}</p>
+    <DietBadges {vegan} {jain} {glutenFree} {spice} />
+    <p class="text-xs text-ink-2">
+      Allergens: {allergens.length ? allergens.join(', ') : 'none listed'}
+    </p>
+  </div>
+  <div class="flex items-start justify-between gap-4 sm:flex-col sm:items-end">
+    <Price value={price} />
+    <button
+      class="min-h-11 border border-ink px-4 text-sm font-semibold hover:bg-ink hover:text-paper"
+      type="button"
+      data-add-item={id}
+    >
+      Add
+    </button>
+  </div>
+</article>
+
+<script>
+  import { addToCart } from '../lib/cart';
+  document.addEventListener('click', (event) => {
+    const target =
+      event.target instanceof Element
+        ? event.target.closest<HTMLElement>('[data-add-item]')
+        : null;
+    if (target?.dataset.addItem) addToCart(target.dataset.addItem);
+  });
+</script>

@@ -1,0 +1,13 @@
+---
+interface Props {
+  shot: string;
+}
+const { shot } = Astro.props;
+---
+
+<figure class="grid min-h-52 place-items-center border border-dashed border-ink bg-paper-2 p-6 text-center">
+  <figcaption>
+    <span class="ph-label block text-ink-2">Shot to take:</span>
+    <span class="mt-2 block font-display text-2xl">{shot}</span>
+  </figcaption>
+</figure>

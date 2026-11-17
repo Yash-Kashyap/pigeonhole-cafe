@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ComponentKit from './_kit.astro';
+
+const isComponentKit = Astro.params.kit === '_kit';
+if (!isComponentKit) Astro.response.status = 404;
+---
+
+{isComponentKit ? (
+  <ComponentKit />
+) : (
+  <BaseLayout
+    title="Not found | The Pigeonhole Cafe"
+    description="This page does not exist."
+    noindex
+    showAssistant={false}
+  >
+    <section class="ph-container py-24">
+      <p class="ph-label text-stamp">Not found</p>
+      <h1 class="mt-4 text-6xl">No letter in this slot.</h1>
+    </section>
+  </BaseLayout>
+)}

@@ -1,0 +1,98 @@
+---
+interface Props {
+  code: string;
+  slot: string;
+  date: string;
+  time: string;
+  partySize: number;
+  status: 'confirmed' | 'requested' | 'cancelled';
+}
+const { code, slot, date, time, partySize, status } = Astro.props;
+---
+
+<article class="ticket" aria-label={`${status} booking ${code}`}>
+  <div class="body">
+    <p class="ph-label text-ink-2">Booking receipt</p>
+    <h3>{code}</h3>
+    <dl>
+      <div>
+        <dt>Date</dt>
+        <dd>{date}</dd>
+      </div>
+      <div>
+        <dt>Time</dt>
+        <dd>{time}</dd>
+      </div>
+      <div>
+        <dt>Party</dt>
+        <dd>{partySize}</dd>
+      </div>
+    </dl>
+  </div>
+  <div class="stub">
+    <span class="ph-label">{status}</span>
+    <strong>{slot}</strong>
+    <span class="ph-label">Hold 15 min</span>
+  </div>
+</article>
+
+<style>
+  .ticket {
+    position: relative;
+    display: flex;
+    max-width: 580px;
+    border: 1px solid var(--ink);
+    background: var(--card);
+    filter: drop-shadow(0 16px 20px rgba(27, 36, 48, 0.12));
+  }
+  .body {
+    flex: 1;
+    padding: 24px;
+  }
+  h3 {
+    margin-top: 8px;
+    font-size: clamp(1.75rem, 5vw, 2.6rem);
+  }
+  dl {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 24px 0 0;
+  }
+  dt {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  dd {
+    margin: 4px 0 0;
+  }
+  .stub {
+    display: flex;
+    width: 150px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border-left: 2px dashed var(--ink);
+    background: var(--paper-2);
+    padding: 24px 16px;
+    text-align: center;
+  }
+  .stub strong {
+    font-family: var(--font-mono);
+    font-size: 1.6rem;
+  }
+  @media (max-width: 39.99rem) {
+    .ticket {
+      flex-direction: column;
+    }
+    .stub {
+      width: auto;
+      flex-direction: row;
+      border-top: 2px dashed var(--ink);
+      border-left: 0;
+    }
+  }
+</style>

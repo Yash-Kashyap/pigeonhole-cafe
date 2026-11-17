@@ -1,0 +1,15 @@
+node_modules
+dist
+.astro
+.checks
+design-prototype
+docs
+data
+supabase
+functions
+C[L]AUDE.md
+AGENTS.md
+GEMINI.md
+DECISIONS.md
+pigeonhole-build-plan-ALL.md
+C[O]DEX-PHASE0-PROMPT.md

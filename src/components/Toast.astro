@@ -1,0 +1,19 @@
+---
+interface Props {
+  tone?: 'info' | 'success' | 'error';
+}
+const { tone = 'info' } = Astro.props;
+---
+
+<div
+  class:list={[
+    'border px-4 py-3 text-sm',
+    tone === 'info' && 'border-ink bg-ink text-paper',
+    tone === 'success' && 'border-ok text-ok',
+    tone === 'error' && 'border-err text-err',
+  ]}
+  role="status"
+  aria-live="polite"
+>
+  <slot />
+</div>

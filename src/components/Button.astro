@@ -1,0 +1,26 @@
+---
+interface Props {
+  href?: string;
+  variant?: 'solid' | 'outline' | 'stamp';
+  type?: 'button' | 'submit' | 'reset';
+}
+const { href, variant = 'solid', type = 'button' } = Astro.props;
+const classes = [
+  'inline-flex min-h-11 items-center justify-center border px-5 font-semibold no-underline transition active:translate-y-px',
+  variant === 'solid' && 'border-ink bg-ink text-paper hover:bg-ink-2',
+  variant === 'outline' &&
+    'border-ink bg-transparent text-ink hover:bg-ink hover:text-paper',
+  variant === 'stamp' &&
+    'border-stamp bg-transparent font-mono text-sm tracking-wider text-stamp uppercase',
+];
+---
+
+{href ? (
+  <a class:list={classes} href={href}>
+    <slot />
+  </a>
+) : (
+  <button class:list={classes} type={type}>
+    <slot />
+  </button>
+)}

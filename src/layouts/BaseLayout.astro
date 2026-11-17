@@ -1,0 +1,51 @@
+---
+import AssistantWidget from '../components/AssistantWidget.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  noindex?: boolean;
+  showAssistant?: boolean;
+}
+const {
+  title,
+  description,
+  noindex = false,
+  showAssistant = true,
+} = Astro.props;
+const allowIndex = import.meta.env.PUBLIC_ALLOW_INDEX === 'true';
+const shouldNoindex = noindex || !allowIndex;
+const canonical = new URL(
+  Astro.url.pathname,
+  import.meta.env.PUBLIC_SITE_URL || Astro.url.origin,
+);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {shouldNoindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="canonical" href={canonical} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <script is:inline>
+      history.scrollRestoration = 'manual';
+      window.scrollTo(0, 0);
+    </script>
+  </head>
+  <body>
+    <SiteHeader />
+    <main id="main-content">
+      <slot />
+    </main>
+    <SiteFooter />
+    {showAssistant && <AssistantWidget />}
+  </body>
+</html>
