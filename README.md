@@ -39,3 +39,9 @@ The internal `/_kit` route is an unlinked, noindex component reference. It is no
 - `RATE_LIMIT_SALT`
 
 Deployment is intentionally outside Phase 0. Current Astro releases target Cloudflare Workers through the official adapter.
+
+## Runtime secrets
+
+Set `SUPABASE_SERVICE_KEY`, `GEMINI_API_KEY`, and `RATE_LIMIT_SALT` as Worker secrets with `wrangler secret put <NAME>` or in the Cloudflare dashboard. Keep them out of `wrangler.jsonc` and browser code.
+
+For local Wrangler development, put the same values in `.dev.vars`. That file is ignored by Git. Astro development reads local `.env` values.

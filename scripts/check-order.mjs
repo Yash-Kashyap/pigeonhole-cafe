@@ -406,17 +406,7 @@ try {
   const isChecked = await consentCheckbox.isChecked();
   ok('Keyboard Space toggled demo consent checkbox', isChecked);
 
-  // Test valid submit showing inline demo notice (no fake success, no API call)
-  await submitBtn.click();
-  await menuPage.waitForTimeout(300);
-
-  const noticeCount = await menuPage
-    .locator('div[role="status"]:has-text("Order ready for Phase 2b")')
-    .count();
-  ok(
-    'Valid submit displays clear inline Phase 2b readiness notice without API call',
-    noticeCount === 1,
-  );
+  // The real submit creates an order, so it is tested (with cleanup) in scripts/check-order-flow.mjs.
 
   await menuPage.close();
   await context.close();

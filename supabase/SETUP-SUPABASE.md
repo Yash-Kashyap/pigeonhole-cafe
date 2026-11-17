@@ -7,7 +7,7 @@ The Design prototype (the artifact) cannot talk to Supabase: published pages blo
 
 ## Steps (about 20 minutes)
 1. Create a free account at supabase.com and a new project. Region: pick one near your clients (for example Frankfurt for Europe, N. Virginia for America). Save the database password in your password manager.
-2. Open **SQL Editor**. Paste and run `migrations/0001_init.sql`, then `migrations/0002_seed_menu.sql`. Check **Table Editor**: `menu_items` should show 240 rows and `slot_tables` 16.
+2. Open **SQL Editor**. Paste and run `migrations/0001_init.sql`, then `migrations/0002_seed_menu.sql`, then `migrations/0003_create_order_v2.sql`. Check **Table Editor**: `menu_items` should show 240 rows and `slot_tables` 16. Migration 0003 replaces only the `create_order` function and keeps its existing service-role grant.
 3. Open **Project Settings > API Keys**. Copy the Project URL (`https://<project-ref>.supabase.co`, without `/rest/v1/`), the **publishable key** (`sb_publishable_...`) and the **secret key** (`sb_secret_...`) into your local `.env` (see `.env.example`). The secret key goes only on the server (Cloudflare secret). Never put it in browser code or in git. Do not use the legacy `anon` and `service_role` keys; they are retired in early 2027.
 4. Create the owner login: **Authentication > Users > Add user**, enter an email and a strong password you choose, tick auto-confirm. Then in the SQL Editor run (with your email):
    `update auth.users set raw_app_meta_data = raw_app_meta_data || '{"role":"owner"}' where email = 'you@example.com';`

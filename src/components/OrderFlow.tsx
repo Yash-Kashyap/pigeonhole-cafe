@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 import {
   addToCart,
+  clearCart,
   computeCartDetails,
   getOftenAddedSuggestions,
   readCart,
@@ -98,6 +99,10 @@ export default function OrderFlow({ items }: Props) {
   const [errorSummary, setErrorSummary] = useState<string[]>([]);
   const [suggestedPickup, setSuggestedPickup] = useState<Date | null>(null);
   const [demoNotice, setDemoNotice] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  // Two very fast clicks can both arrive before the button is disabled, so the handler guards itself too.
+  const submittingRef = useRef(false);
+  const [unavailableIds, setUnavailableIds] = useState<string[]>([]);
 
   const errorSummaryRef = useRef<HTMLDivElement>(null);
   const menuMap = useMemo(() => new Map(items.map((i) => [i.id, i])), [items]);
@@ -205,10 +210,12 @@ export default function OrderFlow({ items }: Props) {
     }
   }, [errorSummary]);
 
-  const handleSubmit = (event: React.SyntheticEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (submittingRef.current) return;
     setDemoNotice(null);
     setSuggestedPickup(null);
+    setUnavailableIds([]);
     const newErrors: Record<string, string> = {};
     const summaryList: string[] = [];
 
@@ -275,13 +282,91 @@ export default function OrderFlow({ items }: Props) {
       return;
     }
 
-    // Form and rules are 100% valid!
+    // Client checks are for feedback. The server repeats every decision.
     setErrors({});
     setErrorSummary([]);
-    const pickupDisplay = formatClockTime(pickupAt);
-    setDemoNotice(
-      `Takeaway orders are not connected to the kitchen yet (Phase 2b). Your order details and pickup time (${pickupDisplay}) are valid under the café's rules.`,
-    );
+    submittingRef.current = true;
+    setSubmitting(true);
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cart.map((item) => ({
+            id: item.id,
+            qty: item.quantity,
+            ...(item.note ? { note: item.note } : {}),
+          })),
+          name,
+          phone,
+          ...(pickupMode === 'asap'
+            ? { asap: true }
+            : { pickupAt: pickupAt.toISOString() }),
+          notes: kitchenNotes,
+          honeypot,
+          mountedAt,
+        }),
+      });
+      const data: unknown = await response.json().catch(() => ({}));
+      if (
+        response.status === 201 &&
+        data &&
+        typeof data === 'object' &&
+        typeof (data as { code?: unknown }).code === 'string'
+      ) {
+        clearCart();
+        window.location.assign(
+          `/order/confirmed?code=${encodeURIComponent((data as { code: string }).code)}`,
+        );
+        return;
+      }
+      if (response.status === 409 && data && typeof data === 'object') {
+        const ids = Array.isArray(
+          (data as { unavailableIds?: unknown }).unavailableIds,
+        )
+          ? (data as { unavailableIds: unknown[] }).unavailableIds.filter(
+              (id): id is string => typeof id === 'string',
+            )
+          : [];
+        setUnavailableIds(ids);
+        setErrorSummary([
+          'One or more items sold out while you were ordering.',
+        ]);
+      } else if (response.status === 422 && data && typeof data === 'object') {
+        const messages = Array.isArray((data as { errors?: unknown }).errors)
+          ? (data as { errors: unknown[] }).errors.filter(
+              (message): message is string => typeof message === 'string',
+            )
+          : ['Choose another pickup time.'];
+        setErrors({ pickup: messages.join(' ') });
+        setErrorSummary(messages);
+        try {
+          setSuggestedPickup(nearestValidPickup(new Date(), prepMinutes));
+        } catch {
+          /* no pickup remains */
+        }
+      } else if (response.status === 429) {
+        const retryAfter = response.headers.get('Retry-After');
+        setErrorSummary([
+          `Please wait ${retryAfter ? `${Math.ceil(Number(retryAfter) / 60)} minutes` : 'before trying again'}.`,
+        ]);
+      } else {
+        setErrorSummary([
+          data &&
+          typeof data === 'object' &&
+          typeof (data as { message?: unknown }).message === 'string'
+            ? (data as { message: string }).message
+            : 'We could not place the order. Please try again.',
+        ]);
+      }
+    } catch {
+      setDemoNotice(
+        'The connection failed. Your cart and details are still here. Please retry.',
+      );
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
+    }
   };
 
   const applySuggestedPickup = () => {
@@ -441,7 +526,10 @@ export default function OrderFlow({ items }: Props) {
           ) : (
             <div className="divide-y divide-ink/20">
               {cartDetails.lines.map((line) => (
-                <article key={line.id} className="py-5">
+                <article
+                  key={line.id}
+                  className={`py-5 ${unavailableIds.includes(line.id) ? 'border-l-4 border-err pl-3' : ''}`}
+                >
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -456,6 +544,18 @@ export default function OrderFlow({ items }: Props) {
                           : 'No listed allergens'}{' '}
                         · {line.prepMinutes} min
                       </p>
+                      {unavailableIds.includes(line.id) && (
+                        <div className="mt-2 flex items-center gap-3 text-sm text-err">
+                          <span>Sold out today.</span>
+                          <button
+                            type="button"
+                            className="underline"
+                            onClick={() => removeFromCart(line.id)}
+                          >
+                            Remove it
+                          </button>
+                        </div>
+                      )}
 
                       {/* Line Note */}
                       <div className="mt-2 text-sm">
@@ -870,10 +970,26 @@ export default function OrderFlow({ items }: Props) {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={cartDetails.itemCount === 0}
+              disabled={
+                cartDetails.itemCount === 0 ||
+                submitting ||
+                unavailableIds.some((id) =>
+                  cartDetails.lines.some((line) => line.id === id),
+                )
+              }
               className="min-h-12 w-full border border-ink bg-ink px-6 text-base font-semibold text-paper shadow-ledger transition hover:bg-brass hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Place order
+              {submitting ? (
+                <span className="inline-flex items-center gap-2">
+                  <span
+                    className="size-4 animate-spin rounded-full border-2 border-paper border-t-transparent"
+                    aria-hidden="true"
+                  />
+                  Sending order…
+                </span>
+              ) : (
+                'Place order'
+              )}
             </button>
           </form>
         </section>

@@ -407,6 +407,10 @@ export function clearCart(): void {
   window.dispatchEvent(new CustomEvent('ph-cart-change'));
 }
 
+export function restoreOrderCart(items: CartItem[]): void {
+  writeCart(items);
+}
+
 export function cartCount(items = readCart()): number {
   return items.reduce((total, item) => total + item.quantity, 0);
 }

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildWhatsAppUrl,
+  buildOrderCalendarIcs,
+  buildOrderWhatsAppText,
   cleanWhatsAppMessage,
   normaliseWhatsAppNumber,
   whatsAppRedirectPath,
@@ -33,5 +35,28 @@ describe('whatsapp helpers', () => {
       '/whatsapp?text=Hello%20there',
     );
     expect(whatsAppRedirectPath('Hello')).not.toMatch(/\d{10}/);
+  });
+});
+
+describe('order confirmation helpers', () => {
+  it('builds an encoded order summary without a phone number', () => {
+    const text = buildOrderWhatsAppText({
+      code: 'PH-ORD-1000',
+      firstName: 'Ira',
+      pickupAt: '17 Nov, 10:45 AM',
+      items: [{ name: 'Post Chai', qty: 2 }],
+    });
+    expect(text).toContain('PH-ORD-1000');
+    expect(text).toContain('2 × Post Chai');
+    expect(text).not.toMatch(/\+?91\d{10}/);
+    expect(whatsAppRedirectPath(text)).not.toContain('wa.me');
+  });
+  it('writes a thirty-minute UTC calendar event from an IST pickup instant', () => {
+    const ics = buildOrderCalendarIcs({
+      code: 'PH-ORD-1000',
+      pickupAt: '2026-11-17T13:30:00.000Z',
+    });
+    expect(ics).toContain('DTSTART:20261117T133000Z');
+    expect(ics).toContain('DTEND:20261117T140000Z');
   });
 });

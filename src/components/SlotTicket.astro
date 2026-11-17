@@ -1,18 +1,29 @@
 ---
 interface Props {
   code: string;
-  slot: string;
+  slot?: string;
   date: string;
   time: string;
-  partySize: number;
-  status: 'confirmed' | 'requested' | 'cancelled';
+  partySize?: number;
+  status: string;
+  kind?: 'booking' | 'order';
 }
-const { code, slot, date, time, partySize, status } = Astro.props;
+const {
+  code,
+  slot,
+  date,
+  time,
+  partySize,
+  status,
+  kind = 'booking',
+} = Astro.props;
 ---
 
 <article class="ticket" aria-label={`${status} booking ${code}`}>
   <div class="body">
-    <p class="ph-label text-ink-2">Booking receipt</p>
+    <p class="ph-label text-ink-2">
+      {kind === 'order' ? 'Takeaway receipt' : 'Booking receipt'}
+    </p>
     <h3>{code}</h3>
     <dl>
       <div>
@@ -23,16 +34,20 @@ const { code, slot, date, time, partySize, status } = Astro.props;
         <dt>Time</dt>
         <dd>{time}</dd>
       </div>
-      <div>
-        <dt>Party</dt>
-        <dd>{partySize}</dd>
-      </div>
+      {kind === 'booking' && (
+        <div>
+          <dt>Party</dt>
+          <dd>{partySize}</dd>
+        </div>
+      )}
     </dl>
   </div>
   <div class="stub">
     <span class="ph-label">{status}</span>
-    <strong>{slot}</strong>
-    <span class="ph-label">Hold 15 min</span>
+    <strong>{slot ?? 'PICKUP'}</strong>
+    <span class="ph-label">
+      {kind === 'order' ? 'Pay at pickup' : 'Hold 15 min'}
+    </span>
   </div>
 </article>
 
