@@ -12,6 +12,7 @@ import {
   type CartItem,
 } from '../lib/cart';
 import type { MenuItem } from '../lib/menu';
+import { resolveOrderPickupParam } from '../lib/order-pickup';
 import {
   estimatedPrepMinutes,
   getAsapPickup,
@@ -92,6 +93,7 @@ export default function OrderFlow({ items }: Props) {
   const [pickupMode, setPickupMode] = useState<'asap' | 'scheduled'>('asap');
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
+  const [pickupReady, setPickupReady] = useState<boolean>(false);
 
   // Note editing state for cart items
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
@@ -110,17 +112,35 @@ export default function OrderFlow({ items }: Props) {
   const errorSummaryRef = useRef<HTMLDivElement>(null);
   const menuMap = useMemo(() => new Map(items.map((i) => [i.id, i])), [items]);
 
-  // Sync cart from storage
+  // Sync cart from storage and apply any valid ?pickup= query parameter on mount
   useEffect(() => {
     const sync = () => setCart(readCart());
-    sync();
+    const initialCart = readCart();
+    setCart(initialCart);
+
+    const initialDetails = computeCartDetails(initialCart, items);
+    const initialPrep = estimatedPrepMinutes(
+      initialDetails.lines.map((line) => line.prepMinutes),
+    );
+    const preselected = resolveOrderPickupParam(
+      window.location.search,
+      new Date(),
+      initialPrep,
+    );
+    if (preselected) {
+      setPickupMode('scheduled');
+      setSelectedDate(preselected.date);
+      setSelectedTime(preselected.time);
+    }
+    setPickupReady(true);
+
     window.addEventListener('storage', sync);
     window.addEventListener('ph-cart-change', sync);
     return () => {
       window.removeEventListener('storage', sync);
       window.removeEventListener('ph-cart-change', sync);
     };
-  }, []);
+  }, [items]);
 
   // Update clock every minute
   useEffect(() => {
@@ -154,6 +174,7 @@ export default function OrderFlow({ items }: Props) {
 
   // Set default date when dates load
   useEffect(() => {
+    if (!pickupReady) return;
     if (!selectedDate || !pickupDates.some((d) => d.date === selectedDate)) {
       const firstAvailable = pickupDates.find((d) => d.available);
       if (firstAvailable) {
@@ -162,7 +183,7 @@ export default function OrderFlow({ items }: Props) {
         setSelectedDate(pickupDates[0].date);
       }
     }
-  }, [pickupDates, selectedDate]);
+  }, [pickupDates, pickupReady, selectedDate]);
 
   const pickupWindow = useMemo(() => {
     if (!selectedDate) return [];
@@ -171,6 +192,7 @@ export default function OrderFlow({ items }: Props) {
 
   // Set default time when window loads
   useEffect(() => {
+    if (!pickupReady) return;
     if (
       !selectedTime ||
       !pickupWindow.some((opt) => opt.time === selectedTime)
@@ -182,7 +204,7 @@ export default function OrderFlow({ items }: Props) {
         setSelectedTime(pickupWindow[0].time);
       }
     }
-  }, [pickupWindow, selectedTime]);
+  }, [pickupReady, pickupWindow, selectedTime]);
 
   // Switch to scheduled mode if café is closed or last orders passed
   useEffect(() => {

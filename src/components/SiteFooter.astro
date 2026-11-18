@@ -71,6 +71,26 @@ const isCurrent = (href: string) => {
         <a
           class:list={[
             'transition-colors hover:underline',
+            isCurrent('/gatherings') ? 'font-semibold text-brass' : '',
+          ]}
+          href="/gatherings"
+          aria-current={isCurrent('/gatherings') ? 'page' : undefined}
+        >
+          Gatherings
+        </a>
+        <a
+          class:list={[
+            'transition-colors hover:underline',
+            isCurrent('/trek-stop') ? 'font-semibold text-brass' : '',
+          ]}
+          href="/trek-stop"
+          aria-current={isCurrent('/trek-stop') ? 'page' : undefined}
+        >
+          Trek Stop
+        </a>
+        <a
+          class:list={[
+            'transition-colors hover:underline',
             isCurrent('/visit') ? 'font-semibold text-brass' : '',
           ]}
           href="/visit"

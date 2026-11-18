@@ -1,0 +1,446 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import OpenMicForm from '../components/OpenMicForm';
+import Postmark from '../components/Postmark.astro';
+import Price from '../components/Price.astro';
+import PrivateTableForm from '../components/PrivateTableForm';
+import StudentHourBadge from '../components/StudentHourBadge';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import { formatOpenMicBlock } from '../lib/gatherings';
+import { loadMenu } from '../lib/menu-data';
+import { nextFirstSaturday, nextFirstSaturdays } from '../lib/rules';
+
+const now = new Date();
+const nextOpenMicDate = nextFirstSaturday(now);
+const nextOpenMic = formatOpenMicBlock(nextOpenMicDate);
+const upcomingOpenMics = nextFirstSaturdays(now, 3).map(formatOpenMicBlock);
+
+const menuItems = loadMenu();
+const postmarkCombo = menuItems.find((item) => item.id === 'PH0215');
+if (!postmarkCombo) {
+  throw new Error('Required Postmark Combo menu item PH0215 is missing.');
+}
+
+const openMicJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: 'Monthly Open-Mic Night at The Pigeonhole Café (Demo)',
+  startDate: nextOpenMic.iso,
+  eventStatus: 'https://schema.org/EventScheduled',
+  description:
+    'Fictional demo event listing for the monthly open-mic night held on the first Saturday of each month at The Pigeonhole Café.',
+  location: {
+    '@type': 'Place',
+    name: 'The Pigeonhole Café (Fictional Demo)',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Old Sorting Room, Post Office Lane',
+      addressLocality: 'Kothi Bagh',
+      addressRegion: 'Himachal Pradesh',
+      addressCountry: 'IN',
+    },
+  },
+};
+const safeJsonLd = JSON.stringify(openMicJsonLd).replaceAll('<', '\\u003c');
+---
+
+<BaseLayout
+  title="Gatherings: open-mic, parties and offers | The Pigeonhole Café (demo)"
+  description="Monthly open-mic nights, private tables for up to 12, and offers for regulars. Fictional demo café."
+>
+  <script type="application/ld+json" set:html={safeJsonLd} />
+  <!-- 1. Header -->
+  <header class="border-b border-ink/20 py-12 md:py-20">
+    <div class="ph-container space-y-6">
+      <p class="ph-label text-stamp">Gatherings · Demo</p>
+      <h1 class="text-5xl sm:text-6xl lg:text-7xl">Gatherings</h1>
+      <p class="max-w-[60ch] text-xl text-ink-2">
+        Open-mic, birthdays and small parties. Plus the offers regulars use.
+      </p>
+
+      <nav
+        aria-label="Gatherings sections"
+        class="flex flex-wrap gap-3 pt-2"
+        data-anchor-chips
+      >
+        <a
+          href="#open-mic"
+          class="inline-flex min-h-11 items-center border border-ink bg-card px-4 text-sm font-medium text-ink no-underline transition hover:bg-ink hover:text-paper"
+        >
+          Open-mic
+        </a>
+        <a
+          href="#private-tables"
+          class="inline-flex min-h-11 items-center border border-ink bg-card px-4 text-sm font-medium text-ink no-underline transition hover:bg-ink hover:text-paper"
+        >
+          Private tables
+        </a>
+        <a
+          href="#offers"
+          class="inline-flex min-h-11 items-center border border-ink bg-card px-4 text-sm font-medium text-ink no-underline transition hover:bg-ink hover:text-paper"
+        >
+          Offers
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 2. Open-mic night -->
+  <section
+    id="open-mic"
+    class="scroll-mt-8 border-b border-ink/20 py-14 md:py-20"
+    aria-labelledby="open-mic-heading"
+  >
+    <div class="ph-container grid gap-10 lg:grid-cols-12 lg:items-start">
+      <div class="space-y-6 lg:col-span-5">
+        <div>
+          <p class="ph-label text-brass-text">First Saturday of every month</p>
+          <h2 id="open-mic-heading" class="mt-2 text-4xl sm:text-5xl">
+            Open-mic night
+          </h2>
+        </div>
+
+        <div
+          class="border border-ink bg-card p-6 shadow-ledger"
+          data-open-mic-date-block
+        >
+          <p class="ph-label text-stamp">Next open-mic</p>
+          <div class="mt-3 flex items-baseline gap-4">
+            <span class="font-display text-6xl leading-none text-ink">
+              {nextOpenMic.dayNumber}
+            </span>
+            <div>
+              <p class="font-display text-2xl text-ink">
+                {nextOpenMic.monthYear}
+              </p>
+              <p class="ph-label mt-1 text-ink-2">
+                First Saturday of every month · Evening
+              </p>
+            </div>
+          </div>
+          <p class="mt-4 border-t border-ink/15 pt-4 text-sm text-ink-2">
+            The team confirms the start time when you sign up.
+          </p>
+        </div>
+
+        <p class="max-w-[54ch] text-base text-ink-2">
+          Poetry, music, stories. Two songs or ten minutes. Sign up as a
+          performer or just come to listen.
+        </p>
+
+        <div>
+          <p class="ph-label text-ink-2">Next three dates</p>
+          <ul
+            class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3"
+            data-upcoming-open-mics
+          >
+            {upcomingOpenMics.map((entry) => (
+              <li class="border border-ink/30 bg-card px-3 py-2.5 font-mono text-xs text-ink">
+                {entry.shortLabel}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="pt-1">
+          <Button
+            href={`/reserve?date=${encodeURIComponent(nextOpenMic.iso)}`}
+            variant="outline"
+          >
+            Reserve a slot for open-mic night
+          </Button>
+        </div>
+      </div>
+
+      <div class="lg:col-span-7">
+        <OpenMicForm client:load />
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Private tables -->
+  <section
+    id="private-tables"
+    class="scroll-mt-8 border-b border-ink/20 bg-paper-2/50 py-14 md:py-20"
+    aria-labelledby="private-tables-heading"
+  >
+    <div class="ph-container space-y-10">
+      <div class="max-w-2xl space-y-3">
+        <p class="ph-label text-brass-text">Groups up to 12</p>
+        <h2 id="private-tables-heading" class="text-4xl sm:text-5xl">
+          Private tables
+        </h2>
+        <p class="text-ink-2">
+          Book one or two neighbouring slots for a quiet table together.
+        </p>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-3">
+        <article class="border border-ink bg-card p-6 shadow-ledger">
+          <p class="ph-label text-stamp">01</p>
+          <h3 class="mt-2 text-2xl">Small party</h3>
+          <p class="mt-2 text-sm text-ink-2">
+            Tables for 7 to 12 people, confirmed by the team across one or two
+            slots.
+          </p>
+        </article>
+
+        <article class="border border-ink bg-card p-6 shadow-ledger">
+          <p class="ph-label text-stamp">02</p>
+          <h3 class="mt-2 text-2xl">Birthday</h3>
+          <p class="mt-2 text-sm text-ink-2">
+            Gather up to 12 guests and pre-order from the menu so food is ready
+            when you arrive.
+          </p>
+        </article>
+
+        <article class="border border-ink bg-card p-6 shadow-ledger">
+          <p class="ph-label text-stamp">03</p>
+          <h3 class="mt-2 text-2xl">Study group or work meet-up</h3>
+          <p class="mt-2 text-sm text-ink-2">
+            Laptop-friendly zone Tuesday to Friday daytime, with Wi-Fi and plug
+            points at every table.
+          </p>
+        </article>
+      </div>
+
+      <div class="border-l-4 border-ink bg-card p-5 text-sm text-ink shadow-ledger">
+        <p>
+          Up to 12 people. Groups of 8 or more need 24 hours' notice. A slot is
+          held 15 minutes after the booking time. Pre-order from the menu so it
+          is ready when you arrive.
+        </p>
+        <p class="ph-label mt-2 text-stamp">No catering. No delivery.</p>
+      </div>
+
+      <div class="grid gap-8 lg:grid-cols-12 lg:items-start">
+        <div class="lg:col-span-8">
+          <PrivateTableForm client:load />
+        </div>
+
+        <aside class="space-y-4 border border-ink bg-card p-6 shadow-ledger lg:col-span-4">
+          <p class="ph-label text-stamp">Larger gatherings</p>
+          <h3 class="text-2xl">More than 12 people</h3>
+          <p class="text-sm text-ink-2">
+            For groups above 12, message the team on WhatsApp so we can talk
+            through seating.
+          </p>
+          <div class="pt-1">
+            <WhatsAppButton
+              text="Hello, I am enquiring about a group of more than 12 people at The Pigeonhole Café."
+              variant="outline"
+            >
+              Message the team on WhatsApp
+            </WhatsAppButton>
+          </div>
+          <p class="border-t border-ink/15 pt-3 text-xs text-ink-2">
+            No catering. No delivery.
+          </p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Offers -->
+  <section
+    id="offers"
+    class="scroll-mt-8 border-b border-ink/20 py-14 md:py-20"
+    aria-labelledby="offers-heading"
+  >
+    <div class="ph-container space-y-10">
+      <div class="max-w-xl space-y-2">
+        <p class="ph-label text-brass-text">For regulars</p>
+        <h2 id="offers-heading" class="text-4xl sm:text-5xl">
+          Offers
+        </h2>
+      </div>
+
+      <div class="grid gap-6 lg:grid-cols-3">
+        <!-- Card 1: Postmark Combo -->
+        <article class="flex flex-col justify-between border-2 border-dashed border-ink bg-card p-6 shadow-ledger">
+          <div class="space-y-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <p class="ph-label text-stamp">Offer stamp</p>
+              <Price value={postmarkCombo.price_usd} />
+            </div>
+            <h3 class="text-3xl">Postmark Combo</h3>
+            <p class="text-sm text-ink-2">
+              Any chai up to $1.40 with a Maska Pav.
+            </p>
+          </div>
+
+          <div class="mt-6 space-y-2 border-t border-ink/15 pt-4">
+            <button
+              type="button"
+              data-add-combo={postmarkCombo.id}
+              class="inline-flex min-h-11 w-full cursor-pointer items-center justify-center border border-ink bg-ink px-5 text-sm font-semibold text-paper transition active:translate-y-px hover:bg-ink-2"
+            >
+              Add to order
+            </button>
+            <p
+              id="combo-cart-status"
+              role="status"
+              aria-live="polite"
+              class="min-h-5 font-mono text-xs text-ok"
+            ></p>
+          </div>
+        </article>
+
+        <!-- Card 2: Stamp card -->
+        <article class="flex flex-col justify-between border-2 border-dashed border-ink bg-card p-6 shadow-ledger">
+          <div class="space-y-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <p class="ph-label text-stamp">Chai ledger</p>
+              <span class="ph-label text-ink-2">Illustration</span>
+            </div>
+            <h3 class="text-3xl">Stamp card</h3>
+            <p class="text-sm text-ink-2">Every 8th chai is free.</p>
+          </div>
+
+          <div class="mt-6 border border-ink/25 bg-paper p-4">
+            <svg
+              viewBox="0 0 320 140"
+              class="h-auto w-full"
+              role="img"
+              aria-label="Stamp card, seven of eight stamps collected"
+            >
+              <rect
+                x="2"
+                y="2"
+                width="316"
+                height="136"
+                fill="#FBF8F1"
+                stroke="#1B2430"
+                stroke-width="1.5"
+              />
+              {[0, 1, 2, 3, 4, 5, 6].map((index) => {
+                const col = index % 4;
+                const row = Math.floor(index / 4);
+                const cx = 44 + col * 76;
+                const cy = 40 + row * 60;
+                return (
+                  <g>
+                    <circle
+                      cx={cx}
+                      cy={cy}
+                      r="22"
+                      fill="#8E2F2A"
+                      fill-opacity="0.14"
+                      stroke="#8E2F2A"
+                      stroke-width="2"
+                    />
+                    <circle
+                      cx={cx}
+                      cy={cy}
+                      r="16"
+                      fill="none"
+                      stroke="#8E2F2A"
+                      stroke-width="1"
+                    />
+                    <text
+                      x={cx}
+                      y={cy + 4}
+                      text-anchor="middle"
+                      fill="#8E2F2A"
+                      font-family="'DM Mono', monospace"
+                      font-size="10"
+                      font-weight="600"
+                    >
+                      PH
+                    </text>
+                  </g>
+                );
+              })}
+              <g>
+                <circle
+                  cx="272"
+                  cy="100"
+                  r="22"
+                  fill="none"
+                  stroke="#7A5D1C"
+                  stroke-width="2"
+                  stroke-dasharray="4 3"
+                />
+                <text
+                  x="272"
+                  y="104"
+                  text-anchor="middle"
+                  fill="#7A5D1C"
+                  font-family="'DM Mono', monospace"
+                  font-size="9"
+                  font-weight="600"
+                >
+                  FREE
+                </text>
+              </g>
+            </svg>
+            <p class="ph-label mt-2 text-center text-ink-2">Illustration</p>
+          </div>
+        </article>
+
+        <!-- Card 3: Student Hour -->
+        <article class="flex flex-col justify-between border-2 border-dashed border-ink bg-card p-6 shadow-ledger">
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <p class="ph-label text-stamp">Counter offer</p>
+              <StudentHourBadge client:load />
+            </div>
+            <h3 class="text-3xl">Student Hour</h3>
+            <p class="text-sm text-ink-2">
+              10% off with student ID, Tuesday to Thursday, 3 to 6 PM. Shown at
+              the counter.
+            </p>
+          </div>
+
+          <p class="mt-6 border-t border-ink/15 pt-4 font-mono text-xs text-ink-2">
+            Applied at the counter only, never online.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Closing band -->
+  <section class="py-16 md:py-24 text-center">
+    <div class="ph-container max-w-2xl space-y-6">
+      <div class="flex justify-center">
+        <Postmark size={96} decorative />
+      </div>
+      <h2 class="text-4xl sm:text-5xl">Bringing people? Ask us.</h2>
+      <p class="text-ink-2">
+        Check a quick question with the assistant or book your slot directly.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4 pt-2">
+        <button
+          type="button"
+          data-open-assistant
+          class="inline-flex min-h-11 cursor-pointer items-center justify-center border border-ink bg-ink px-6 font-semibold text-paper transition hover:bg-ink-2"
+        >
+          Ask the assistant
+        </button>
+        <Button href="/reserve" variant="outline">
+          Reserve a slot
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import { addToCart } from '../lib/cart';
+
+    const comboButton =
+      document.querySelector<HTMLButtonElement>('[data-add-combo]');
+    const statusLine =
+      document.querySelector<HTMLElement>('#combo-cart-status');
+
+    comboButton?.addEventListener('click', () => {
+      const itemId = comboButton.dataset.addCombo;
+      if (!itemId) return;
+      addToCart(itemId, 1);
+      if (statusLine) {
+        statusLine.textContent = 'Added Postmark Combo to your order.';
+      }
+    });
+  </script>
+</BaseLayout>

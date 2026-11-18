@@ -15,6 +15,7 @@ import {
   formatReserveDateLong,
   getPartyHelperLines,
   isValidIndianPhoneInput,
+  parseReserveDateParam,
   parseReserveHash,
   sanitizeReserveDraft,
   serializeReserveHash,
@@ -185,15 +186,26 @@ export default function ReserveFlow({ items }: Props) {
       saved = {};
     }
     const fromHash = parseReserveHash(window.location.hash);
+    const fromQueryDate = parseReserveDateParam(
+      window.location.search,
+      calendar.bookableDates,
+    );
 
-    const nextDateCandidate = fromHash.date ?? saved.date ?? '';
+    const nextDateCandidate =
+      fromQueryDate ?? fromHash.date ?? saved.date ?? '';
     const nextDate = bookableSet.has(nextDateCandidate)
       ? nextDateCandidate
       : calendar.firstSelectableDate;
-    const nextTime =
-      nextDate === nextDateCandidate ? (fromHash.time ?? saved.time ?? '') : '';
+    const preservedTime = fromQueryDate
+      ? ''
+      : nextDate === (fromHash.date ?? saved.date ?? '')
+        ? (fromHash.time ?? saved.time ?? '')
+        : '';
+    const nextTime = preservedTime;
     const nextParty = fromHash.partySize ?? saved.partySize ?? 2;
-    const nextStepCandidate = fromHash.step ?? saved.step ?? 1;
+    const nextStepCandidate = fromQueryDate
+      ? 1
+      : (fromHash.step ?? saved.step ?? 1);
 
     setDate(nextDate);
     setTime(nextTime);

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import GeneralContactForm from '../components/GeneralContactForm';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import { FAQ_ITEMS } from '../data/faq';
 import { CAFE_TIME_ZONE, getOpenState } from '../lib/rules';
@@ -618,6 +619,8 @@ const facilities = [
             </WhatsAppButton>
           </div>
         </div>
+
+        <GeneralContactForm client:load />
       </div>
     </div>
   </section>

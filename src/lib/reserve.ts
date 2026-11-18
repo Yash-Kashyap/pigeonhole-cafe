@@ -395,6 +395,19 @@ export function buildReserveCalendar(now: Date): {
   };
 }
 
+/**
+ * Reads an optional ?date=YYYY-MM-DD query parameter and accepts it only when it
+ * is a real date present in the bookable dates list from rules.
+ */
+export function parseReserveDateParam(
+  search: string,
+  bookableDates: readonly string[],
+): string | null {
+  const raw = new URLSearchParams(search).get('date')?.trim() ?? '';
+  if (!parseIsoDate(raw)) return null;
+  return bookableDates.includes(raw) ? raw : null;
+}
+
 export function parseReserveHash(hash: string): Partial<ReserveHashState> {
   const cleaned = hash.replace(/^#/, '').trim();
   if (!cleaned) return {};

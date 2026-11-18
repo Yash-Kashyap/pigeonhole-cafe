@@ -1,0 +1,257 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import MenuCard from '../components/MenuCard.astro';
+import MoodPhoto from '../components/MoodPhoto.astro';
+import OpenStatus from '../components/OpenStatus';
+import SundayPlanner from '../components/SundayPlanner';
+import TrekOrderAhead from '../components/TrekOrderAhead';
+import { resolveTrekItems } from '../data/trek-items';
+import { loadMenu } from '../lib/menu-data';
+import { isTrekSeason } from '../lib/rules';
+
+const now = new Date();
+const inTrekSeason = isTrekSeason(now);
+const allItems = loadMenu();
+const trekItems = resolveTrekItems(allItems);
+
+const trekGroups = [
+  {
+    id: 'before-you-go',
+    heading: 'Before you go',
+    subtitle: 'Food before a trek: hot siddu and spiced chai from the counter.',
+    items: trekItems.slice(0, 4),
+  },
+  {
+    id: 'take-with-you',
+    heading: 'Take with you',
+    subtitle: 'Packed takeaway items ready to collect before setting out.',
+    items: trekItems.slice(4, 7),
+  },
+  {
+    id: 'when-you-come-back',
+    heading: 'When you come back',
+    subtitle:
+      "Full trekker's thali, slow-cooked madra, kheer and hill sharbat.",
+    items: trekItems.slice(7, 13),
+  },
+];
+
+const goodToKnow = [
+  'Street parking nearby, about 5 cars',
+  'Steps at the entrance, no ramp yet',
+  'Pets outdoors only',
+  'Wi-Fi and plug points at every table',
+  'Wood-fired heater in winter',
+  'Payments: UPI, cards, cash',
+];
+---
+
+<BaseLayout
+  title="Trek Stop: fuel before and after the climb | The Pigeonhole Café (demo)"
+  description="Himachali Siddu, trekker's thali and takeaway order-ahead for trekkers. Sunday opening at 7 AM in trek season. Fictional demo café."
+>
+  <!-- 1. Hero -->
+  <header class="border-b border-ink/20 py-12 md:py-20">
+    <div class="ph-container grid items-center gap-10 lg:grid-cols-12">
+      <div class="space-y-6 lg:col-span-7">
+        <p class="ph-label text-stamp">Trek Stop</p>
+        <h1 class="text-5xl sm:text-6xl">
+          Fuel for the climb. Sorted for the way down.
+        </h1>
+
+        <div
+          data-season-banner
+          class="border-l-4 border-stamp bg-card px-4 py-3 text-sm font-medium text-ink shadow-ledger"
+        >
+          {inTrekSeason
+            ? 'Trek season: Sundays open from 7:00 AM'
+            : 'Trek season runs October to November. Other days open as usual.'}
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <OpenStatus client:load />
+        </div>
+
+        <div class="flex flex-wrap gap-4 pt-1">
+          <Button href="#order-ahead" variant="solid">
+            Order ahead
+          </Button>
+          <Button href="/reserve" variant="outline">
+            Reserve a slot
+          </Button>
+        </div>
+      </div>
+
+      <div class="lg:col-span-5">
+        <MoodPhoto
+          base="valley"
+          alt="Mountain village beneath snowy peaks"
+          width={640}
+          height={480}
+          eager
+        />
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. The trekker's plate -->
+  <section
+    id="trekker-plate"
+    class="border-b border-ink/20 py-14 md:py-20"
+    aria-labelledby="trekker-plate-heading"
+  >
+    <div class="ph-container space-y-12">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div class="max-w-2xl space-y-2">
+          <p class="ph-label text-brass-text">Curated from the menu</p>
+          <h2 id="trekker-plate-heading" class="text-4xl sm:text-5xl">
+            What trekkers order
+          </h2>
+          <p class="text-ink-2">
+            Every dish is vegetarian and eggless, with allergens listed on each
+            card.
+          </p>
+        </div>
+        <p
+          id="trek-add-toast"
+          role="status"
+          aria-live="polite"
+          class="min-h-6 font-mono text-xs text-ok"
+        ></p>
+      </div>
+
+      {trekGroups.map((group) => (
+        <section
+          aria-labelledby={`group-${group.id}`}
+          class="space-y-4"
+          data-trek-group={group.id}
+        >
+          <div class="space-y-1">
+            <h3 id={`group-${group.id}`} class="text-3xl">
+              {group.heading}
+            </h3>
+            <p class="text-sm text-ink-2">{group.subtitle}</p>
+          </div>
+
+          <div class="border-b border-ink bg-card px-5 shadow-ledger">
+            {group.items.map((item) => (
+              <MenuCard
+                id={item.id}
+                name={item.name}
+                description={item.description}
+                price={item.price_usd}
+                vegan={item.vegan}
+                jain={item.jain_option}
+                glutenFree={item.gluten_free}
+                spice={item.spice_level as 0 | 1 | 2 | 3}
+                allergens={item.allergens}
+                prepMinutes={item.prep_minutes}
+                tags={item.tags}
+                unavailable={!item.available}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  </section>
+
+  <!-- 3. Order ahead -->
+  <section
+    id="order-ahead"
+    class="scroll-mt-8 border-b border-ink/20 bg-paper-2/50 py-14 md:py-20"
+    aria-labelledby="order-ahead-heading"
+  >
+    <div class="ph-container space-y-6">
+      <div class="max-w-xl space-y-2">
+        <p class="ph-label text-brass-text">Takeaway counter</p>
+        <h2 id="order-ahead-heading" class="text-4xl sm:text-5xl">
+          Order ahead
+        </h2>
+      </div>
+      <TrekOrderAhead client:load items={allItems} />
+    </div>
+  </section>
+
+  <!-- 4. Sunday planner -->
+  <section
+    id="sunday-planner"
+    class="border-b border-ink/20 py-14 md:py-20"
+    aria-labelledby="sunday-planner-heading"
+  >
+    <div class="ph-container max-w-3xl">
+      <SundayPlanner client:load />
+    </div>
+  </section>
+
+  <!-- 5. Good to know -->
+  <section
+    class="border-b border-ink/20 bg-card py-14 md:py-20"
+    aria-labelledby="good-to-know-heading"
+  >
+    <div class="ph-container space-y-8">
+      <div class="max-w-xl space-y-2">
+        <p class="ph-label text-brass-text">Practical notes</p>
+        <h2 id="good-to-know-heading" class="text-4xl sm:text-5xl">
+          Good to know
+        </h2>
+      </div>
+
+      <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {goodToKnow.map((fact, index) => (
+          <li class="border border-ink bg-paper p-5 text-sm text-ink shadow-ledger">
+            <span class="font-mono text-xs font-semibold text-stamp">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <p class="mt-2 font-medium">{fact}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- 6. Closing -->
+  <section class="py-16 md:py-24 text-center">
+    <div class="ph-container max-w-2xl space-y-6">
+      <h2 class="text-4xl sm:text-5xl">Sorted before the climb.</h2>
+      <p class="text-ink-2">
+        Pack your takeaway ahead or check our full hours and facilities.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4 pt-2">
+        <Button href="#order-ahead" variant="solid">
+          Order ahead
+        </Button>
+        <Button href="/visit" variant="outline">
+          Visit and help
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import { addToCart } from '../lib/cart';
+
+    const toast = document.querySelector<HTMLElement>('#trek-add-toast');
+    document
+      .querySelectorAll<HTMLButtonElement>('[data-add-to-cart]')
+      .forEach((button) => {
+        button.addEventListener('click', () => {
+          const id = button.dataset.addToCart;
+          const name = button.dataset.itemName ?? 'Item';
+          if (!id) return;
+          addToCart(id, 1);
+          const original = button.textContent;
+          button.textContent = 'Added';
+          if (toast) {
+            toast.textContent = `Added ${name} to your bag.`;
+          }
+          window.setTimeout(() => {
+            if (button.textContent === 'Added') {
+              button.textContent = original ?? 'Add';
+            }
+          }, 1200);
+        });
+      });
+  </script>
+</BaseLayout>

@@ -16,6 +16,7 @@ import {
   formatSlotLabel,
   getPartyHelperLines,
   isValidIndianPhoneInput,
+  parseReserveDateParam,
   parseReserveHash,
   sanitizeReserveDraft,
   serializeReserveHash,
@@ -311,5 +312,33 @@ describe('phone validation, .ics builder and WhatsApp helpers', () => {
     const path = buildBookingWhatsAppPath(booking);
     expect(path.startsWith('/whatsapp?text=')).toBe(true);
     expect(path).not.toContain('wa.me');
+  });
+
+  it('preselects ?date=YYYY-MM-DD only when it is a valid bookable date', () => {
+    const now = new Date('2026-11-18T04:00:00.000Z');
+    const cal = buildReserveCalendar(now);
+
+    expect(parseReserveDateParam('?date=2026-11-22', cal.bookableDates)).toBe(
+      '2026-11-22',
+    );
+    // Monday is closed and must be ignored
+    expect(
+      parseReserveDateParam('?date=2026-11-23', cal.bookableDates),
+    ).toBeNull();
+    // Past or beyond 30-day window must be ignored
+    expect(
+      parseReserveDateParam('?date=2026-11-10', cal.bookableDates),
+    ).toBeNull();
+    expect(
+      parseReserveDateParam('?date=2027-01-10', cal.bookableDates),
+    ).toBeNull();
+    // Malformed strings must be ignored
+    expect(
+      parseReserveDateParam('?date=2026-02-30', cal.bookableDates),
+    ).toBeNull();
+    expect(
+      parseReserveDateParam('?date=not-a-date', cal.bookableDates),
+    ).toBeNull();
+    expect(parseReserveDateParam('', cal.bookableDates)).toBeNull();
   });
 });
