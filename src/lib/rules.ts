@@ -529,6 +529,7 @@ export function validateOrder(
 
 export function nextFirstSaturday(now: Date): Date {
   const p = localParts(now);
+  const today = istDate(p.year, p.month, p.day);
   for (let monthOffset = 0; monthOffset < 24; monthOffset += 1) {
     const total = p.month - 1 + monthOffset;
     const year = p.year + Math.floor(total / 12);
@@ -536,14 +537,66 @@ export function nextFirstSaturday(now: Date): Date {
     const first = istDate(year, month, 1);
     const fp = localParts(first);
     const saturday = istDate(year, month, 1 + ((6 - fp.weekday + 7) % 7));
-    if (saturday >= now) return saturday;
+    if (saturday > today) return saturday;
+    if (saturday.getTime() === today.getTime()) {
+      const hours = hoursFor(saturday);
+      const minutes = p.hour * 60 + p.minute;
+      if (hours && minutes < hours.close) return saturday;
+    }
   }
   throw new Error('Unable to find the next first Saturday.');
 }
 
+export function nextFirstSaturdays(now: Date, count = 3): Date[] {
+  if (!Number.isInteger(count) || count < 1 || count > 24) return [];
+  const dates: Date[] = [];
+  let cursor = now;
+  while (dates.length < count) {
+    const next = nextFirstSaturday(cursor);
+    dates.push(next);
+    cursor = new Date(next.getTime() + 86_400_000);
+  }
+  return dates;
+}
+
+export function isTrekSeason(date: Date): boolean {
+  const month = localParts(date).month;
+  return month === 10 || month === 11;
+}
+
 export function isTrekSunday(date: Date): boolean {
   const p = localParts(date);
-  return p.weekday === 0 && (p.month === 10 || p.month === 11);
+  return p.weekday === 0 && isTrekSeason(date);
+}
+
+export function getSundayPlannerDates(now: Date, weeks = 8): string[] {
+  if (!Number.isInteger(weeks) || weeks < 1 || weeks > 52) return [];
+  const p = localParts(now);
+  const today = istDate(p.year, p.month, p.day);
+  const daysUntilSunday = (7 - p.weekday) % 7;
+  const firstSunday = new Date(today.getTime() + daysUntilSunday * 86_400_000);
+  return Array.from({ length: weeks }, (_, index) =>
+    isoLocal(new Date(firstSunday.getTime() + index * 7 * 86_400_000)),
+  );
+}
+
+export function getSundayPlan(date: string): {
+  opensAt: '07:00' | '08:00';
+  closesAt: '23:00';
+  lastOrdersAt: '22:30';
+  trekSeason: boolean;
+} | null {
+  const parsed = parseDate(date);
+  if (!parsed) return null;
+  const day = istDate(parsed.year, parsed.month, parsed.day);
+  if (localParts(day).weekday !== 0) return null;
+  const trekSeason = isTrekSeason(day);
+  return {
+    opensAt: trekSeason ? '07:00' : '08:00',
+    closesAt: '23:00',
+    lastOrdersAt: '22:30',
+    trekSeason,
+  };
 }
 
 export function isStudentHourNow(date: Date): boolean {

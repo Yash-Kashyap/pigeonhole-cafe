@@ -7,15 +7,19 @@ import {
   getBookableTimes,
   getBookingHoldUntil,
   getOpenState,
+  getSundayPlan,
+  getSundayPlannerDates,
   estimatedPrepMinutes,
   getAsapPickup,
   getPickupDates,
   getPickupWindow,
   hasLargePartyNotice,
   isStudentHourNow,
+  isTrekSeason,
   isTrekSunday,
   nearestValidPickup,
   nextFirstSaturday,
+  nextFirstSaturdays,
   validateBooking,
   validateOrder,
 } from './rules';
@@ -239,14 +243,63 @@ describe('pickup choices', () => {
 });
 
 describe('offer and event rules', () => {
-  it('finds the next first Saturday', () =>
+  it('finds the next first Saturday after the current month date has passed', () =>
     expect(nextFirstSaturday(atIst('2026-11-08T12:00:00'))).toEqual(
       atIst('2026-12-05T00:00:00'),
     ));
-  it('recognises trek Sundays and student hours', () => {
+  it('keeps the first Saturday until closing and rolls after closing', () => {
+    expect(nextFirstSaturday(atIst('2026-12-05T22:59:00'))).toEqual(
+      atIst('2026-12-05T00:00:00'),
+    );
+    expect(nextFirstSaturday(atIst('2026-12-05T23:00:00'))).toEqual(
+      atIst('2027-01-02T00:00:00'),
+    );
+  });
+  it('handles month, year, the 31st and leap-year boundaries', () => {
+    expect(nextFirstSaturday(atIst('2026-01-31T12:00:00'))).toEqual(
+      atIst('2026-02-07T00:00:00'),
+    );
+    expect(nextFirstSaturday(atIst('2027-12-31T23:59:00'))).toEqual(
+      atIst('2028-01-01T00:00:00'),
+    );
+    expect(nextFirstSaturday(atIst('2028-02-29T12:00:00'))).toEqual(
+      atIst('2028-03-04T00:00:00'),
+    );
+    expect(nextFirstSaturdays(atIst('2026-12-05T12:00:00'))).toEqual([
+      atIst('2026-12-05T00:00:00'),
+      atIst('2027-01-02T00:00:00'),
+      atIst('2027-02-06T00:00:00'),
+    ]);
+  });
+  it('recognises trek season, trek Sundays and student hours', () => {
+    expect(isTrekSeason(atIst('2026-10-01T08:00:00'))).toBe(true);
+    expect(isTrekSeason(atIst('2026-11-30T08:00:00'))).toBe(true);
+    expect(isTrekSeason(atIst('2026-09-30T08:00:00'))).toBe(false);
     expect(isTrekSunday(atIst('2026-10-04T08:00:00'))).toBe(true);
+    expect(isTrekSunday(atIst('2026-11-01T08:00:00'))).toBe(true);
+    expect(isTrekSunday(atIst('2026-10-05T08:00:00'))).toBe(false);
+    expect(isTrekSunday(atIst('2026-09-27T08:00:00'))).toBe(false);
     expect(isTrekSunday(atIst('2026-12-06T08:00:00'))).toBe(false);
     expect(isStudentHourNow(atIst('2026-11-17T15:00:00'))).toBe(true);
     expect(isStudentHourNow(atIst('2026-11-20T15:00:00'))).toBe(false);
+  });
+  it('builds eight Sunday choices and the correct planner hours', () => {
+    const dates = getSundayPlannerDates(atIst('2026-09-30T23:30:00'));
+    expect(dates).toHaveLength(8);
+    expect(dates[0]).toBe('2026-10-04');
+    expect(dates[7]).toBe('2026-11-22');
+    expect(getSundayPlan('2026-10-04')).toEqual({
+      opensAt: '07:00',
+      closesAt: '23:00',
+      lastOrdersAt: '22:30',
+      trekSeason: true,
+    });
+    expect(getSundayPlan('2026-12-06')).toEqual({
+      opensAt: '08:00',
+      closesAt: '23:00',
+      lastOrdersAt: '22:30',
+      trekSeason: false,
+    });
+    expect(getSundayPlan('2026-10-05')).toBeNull();
   });
 });
