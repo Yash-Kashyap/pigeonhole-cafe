@@ -2,6 +2,10 @@ export const CAFE_TIME_ZONE = 'Asia/Kolkata';
 export const BOOKING_DURATION_MINUTES = 90;
 export const BOOKING_STEP_MINUTES = 30;
 export const BOOKING_HORIZON_DAYS = 30;
+export const BOOKING_SAME_DAY_CUTOFF_MINUTES = 120;
+export const BOOKING_LARGE_PARTY_NOTICE_MINUTES = 24 * 60;
+export const BOOKING_CANCEL_CUTOFF_MINUTES = 120;
+export const BOOKING_HOLD_MINUTES = 15;
 export const PICKUP_HORIZON_DAYS = 7;
 
 type LocalParts = {
@@ -185,7 +189,7 @@ export function getBookableTimes(date: string, now: Date): string[] {
   if (!getBookableDates(now).includes(date)) return [];
   const hours = hoursFor(day);
   if (!hours) return [];
-  const minimum = now.getTime() + 2 * 60 * 60_000;
+  const minimum = now.getTime() + BOOKING_SAME_DAY_CUTOFF_MINUTES * 60_000;
   const times: string[] = [];
   for (
     let minutes = hours.open;
@@ -207,6 +211,75 @@ export function getBookableTimes(date: string, now: Date): string[] {
   return times;
 }
 
+/** Converts a local cafe date and time to its absolute booking start. */
+export function getBookingStart(date: string, time: string): Date | null {
+  const parsedDate = parseDate(date);
+  const parsedTime = parseTime(time);
+  if (!parsedDate || !parsedTime) return null;
+  return istDate(
+    parsedDate.year,
+    parsedDate.month,
+    parsedDate.day,
+    parsedTime.hour,
+    parsedTime.minute,
+  );
+}
+
+/** The time until which a confirmed slot is held. */
+export function getBookingHoldUntil(date: string, time: string): Date | null {
+  const start = getBookingStart(date, time);
+  return start
+    ? new Date(start.getTime() + BOOKING_HOLD_MINUTES * 60_000)
+    : null;
+}
+
+/** Groups of eight to twelve must book at least 24 hours ahead. */
+export function hasLargePartyNotice(
+  date: string,
+  time: string,
+  now: Date,
+): boolean {
+  const start = getBookingStart(date, time);
+  return (
+    start !== null &&
+    start.getTime() - now.getTime() >=
+      BOOKING_LARGE_PARTY_NOTICE_MINUTES * 60_000
+  );
+}
+
+/** Cancellations are accepted until exactly two hours before the start. */
+export function canCancelBooking(
+  date: string,
+  time: string,
+  now: Date,
+): boolean {
+  const start = getBookingStart(date, time);
+  return (
+    start !== null &&
+    start.getTime() - now.getTime() >= BOOKING_CANCEL_CUTOFF_MINUTES * 60_000
+  );
+}
+
+/** Half-open booking ranges overlap when each begins before the other ends. */
+export function bookingRangesOverlap(
+  firstStart: Date,
+  secondStart: Date,
+  durationMinutes = BOOKING_DURATION_MINUTES,
+): boolean {
+  if (
+    Number.isNaN(firstStart.getTime()) ||
+    Number.isNaN(secondStart.getTime()) ||
+    !Number.isFinite(durationMinutes) ||
+    durationMinutes <= 0
+  )
+    return false;
+  const duration = durationMinutes * 60_000;
+  return (
+    firstStart.getTime() < secondStart.getTime() + duration &&
+    secondStart.getTime() < firstStart.getTime() + duration
+  );
+}
+
 export function classifyParty(partySize: number): PartyClass {
   if (!Number.isInteger(partySize) || partySize < 1 || partySize > 12)
     return 'handoff';
@@ -225,20 +298,15 @@ export function validateBooking(
   if (!date) errors.push('Choose a valid booking date.');
   if (!time) errors.push('Choose a valid booking time.');
   if (date && time) {
-    const start = istDate(
-      date.year,
-      date.month,
-      date.day,
-      time.hour,
-      time.minute,
-    );
+    const start = getBookingStart(booking.date, booking.time);
     if (!getBookableDates(now).includes(booking.date))
       errors.push('Date is outside the booking window or the café is closed.');
     if (!getBookableTimes(booking.date, now).includes(booking.time))
       errors.push('Time is not available under the booking rules.');
     if (
       booking.partySize >= 8 &&
-      start.getTime() - now.getTime() < 24 * 60 * 60_000
+      start !== null &&
+      !hasLargePartyNotice(booking.date, booking.time, now)
     ) {
       errors.push('Groups of 8 or more need 24 hours notice.');
     }

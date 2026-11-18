@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import {
+  bookingRangesOverlap,
+  canCancelBooking,
   classifyParty,
   getBookableDates,
   getBookableTimes,
+  getBookingHoldUntil,
   getOpenState,
   estimatedPrepMinutes,
   getAsapPickup,
   getPickupDates,
   getPickupWindow,
+  hasLargePartyNotice,
   isStudentHourNow,
   isTrekSunday,
   nearestValidPickup,
@@ -35,32 +39,84 @@ describe('opening rules', () => {
 
 describe('booking rules', () => {
   const now = atIst('2026-11-17T10:00:00');
-  it('returns non-Monday dates through the 30-day horizon', () => {
+  it('returns today through day 30 while excluding Mondays', () => {
     const dates = getBookableDates(now);
     expect(dates).toContain('2026-11-17');
     expect(dates).not.toContain('2026-11-23');
     expect(dates).toContain('2026-12-17');
+    expect(dates).not.toContain('2026-11-16');
+    expect(dates).not.toContain('2026-12-18');
   });
-  it('uses half-hour times, the two-hour cutoff, and the closing cutoff', () => {
+  it('allows the exact two-hour boundary and rejects one minute inside it', () => {
     const times = getBookableTimes('2026-11-17', now);
     expect(times[0]).toBe('12:00');
-    expect(times.at(-1)).toBe('20:30');
+    expect(times).not.toContain('11:59');
+    expect(
+      getBookableTimes('2026-11-17', atIst('2026-11-17T10:01:00')),
+    ).not.toContain('12:00');
   });
-  it('classifies parties', () => {
+  it('uses half-hour steps and the exact weekday last start', () => {
+    const times = getBookableTimes('2026-11-17', now);
+    expect(times.every((time) => /:(00|30)$/.test(time))).toBe(true);
+    expect(times.at(-1)).toBe('20:30');
+    expect(times).not.toContain('21:00');
+  });
+  it('uses the weekend last start and the trek Sunday opening', () => {
+    const futureNow = atIst('2026-10-01T10:00:00');
+    const saturday = getBookableTimes('2026-10-03', futureNow);
+    const sunday = getBookableTimes('2026-10-04', futureNow);
+    expect(saturday[0]).toBe('08:00');
+    expect(saturday.at(-1)).toBe('22:00');
+    expect(sunday[0]).toBe('07:00');
+    expect(sunday.at(-1)).toBe('22:00');
+  });
+  it('classifies every party boundary', () => {
+    expect(classifyParty(1)).toBe('confirmed');
     expect(classifyParty(6)).toBe('confirmed');
     expect(classifyParty(7)).toBe('requested');
+    expect(classifyParty(8)).toBe('requested');
     expect(classifyParty(12)).toBe('requested');
     expect(classifyParty(13)).toBe('handoff');
+    expect(classifyParty(0)).toBe('handoff');
+    expect(classifyParty(-1)).toBe('handoff');
+    expect(classifyParty(4.5)).toBe('handoff');
   });
-  it('enforces 24 hours notice for groups of eight', () => {
+  it('enforces the exact 24-hour notice boundary for groups of eight', () => {
     expect(
-      validateBooking({ date: '2026-11-18', time: '09:30', partySize: 8 }, now)
+      validateBooking({ date: '2026-11-18', time: '09:59', partySize: 8 }, now)
         .valid,
     ).toBe(false);
     expect(
-      validateBooking({ date: '2026-11-19', time: '09:30', partySize: 8 }, now)
+      validateBooking({ date: '2026-11-18', time: '10:00', partySize: 8 }, now)
         .valid,
     ).toBe(true);
+    expect(hasLargePartyNotice('2026-11-18', '10:00', now)).toBe(true);
+    expect(hasLargePartyNotice('2026-11-18', '09:59', now)).toBe(false);
+  });
+  it('detects 90-minute overlaps but permits touching boundaries', () => {
+    const first = atIst('2026-11-17T12:00:00');
+    expect(bookingRangesOverlap(first, atIst('2026-11-17T13:29:00'))).toBe(
+      true,
+    );
+    expect(bookingRangesOverlap(first, atIst('2026-11-17T13:30:00'))).toBe(
+      false,
+    );
+    expect(bookingRangesOverlap(first, atIst('2026-11-17T11:00:00'))).toBe(
+      true,
+    );
+  });
+  it('uses the exact two-hour cancellation boundary', () => {
+    expect(
+      canCancelBooking('2026-11-17', '12:00', atIst('2026-11-17T10:00:00')),
+    ).toBe(true);
+    expect(
+      canCancelBooking('2026-11-17', '12:00', atIst('2026-11-17T10:01:00')),
+    ).toBe(false);
+  });
+  it('holds a slot until 15 minutes after its start', () => {
+    expect(getBookingHoldUntil('2026-11-17', '12:00')).toEqual(
+      atIst('2026-11-17T12:15:00'),
+    );
   });
 });
 
