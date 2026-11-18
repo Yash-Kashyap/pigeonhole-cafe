@@ -1,16 +1,16 @@
 ---
-import BaseLayout from '../../../layouts/BaseLayout.astro';
+import OwnerToday from '../../../components/owner/OwnerToday';
+import OwnerLayout from '../../../layouts/OwnerLayout.astro';
+import { getOwnerRealtimeProps } from '../../../lib/owner-page-props';
+
+export const prerender = false;
+const realtime = getOwnerRealtimeProps();
 ---
 
-<BaseLayout
-  title="Owner area | The Pigeonhole Café (demo)"
-  description="Guarded owner area for The Pigeonhole Café demo."
-  noindex
-  showAssistant={false}
->
-  <section class="mx-auto max-w-3xl px-4 py-20">
-    <p class="ph-label text-stamp">Private counter · Demo</p>
-    <h1 class="mt-3 font-serif text-4xl">The guarded owner area works.</h1>
-    <p class="mt-4 text-ink-2">Phase 4b supplies the dashboard screens.</p>
-  </section>
-</BaseLayout>
+<OwnerLayout title="Today" active="today">
+  <OwnerToday
+    client:load
+    supabaseUrl={realtime.supabaseUrl}
+    supabaseAnonKey={realtime.supabaseAnonKey}
+  />
+</OwnerLayout>

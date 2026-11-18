@@ -1,0 +1,149 @@
+---
+import OwnerHeaderControls from '../components/owner/OwnerHeaderControls';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  active: 'today' | 'orders' | 'bookings' | 'inbox' | 'menu';
+}
+
+const { title, active } = Astro.props;
+
+const navItems: ReadonlyArray<{
+  key: Props['active'];
+  label: string;
+  href: string;
+}> = [
+  { key: 'today', label: 'Today', href: '/owner/app' },
+  { key: 'orders', label: 'Orders', href: '/owner/app/orders' },
+  { key: 'bookings', label: 'Bookings', href: '/owner/app/bookings' },
+  { key: 'inbox', label: 'Inbox', href: '/owner/app/inbox' },
+  { key: 'menu', label: 'Menu', href: '/owner/app/menu' },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Private counter dashboard for The Pigeonhole Café demo."
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{title} | Owner Counter | The Pigeonhole Café (demo)</title>
+    <script is:inline>
+      history.scrollRestoration = 'manual';
+      window.scrollTo(0, 0);
+    </script>
+  </head>
+  <body class="bg-paper text-ink">
+    <a
+      href="#owner-main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:border focus:border-ink focus:bg-card focus:px-4 focus:py-2"
+    >
+      Skip to counter content
+    </a>
+
+    <div class="flex min-h-screen flex-col">
+      <header class="sticky top-0 z-30 border-b border-ink bg-card">
+        <div class="mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-3 px-4 py-3 md:px-6">
+          <div class="min-w-0">
+            <a
+              href="/owner/app"
+              class="inline-flex flex-wrap items-baseline gap-2 no-underline"
+            >
+              <span class="font-display text-xl leading-tight sm:text-2xl">
+                The Pigeonhole Café
+              </span>
+              <span class="ph-label text-stamp">Owner · Demo</span>
+            </a>
+          </div>
+          <OwnerHeaderControls client:load />
+        </div>
+      </header>
+
+      <div class="mx-auto flex w-full max-w-[1440px] flex-1 flex-col md:flex-row">
+        <aside
+          aria-label="Owner sections"
+          class="hidden w-56 shrink-0 border-r border-ink/20 bg-paper-2/60 p-4 md:flex md:flex-col md:justify-between"
+        >
+          <nav aria-label="Primary owner navigation" class="grid gap-1.5">
+            {navItems.map((item) => {
+              const isCurrent = item.key === active;
+              return (
+                <a
+                  href={item.href}
+                  aria-current={isCurrent ? 'page' : undefined}
+                  class:list={[
+                    'flex min-h-11 items-center justify-between border px-3.5 text-sm font-semibold no-underline transition-colors',
+                    isCurrent
+                      ? 'border-ink bg-ink text-paper'
+                      : 'border-transparent text-ink hover:border-ink/30 hover:bg-card',
+                  ]}
+                >
+                  <span>{item.label}</span>
+                  {isCurrent && (
+                    <span
+                      class="size-1.5 rounded-full bg-brass"
+                      aria-hidden="true"
+                    />
+                  )}
+                </a>
+              );
+            })}
+          </nav>
+
+          <div class="mt-8 border-t border-ink/20 pt-4 text-xs text-ink-2">
+            <p class="ph-label text-brass-text">Counter note</p>
+            <p class="mt-1.5 leading-relaxed">
+              Changes to orders, bookings, and menu items update customer pages
+              immediately.
+            </p>
+          </div>
+        </aside>
+
+        <div class="flex min-w-0 flex-1 flex-col">
+          <main
+            id="owner-main"
+            class="min-w-0 flex-1 px-4 py-5 sm:px-6 md:py-6"
+          >
+            <slot />
+          </main>
+
+          <footer class="border-t border-ink/20 bg-paper-2/50 px-4 py-4 pb-20 text-xs text-ink-2 sm:px-6 md:pb-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <p>Demo area. Data shown is fictional.</p>
+              <p class="font-mono text-[11px] uppercase tracking-[0.06em]">
+                The Pigeonhole Café · Kothi Bagh
+              </p>
+            </div>
+          </footer>
+        </div>
+      </div>
+
+      <nav
+        aria-label="Mobile owner navigation"
+        class="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-ink bg-card md:hidden"
+      >
+        {navItems.map((item) => {
+          const isCurrent = item.key === active;
+          return (
+            <a
+              href={item.href}
+              aria-current={isCurrent ? 'page' : undefined}
+              class:list={[
+                'flex min-h-14 flex-col items-center justify-center px-1 text-center font-mono text-[11px] font-medium tracking-[0.04em] uppercase no-underline',
+                isCurrent ? 'bg-ink text-paper' : 'text-ink hover:bg-paper-2',
+              ]}
+            >
+              <span class="truncate">{item.label}</span>
+            </a>
+          );
+        })}
+      </nav>
+    </div>
+  </body>
+</html>

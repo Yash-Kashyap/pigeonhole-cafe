@@ -1,0 +1,16 @@
+---
+import OwnerOrders from '../../../components/owner/OwnerOrders';
+import OwnerLayout from '../../../layouts/OwnerLayout.astro';
+import { getOwnerRealtimeProps } from '../../../lib/owner-page-props';
+
+export const prerender = false;
+const realtime = getOwnerRealtimeProps();
+---
+
+<OwnerLayout title="Orders" active="orders">
+  <OwnerOrders
+    client:load
+    supabaseUrl={realtime.supabaseUrl}
+    supabaseAnonKey={realtime.supabaseAnonKey}
+  />
+</OwnerLayout>

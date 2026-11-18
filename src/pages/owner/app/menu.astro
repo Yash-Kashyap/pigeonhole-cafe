@@ -1,0 +1,16 @@
+---
+import OwnerMenu from '../../../components/owner/OwnerMenu';
+import OwnerLayout from '../../../layouts/OwnerLayout.astro';
+import { getOwnerRealtimeProps } from '../../../lib/owner-page-props';
+
+export const prerender = false;
+const realtime = getOwnerRealtimeProps();
+---
+
+<OwnerLayout title="Menu" active="menu">
+  <OwnerMenu
+    client:load
+    supabaseUrl={realtime.supabaseUrl}
+    supabaseAnonKey={realtime.supabaseAnonKey}
+  />
+</OwnerLayout>

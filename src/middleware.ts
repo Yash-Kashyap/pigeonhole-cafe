@@ -5,7 +5,7 @@ import { jsonResponse } from './lib/owner/http';
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
-  "connect-src 'self' https://*.supabase.co",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
   "font-src 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
