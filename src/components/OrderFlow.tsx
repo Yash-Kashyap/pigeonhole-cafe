@@ -599,7 +599,7 @@ export default function OrderFlow({ items }: Props) {
                               onClick={() =>
                                 handleStartEditNote(line.id, line.note)
                               }
-                              className="text-xs text-brass underline underline-offset-4 hover:text-ink"
+                              className="text-xs text-brass-text underline underline-offset-4 hover:text-ink"
                             >
                               {line.note ? 'Edit note' : '+ Add note'}
                             </button>

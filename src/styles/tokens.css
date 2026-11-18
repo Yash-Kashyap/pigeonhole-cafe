@@ -6,6 +6,7 @@
   --ink-2: #3a4658;
   --brass: #b08d3c;
   --brass-dark: #8a6b24;
+  --brass-text: #7a5d1c;
   --stamp: #8e2f2a;
   --walnut: #4a3426;
   --ok: #2f6b4f;
@@ -37,6 +38,7 @@
   --color-ink-2: var(--ink-2);
   --color-brass: var(--brass);
   --color-brass-dark: var(--brass-dark);
+  --color-brass-text: var(--brass-text);
   --color-stamp: var(--stamp);
   --color-walnut: var(--walnut);
   --color-ok: var(--ok);

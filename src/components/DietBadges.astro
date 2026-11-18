@@ -17,6 +17,7 @@ const {
   {vegan && (
     <span
       class="ph-label border border-ok px-2 py-1 text-ok"
+      role="img"
       aria-label="Vegan"
     >
       V
@@ -25,17 +26,26 @@ const {
   {jain && (
     <span
       class="ph-label border border-brass-dark px-2 py-1 text-brass-dark"
+      role="img"
       aria-label="Jain option available"
     >
       J
     </span>
   )}
   {glutenFree && (
-    <span class="ph-label border border-ink px-2 py-1" aria-label="Gluten-free">
+    <span
+      class="ph-label border border-ink px-2 py-1"
+      role="img"
+      aria-label="Gluten-free"
+    >
       GF
     </span>
   )}
-  <span class="inline-flex gap-1" aria-label={`Spice level ${spice} of 3`}>
+  <span
+    class="inline-flex gap-1"
+    role="img"
+    aria-label={`Spice level ${spice} of 3`}
+  >
     {[1, 2, 3].map((level) => (
       <span
         class:list={[

@@ -705,7 +705,7 @@ export default function MenuExplorer({ items }: Props) {
             aria-label="Cart summary"
           >
             <div className="flex flex-col">
-              <span className="font-mono text-[11px] uppercase tracking-wider text-brass">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-brass-text">
                 Your slip
               </span>
               <span
@@ -733,7 +733,7 @@ export default function MenuExplorer({ items }: Props) {
             aria-label="Cart summary"
           >
             <div>
-              <p className="font-mono text-xs uppercase tracking-wider text-brass">
+              <p className="font-mono text-xs uppercase tracking-wider text-brass-text">
                 Your slip
               </p>
               <p
