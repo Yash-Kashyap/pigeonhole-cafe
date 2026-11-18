@@ -38,17 +38,21 @@ const weekdayIndex: Record<string, number> = {
   Sat: 6,
 };
 
+// Building an Intl.DateTimeFormat is expensive. The pickup and booking logic calls
+// localParts thousands of times in loops, so one formatter is created and reused.
+const localPartsFormatter = new Intl.DateTimeFormat('en-CA', {
+  timeZone: CAFE_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+  weekday: 'short',
+});
+
 function localParts(date: Date): LocalParts {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: CAFE_TIME_ZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-    weekday: 'short',
-  }).formatToParts(date);
+  const parts = localPartsFormatter.formatToParts(date);
   const value = (type: Intl.DateTimeFormatPartTypes) =>
     parts.find((part) => part.type === type)?.value ?? '';
   return {

@@ -51,26 +51,29 @@ const orderSchema = z.object({
   honeypot: z.string().max(0, 'Bot submission rejected.').optional(),
 });
 
+// Intl formatters are expensive to build, and these two run once per pickup option.
+const clockTimeFormatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'Asia/Kolkata',
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true,
+});
+const dateLabelFormatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'Asia/Kolkata',
+  weekday: 'short',
+  month: 'short',
+  day: 'numeric',
+});
+
 function formatClockTime(date: Date): string {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'Asia/Kolkata',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  }).format(date);
-  return parts;
+  return clockTimeFormatter.format(date);
 }
 
 function formatDateLabel(isoDate: string): string {
   const [year, month, day] = isoDate.split('-').map(Number);
   if (!year || !month || !day) return isoDate;
   const d = new Date(Date.UTC(year, month - 1, day, 0, 0) - 330 * 60_000);
-  return new Intl.DateTimeFormat('en-US', {
-    timeZone: 'Asia/Kolkata',
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-  }).format(d);
+  return dateLabelFormatter.format(d);
 }
 
 export default function OrderFlow({ items }: Props) {

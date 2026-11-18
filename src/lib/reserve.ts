@@ -182,6 +182,19 @@ function istMidnight(year: number, month: number, day: number): Date {
   return new Date(Date.UTC(year, month - 1, day, 0, 0) - 330 * 60_000);
 }
 
+// One reused formatter: building an Intl.DateTimeFormat on every call is very slow
+// and the calendar calls this in loops.
+const istPartsFormatter = new Intl.DateTimeFormat('en-CA', {
+  timeZone: CAFE_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+  weekday: 'short',
+});
+
 function istParts(date: Date): {
   year: number;
   month: number;
@@ -190,16 +203,7 @@ function istParts(date: Date): {
   minute: number;
   weekday: number;
 } {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: CAFE_TIME_ZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-    weekday: 'short',
-  }).formatToParts(date);
+  const parts = istPartsFormatter.formatToParts(date);
   const pick = (type: Intl.DateTimeFormatPartTypes) =>
     parts.find((part) => part.type === type)?.value ?? '';
   return {
