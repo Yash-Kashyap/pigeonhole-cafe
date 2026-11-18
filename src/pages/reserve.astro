@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ReserveFlow from '../components/ReserveFlow';
+import { loadMenu } from '../lib/menu-data';
+
+export const prerender = true;
+
+const items = loadMenu();
+---
+
+<BaseLayout
+  title="Reserve a slot | The Pigeonhole Café (demo)"
+  description="Book a slot for 2, 4 or 6 at The Pigeonhole Café. Groups up to 12 with notice. Demo only."
+>
+  <div class="ph-container">
+    <ReserveFlow client:load items={items} />
+  </div>
+</BaseLayout>

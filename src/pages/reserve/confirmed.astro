@@ -1,0 +1,749 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Postmark from '../../components/Postmark.astro';
+import SlotTicket from '../../components/SlotTicket.astro';
+
+export const prerender = true;
+---
+
+<BaseLayout
+  title="Booking status | The Pigeonhole Café (demo)"
+  description="Your demo slot reservation receipt at The Pigeonhole Café."
+  noindex={true}
+>
+  <section class="ph-container py-12 md:py-20">
+    <!-- Loading state -->
+    <div
+      id="booking-loading"
+      class="mx-auto max-w-xl py-12 text-center"
+      role="status"
+      aria-live="polite"
+    >
+      <p class="ph-label text-stamp">Checking booking slip</p>
+      <h1 class="mt-4 text-4xl sm:text-5xl">Looking up your slot…</h1>
+      <p class="mt-4 text-ink-2">Please wait a moment.</p>
+    </div>
+
+    <!-- Not found state -->
+    <div
+      id="booking-not-found"
+      class="mx-auto max-w-xl py-12 text-center"
+      hidden
+    >
+      <p class="ph-label text-stamp">Booking not found</p>
+      <h1 class="mt-4 text-5xl">This booking slip is missing.</h1>
+      <p class="mt-5 text-ink-2">
+        Check the booking code in your link, or reserve a new slot.
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a
+          class="inline-flex min-h-11 items-center border border-ink bg-ink px-5 font-semibold text-paper no-underline transition hover:bg-ink-2"
+          href="/reserve"
+        >
+          Reserve a slot
+        </a>
+        <a
+          class="inline-flex min-h-11 items-center border border-ink px-5 font-semibold text-ink no-underline transition hover:bg-ink hover:text-paper"
+          href="/menu"
+        >
+          Back to menu
+        </a>
+      </div>
+    </div>
+
+    <!-- Temporary error state -->
+    <div id="booking-error" class="mx-auto max-w-xl py-12 text-center" hidden>
+      <p class="ph-label text-stamp">Temporarily unavailable</p>
+      <h1 class="mt-4 text-4xl sm:text-5xl">We could not load your booking.</h1>
+      <p class="mt-4 text-ink-2">
+        Please try again in a moment. Your booking is safe.
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <button
+          id="booking-retry"
+          type="button"
+          class="min-h-11 border border-ink bg-ink px-5 font-semibold text-paper transition hover:bg-ink-2"
+        >
+          Try again
+        </button>
+        <a
+          class="inline-flex min-h-11 items-center border border-ink px-5 font-semibold text-ink no-underline transition hover:bg-ink hover:text-paper"
+          href="/menu"
+        >
+          Back to menu
+        </a>
+      </div>
+    </div>
+
+    <!-- Loaded booking receipt -->
+    <div id="booking-view" class="mx-auto max-w-3xl text-center" hidden>
+      <div id="booking-postmark" class="stamp-thunk mx-auto w-fit" hidden>
+        <Postmark
+          size={132}
+          variant="stamp"
+          text="CONFIRMED · THE PIGEONHOLE CAFÉ · KOTHI BAGH ·"
+          decorative
+        />
+      </div>
+
+      <p id="booking-eyebrow" class="ph-label mt-6 text-stamp">
+        Booking receipt · Demo
+      </p>
+      <h1 id="booking-heading" class="mt-3 text-5xl sm:text-6xl">
+        Your slot is booked.
+      </h1>
+      <p
+        id="booking-message"
+        class="mx-auto mt-4 max-w-xl text-base text-ink-2"
+        aria-live="polite"
+      ></p>
+      <p
+        id="booking-requested-note"
+        class="mx-auto mt-2 max-w-xl text-xs text-ink-2"
+        hidden
+      >
+        The demo owner can confirm it in the owner dashboard. This page updates
+        automatically while open.
+      </p>
+
+      <div class="mx-auto mt-10 max-w-[580px] text-left">
+        <SlotTicket
+          code="PH-BK-0000"
+          slot="PENDING"
+          date="—"
+          time="—"
+          partySize={2}
+          status="requested"
+          kind="booking"
+        />
+      </div>
+
+      <p class="mt-5">
+        <span
+          id="booking-status"
+          aria-live="polite"
+          class="inline-flex min-h-9 items-center border border-ink bg-card px-4 py-1 font-mono text-xs font-semibold uppercase tracking-wider text-ink"
+        >
+          requested
+        </span>
+      </p>
+
+      <!-- Optional pre-order summary -->
+      <section
+        id="booking-preorder"
+        aria-labelledby="booking-preorder-heading"
+        class="mt-10 border-y border-ink py-6 text-left"
+        hidden
+      >
+        <h2 id="booking-preorder-heading" class="text-2xl">
+          Your pre-order
+        </h2>
+        <p class="mt-1 text-xs text-ink-2">
+          Sent to the kitchen on arrival. Pay at the café.
+        </p>
+        <ul id="booking-preorder-lines" class="mt-4 grid gap-2 text-sm"></ul>
+        <p class="mt-5 flex justify-between border-t border-ink pt-4 text-xl">
+          <span>Pre-order total</span>
+          <span id="booking-preorder-total" class="font-mono tabular-nums">
+            $0.00
+          </span>
+        </p>
+      </section>
+
+      <!-- Primary actions -->
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a
+          id="booking-ics"
+          class="inline-flex min-h-11 items-center border border-ink bg-ink px-5 font-semibold text-paper no-underline transition hover:bg-ink-2"
+          href="#"
+          download="booking.ics"
+        >
+          Add to calendar
+        </a>
+        <a
+          id="booking-whatsapp"
+          class="inline-flex min-h-11 items-center border border-ink bg-transparent px-5 font-semibold text-ink no-underline transition hover:bg-ink hover:text-paper"
+          href="/whatsapp"
+          target="_blank"
+          rel="nofollow noopener noreferrer"
+        >
+          Share on WhatsApp
+        </a>
+        <button
+          id="booking-cancel-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="booking-cancel-panel"
+          class="min-h-11 border border-stamp bg-transparent px-5 font-semibold text-stamp transition hover:bg-stamp hover:text-paper"
+        >
+          Change or cancel
+        </button>
+        <a
+          class="inline-flex min-h-11 items-center border border-ink px-5 font-semibold text-ink no-underline transition hover:bg-ink hover:text-paper"
+          href="/menu"
+        >
+          Back to menu
+        </a>
+      </div>
+
+      <!-- Cancel form panel -->
+      <section
+        id="booking-cancel-panel"
+        aria-labelledby="cancel-heading"
+        class="mx-auto mt-8 max-w-md border border-ink bg-card p-6 text-left shadow-ledger"
+        hidden
+      >
+        <h2 id="cancel-heading" class="text-2xl">
+          Change or cancel
+        </h2>
+        <p class="mt-2 text-sm text-ink-2">
+          Cancellations are accepted until 2 hours before the booking time. To
+          change the time, cancel here and reserve a new slot.
+        </p>
+        <form id="booking-cancel-form" class="mt-4 space-y-4" novalidate>
+          <div>
+            <label for="cancel-last4" class="ph-label block text-ink">
+              Last 4 digits of your phone number
+            </label>
+            <input
+              id="cancel-last4"
+              name="last4"
+              type="text"
+              inputmode="numeric"
+              maxlength="4"
+              pattern="[0-9]{4}"
+              autocomplete="off"
+              placeholder="e.g. 3210"
+              class="mt-2 min-h-12 w-full border border-ink bg-paper px-4 font-mono text-base tracking-widest text-ink"
+              required
+            />
+          </div>
+          <p
+            id="cancel-feedback"
+            role="alert"
+            aria-live="polite"
+            class="text-sm text-err"
+            hidden
+          ></p>
+          <div class="flex flex-wrap items-center gap-3">
+            <button
+              id="cancel-submit"
+              type="submit"
+              class="min-h-11 border border-stamp bg-stamp px-5 text-sm font-semibold text-paper transition hover:bg-ink hover:border-ink disabled:cursor-not-allowed disabled:opacity-55"
+            >
+              Cancel booking
+            </button>
+            <button
+              id="cancel-close"
+              type="button"
+              class="min-h-11 border border-ink/40 px-4 text-sm text-ink hover:border-ink"
+            >
+              Keep booking
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <p
+        id="booking-cancel-success"
+        role="status"
+        aria-live="polite"
+        class="mx-auto mt-6 max-w-md border border-ok bg-card p-4 text-sm text-ink"
+        hidden
+      ></p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import {
+    buildBookingCalendarIcs,
+    buildBookingWhatsAppPath,
+    formatClockTime24,
+    formatIsoClockTimeIst,
+    formatReserveDate,
+    formatSlotLabel,
+    type BookingConfirmationData,
+  } from '../../lib/reserve';
+
+  const CODE_RE = /^PH-BK-\d{4,}$/;
+  const TERMINAL_STATUSES = new Set([
+    'cancelled',
+    'declined',
+    'seated',
+    'no_show',
+  ]);
+
+  const loadingEl = document.querySelector<HTMLElement>('#booking-loading');
+  const notFoundEl = document.querySelector<HTMLElement>('#booking-not-found');
+  const errorEl = document.querySelector<HTMLElement>('#booking-error');
+  const viewEl = document.querySelector<HTMLElement>('#booking-view');
+  const retryBtn = document.querySelector<HTMLButtonElement>('#booking-retry');
+
+  const postmarkEl = document.querySelector<HTMLElement>('#booking-postmark');
+  const eyebrowEl = document.querySelector<HTMLElement>('#booking-eyebrow');
+  const headingEl = document.querySelector<HTMLElement>('#booking-heading');
+  const messageEl = document.querySelector<HTMLElement>('#booking-message');
+  const requestedNoteEl = document.querySelector<HTMLElement>(
+    '#booking-requested-note',
+  );
+  const statusChipEl = document.querySelector<HTMLElement>('#booking-status');
+
+  const ticketEl = document.querySelector<HTMLElement>('[data-ticket]');
+  const ticketCodeEl =
+    document.querySelector<HTMLElement>('[data-ticket-code]');
+  const ticketDateEl =
+    document.querySelector<HTMLElement>('[data-ticket-date]');
+  const ticketTimeEl =
+    document.querySelector<HTMLElement>('[data-ticket-time]');
+  const ticketPartyEl = document.querySelector<HTMLElement>(
+    '[data-ticket-party]',
+  );
+  const ticketStatusEl = document.querySelector<HTMLElement>(
+    '[data-ticket-status]',
+  );
+  const ticketSlotEl =
+    document.querySelector<HTMLElement>('[data-ticket-slot]');
+
+  const preorderSectionEl =
+    document.querySelector<HTMLElement>('#booking-preorder');
+  const preorderLinesEl = document.querySelector<HTMLUListElement>(
+    '#booking-preorder-lines',
+  );
+  const preorderTotalEl = document.querySelector<HTMLElement>(
+    '#booking-preorder-total',
+  );
+
+  const icsLinkEl = document.querySelector<HTMLAnchorElement>('#booking-ics');
+  const whatsappLinkEl =
+    document.querySelector<HTMLAnchorElement>('#booking-whatsapp');
+  const cancelToggleBtn = document.querySelector<HTMLButtonElement>(
+    '#booking-cancel-toggle',
+  );
+  const cancelPanelEl = document.querySelector<HTMLElement>(
+    '#booking-cancel-panel',
+  );
+  const cancelFormEl = document.querySelector<HTMLFormElement>(
+    '#booking-cancel-form',
+  );
+  const cancelLast4Input =
+    document.querySelector<HTMLInputElement>('#cancel-last4');
+  const cancelSubmitBtn =
+    document.querySelector<HTMLButtonElement>('#cancel-submit');
+  const cancelCloseBtn =
+    document.querySelector<HTMLButtonElement>('#cancel-close');
+  const cancelFeedbackEl =
+    document.querySelector<HTMLElement>('#cancel-feedback');
+  const cancelSuccessEl = document.querySelector<HTMLElement>(
+    '#booking-cancel-success',
+  );
+
+  const params = new URLSearchParams(window.location.search);
+  const bookingCode = (params.get('code') ?? '').trim();
+
+  let currentBooking: BookingConfirmationData | null = null;
+  let pollTimer: number | null = null;
+  let cancelling = false;
+
+  function showOnly(target: 'loading' | 'not-found' | 'error' | 'view') {
+    if (loadingEl) loadingEl.hidden = target !== 'loading';
+    if (notFoundEl) notFoundEl.hidden = target !== 'not-found';
+    if (errorEl) errorEl.hidden = target !== 'error';
+    if (viewEl) viewEl.hidden = target !== 'view';
+  }
+
+  function stopPolling() {
+    if (pollTimer !== null) {
+      window.clearInterval(pollTimer);
+      pollTimer = null;
+    }
+  }
+
+  function applyStatusChipStyle(status: string) {
+    if (!statusChipEl) return;
+    statusChipEl.textContent = status;
+    statusChipEl.classList.remove(
+      'border-ok',
+      'text-ok',
+      'border-brass-text',
+      'text-brass-text',
+      'border-err',
+      'text-err',
+      'border-ink',
+      'text-ink',
+    );
+    if (status === 'confirmed' || status === 'seated') {
+      statusChipEl.classList.add('border-ok', 'text-ok');
+    } else if (status === 'requested') {
+      statusChipEl.classList.add('border-brass-text', 'text-brass-text');
+    } else if (
+      status === 'cancelled' ||
+      status === 'declined' ||
+      status === 'no_show'
+    ) {
+      statusChipEl.classList.add('border-err', 'text-err');
+    } else {
+      statusChipEl.classList.add('border-ink', 'text-ink');
+    }
+  }
+
+  function renderBooking(data: BookingConfirmationData) {
+    currentBooking = data;
+    const slotText = formatSlotLabel(data.slotLabels, data.status);
+    const dateLabel = formatReserveDate(data.date);
+    const timeLabel = formatClockTime24(data.time);
+    const holdLabel = formatIsoClockTimeIst(data.holdUntil);
+
+    if (postmarkEl) {
+      postmarkEl.hidden = data.status !== 'confirmed';
+    }
+
+    if (eyebrowEl && headingEl && messageEl && requestedNoteEl) {
+      requestedNoteEl.hidden = data.status !== 'requested';
+      if (data.status === 'confirmed') {
+        eyebrowEl.textContent = 'Slot confirmed · Demo';
+        headingEl.textContent = 'Sorted for your slot!';
+        messageEl.textContent = holdLabel
+          ? `Your slot is held until ${holdLabel}.`
+          : 'Your slot is held for 15 minutes after the booking time.';
+      } else if (data.status === 'requested') {
+        eyebrowEl.textContent = 'Request received · Demo';
+        headingEl.textContent = 'We have your request.';
+        messageEl.textContent = 'We will confirm within the day.';
+      } else if (data.status === 'cancelled') {
+        eyebrowEl.textContent = 'Booking cancelled · Demo';
+        headingEl.textContent = 'Your booking is cancelled.';
+        messageEl.textContent = 'This slot has been released.';
+      } else if (data.status === 'declined') {
+        eyebrowEl.textContent = 'Request declined · Demo';
+        headingEl.textContent = 'This request was declined.';
+        messageEl.textContent =
+          'We could not fit this group at the requested time. Choose another slot.';
+      } else if (data.status === 'seated') {
+        eyebrowEl.textContent = 'Seated · Demo';
+        headingEl.textContent = 'You are seated.';
+        messageEl.textContent = 'Enjoy your time at The Pigeonhole Café.';
+      } else {
+        eyebrowEl.textContent = 'Booking status · Demo';
+        headingEl.textContent = 'Booking updated.';
+        messageEl.textContent = `Current status: ${data.status}.`;
+      }
+    }
+
+    if (ticketEl) {
+      ticketEl.setAttribute(
+        'aria-label',
+        `${data.status} booking ${data.code}`,
+      );
+    }
+    if (ticketCodeEl) ticketCodeEl.textContent = data.code;
+    if (ticketDateEl) ticketDateEl.textContent = dateLabel;
+    if (ticketTimeEl) ticketTimeEl.textContent = timeLabel;
+    if (ticketPartyEl) ticketPartyEl.textContent = String(data.party);
+    if (ticketStatusEl) ticketStatusEl.textContent = data.status;
+    if (ticketSlotEl) ticketSlotEl.textContent = slotText;
+
+    applyStatusChipStyle(data.status);
+
+    // Pre-order lines (rendered with DOM nodes, never innerHTML)
+    const lines = Array.isArray(data.preorder?.lines)
+      ? data.preorder.lines
+      : [];
+    if (preorderSectionEl && preorderLinesEl && preorderTotalEl) {
+      if (lines.length > 0) {
+        preorderLinesEl.replaceChildren();
+        for (const line of lines) {
+          const li = document.createElement('li');
+          li.className = 'flex items-baseline justify-between gap-4';
+
+          const left = document.createElement('span');
+          left.textContent = `${line.name} × ${line.qty}`;
+
+          const right = document.createElement('span');
+          right.className = 'font-mono tabular-nums';
+          right.textContent = `$${Number(line.lineTotal).toFixed(2)}`;
+
+          li.append(left, right);
+          preorderLinesEl.append(li);
+        }
+        preorderTotalEl.textContent = `$${Number(data.preorder.total).toFixed(2)}`;
+        preorderSectionEl.hidden = false;
+      } else {
+        preorderSectionEl.hidden = true;
+      }
+    }
+
+    // Calendar (.ics) link generated client-side
+    if (icsLinkEl) {
+      try {
+        const ics = buildBookingCalendarIcs({
+          code: data.code,
+          date: data.date,
+          time: data.time,
+          party: data.party,
+          slotLabels: data.slotLabels,
+          status: data.status,
+        });
+        icsLinkEl.href = `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`;
+        icsLinkEl.download = `${data.code}.ics`;
+      } catch {
+        icsLinkEl.hidden = true;
+      }
+    }
+
+    // WhatsApp share link via /whatsapp redirect
+    if (whatsappLinkEl) {
+      whatsappLinkEl.href = buildBookingWhatsAppPath({
+        code: data.code,
+        date: data.date,
+        time: data.time,
+        party: data.party,
+        slotLabels: data.slotLabels,
+        status: data.status,
+      });
+    }
+
+    // Hide cancel controls once booking is in a terminal state
+    const canCancelUi = !TERMINAL_STATUSES.has(data.status);
+    if (cancelToggleBtn) cancelToggleBtn.hidden = !canCancelUi;
+    if (!canCancelUi && cancelPanelEl) {
+      cancelPanelEl.hidden = true;
+      cancelToggleBtn?.setAttribute('aria-expanded', 'false');
+    }
+
+    if (TERMINAL_STATUSES.has(data.status)) {
+      stopPolling();
+    }
+
+    showOnly('view');
+  }
+
+  function parseBookingPayload(raw: unknown): BookingConfirmationData | null {
+    if (!raw || typeof raw !== 'object') return null;
+    const obj = raw as Record<string, unknown>;
+    if (
+      typeof obj.code !== 'string' ||
+      typeof obj.status !== 'string' ||
+      typeof obj.date !== 'string' ||
+      typeof obj.time !== 'string' ||
+      typeof obj.party !== 'number' ||
+      typeof obj.holdUntil !== 'string'
+    ) {
+      return null;
+    }
+    const slotLabels = Array.isArray(obj.slotLabels)
+      ? obj.slotLabels.filter((v): v is string => typeof v === 'string')
+      : [];
+    const preorderRaw =
+      obj.preorder && typeof obj.preorder === 'object'
+        ? (obj.preorder as { lines?: unknown; total?: unknown })
+        : { lines: [], total: 0 };
+    const lines = Array.isArray(preorderRaw.lines)
+      ? preorderRaw.lines
+          .filter(
+            (line): line is BookingConfirmationData['preorder']['lines'][0] =>
+              Boolean(line) &&
+              typeof line === 'object' &&
+              typeof (line as { id?: unknown }).id === 'string' &&
+              typeof (line as { name?: unknown }).name === 'string' &&
+              typeof (line as { qty?: unknown }).qty === 'number' &&
+              typeof (line as { lineTotal?: unknown }).lineTotal === 'number',
+          )
+          .map((line) => ({
+            id: line.id,
+            name: line.name,
+            price: typeof line.price === 'number' ? line.price : 0,
+            qty: line.qty,
+            lineTotal: line.lineTotal,
+          }))
+      : [];
+    const total = typeof preorderRaw.total === 'number' ? preorderRaw.total : 0;
+
+    return {
+      code: obj.code,
+      status: obj.status,
+      slotLabels,
+      date: obj.date,
+      time: obj.time,
+      party: obj.party,
+      holdUntil: obj.holdUntil,
+      preorder: { lines, total },
+    };
+  }
+
+  function startPollingIfRequested(status: string) {
+    if (status !== 'requested' || pollTimer !== null) return;
+    pollTimer = window.setInterval(async () => {
+      if (document.hidden) return;
+      try {
+        const response = await fetch(
+          `/api/bookings/${encodeURIComponent(bookingCode)}`,
+          { cache: 'no-store' },
+        );
+        if (!response.ok) return;
+        const parsed = parseBookingPayload(await response.json());
+        if (parsed) {
+          renderBooking(parsed);
+        }
+      } catch {
+        /* try again on next tick */
+      }
+    }, 10_000);
+  }
+
+  async function loadBooking() {
+    if (!CODE_RE.test(bookingCode)) {
+      showOnly('not-found');
+      return;
+    }
+    showOnly('loading');
+    try {
+      const response = await fetch(
+        `/api/bookings/${encodeURIComponent(bookingCode)}`,
+        { cache: 'no-store' },
+      );
+      if (response.status === 404) {
+        showOnly('not-found');
+        return;
+      }
+      if (!response.ok) {
+        showOnly('error');
+        return;
+      }
+      const parsed = parseBookingPayload(await response.json());
+      if (!parsed) {
+        showOnly('error');
+        return;
+      }
+      renderBooking(parsed);
+      startPollingIfRequested(parsed.status);
+    } catch {
+      showOnly('error');
+    }
+  }
+
+  retryBtn?.addEventListener('click', () => {
+    void loadBooking();
+  });
+
+  cancelToggleBtn?.addEventListener('click', () => {
+    if (!cancelPanelEl) return;
+    const opening = cancelPanelEl.hidden;
+    cancelPanelEl.hidden = !opening;
+    cancelToggleBtn.setAttribute('aria-expanded', String(opening));
+    if (cancelFeedbackEl) {
+      cancelFeedbackEl.hidden = true;
+      cancelFeedbackEl.textContent = '';
+    }
+    if (opening) {
+      cancelLast4Input?.focus();
+    }
+  });
+
+  cancelCloseBtn?.addEventListener('click', () => {
+    if (!cancelPanelEl) return;
+    cancelPanelEl.hidden = true;
+    cancelToggleBtn?.setAttribute('aria-expanded', 'false');
+  });
+
+  cancelFormEl?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (cancelling || !currentBooking) return;
+
+    const last4 = (cancelLast4Input?.value ?? '').trim();
+    if (!/^\d{4}$/.test(last4)) {
+      if (cancelFeedbackEl) {
+        cancelFeedbackEl.textContent =
+          'Enter the last four digits of your phone number.';
+        cancelFeedbackEl.hidden = false;
+      }
+      cancelLast4Input?.focus();
+      return;
+    }
+
+    if (cancelFeedbackEl) {
+      cancelFeedbackEl.hidden = true;
+      cancelFeedbackEl.textContent = '';
+    }
+    cancelling = true;
+    if (cancelSubmitBtn) {
+      cancelSubmitBtn.disabled = true;
+      cancelSubmitBtn.textContent = 'Cancelling…';
+    }
+
+    try {
+      const response = await fetch('/api/bookings/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: currentBooking.code, last4 }),
+      });
+
+      if (response.status === 200) {
+        const updated: BookingConfirmationData = {
+          ...currentBooking,
+          status: 'cancelled',
+          slotLabels: [],
+        };
+        renderBooking(updated);
+        if (cancelSuccessEl) {
+          cancelSuccessEl.textContent =
+            'Your booking has been cancelled and the slot is free.';
+          cancelSuccessEl.hidden = false;
+        }
+        return;
+      }
+
+      let message =
+        'We could not cancel the booking right now. Please try again.';
+      if (response.status === 404) {
+        message = 'We could not match that booking code and those four digits.';
+      } else if (response.status === 409) {
+        message =
+          'This booking is already cancelled or is within two hours of the start time.';
+      } else if (response.status === 429) {
+        message = 'Too many attempts, try again later.';
+      } else if (response.status === 400) {
+        message = 'Enter the last four digits of your phone number.';
+      }
+
+      if (cancelFeedbackEl) {
+        cancelFeedbackEl.textContent = message;
+        cancelFeedbackEl.hidden = false;
+      }
+    } catch {
+      if (cancelFeedbackEl) {
+        cancelFeedbackEl.textContent =
+          'The connection failed. Please try again.';
+        cancelFeedbackEl.hidden = false;
+      }
+    } finally {
+      cancelling = false;
+      if (cancelSubmitBtn) {
+        cancelSubmitBtn.disabled = false;
+        cancelSubmitBtn.textContent = 'Cancel booking';
+      }
+    }
+  });
+
+  window.addEventListener('beforeunload', stopPolling);
+  void loadBooking();
+</script>
+
+<style>
+  .stamp-thunk {
+    animation: thunk 180ms ease-out both;
+  }
+  @keyframes thunk {
+    from {
+      transform: scale(1.15);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stamp-thunk {
+      animation: none;
+    }
+  }
+</style>
