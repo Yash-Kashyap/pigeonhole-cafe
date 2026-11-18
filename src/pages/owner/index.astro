@@ -1,0 +1,70 @@
+---
+import Button from '../../components/Button.astro';
+import Field from '../../components/Field.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Owner sign in | The Pigeonhole Café (demo)"
+  description="Private owner sign in for The Pigeonhole Café demo."
+  noindex
+  showAssistant={false}
+>
+  <section class="mx-auto grid min-h-[65vh] max-w-xl place-items-center px-4 py-16">
+    <div class="w-full border border-ink bg-card p-6 sm:p-10">
+      <p class="ph-label text-stamp">Private counter · Demo</p>
+      <h1 class="mt-3 font-serif text-4xl">Owner sign in</h1>
+      <p class="mt-3 text-ink-2">Demo area. Data shown is fictional.</p>
+      <form class="mt-8 grid gap-5" id="owner-login-form">
+        <Field label="Email" name="email" type="email" required />
+        <Field label="Password" name="password" type="password" required />
+        <p
+          class="min-h-6 text-sm text-err"
+          id="owner-login-error"
+          role="alert"
+        ></p>
+        <Button type="submit">Sign in</Button>
+      </form>
+      <p class="mt-8 border-t border-rule pt-5 text-sm text-ink-2">
+        This is a fictional practice project. No real café or customer data is
+        shown.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('#owner-login-form');
+  const error = document.querySelector<HTMLElement>('#owner-login-error');
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (error) error.textContent = '';
+    const submit = form.querySelector<HTMLButtonElement>(
+      'button[type="submit"]',
+    );
+    if (submit) submit.disabled = true;
+    const values = new FormData(form);
+    try {
+      const response = await fetch('/api/owner/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: String(values.get('email') ?? ''),
+          password: String(values.get('password') ?? ''),
+        }),
+      });
+      const data: { message?: unknown } = await response.json();
+      if (response.ok) {
+        window.location.assign('/owner/app');
+        return;
+      }
+      if (error)
+        error.textContent =
+          typeof data.message === 'string' ? data.message : 'Sign in failed.';
+    } catch {
+      if (error) error.textContent = 'Sign in is unavailable. Try again.';
+    } finally {
+      if (submit) submit.disabled = false;
+    }
+  });
+</script>
