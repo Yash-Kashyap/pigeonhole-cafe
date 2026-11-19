@@ -2,6 +2,11 @@ import cloudflare from '@astrojs/cloudflare';
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, envField } from 'astro/config';
+import { fileURLToPath, URL } from 'node:url';
+
+const assistantProvider = fileURLToPath(
+  new URL('./src/lib/assistant/gemini.ts', import.meta.url),
+);
 
 export default defineConfig({
   output: 'server',
@@ -46,6 +51,11 @@ export default defineConfig({
         access: 'public',
         optional: true,
       }),
+      ASSISTANT_DAILY_TOKEN_CAP: envField.string({
+        context: 'server',
+        access: 'public',
+        optional: true,
+      }),
       SUPABASE_SERVICE_KEY: envField.string({
         context: 'server',
         access: 'secret',
@@ -64,5 +74,8 @@ export default defineConfig({
     },
   },
   security: { checkOrigin: true },
-  vite: { plugins: [tailwindcss()] },
+  vite: {
+    plugins: [tailwindcss()],
+    resolve: { alias: { '@assistant-provider': assistantProvider } },
+  },
 });

@@ -1,4 +1,5 @@
 import {
+  ASSISTANT_DAILY_TOKEN_CAP,
   GEMINI_MODEL,
   PUBLIC_ALLOW_INDEX,
   PUBLIC_SITE_URL,
@@ -22,6 +23,7 @@ export function readServerEnv(): ServerEnv {
     SUPABASE_SERVICE_KEY: getSecret('SUPABASE_SERVICE_KEY'),
     GEMINI_API_KEY: getSecret('GEMINI_API_KEY'),
     GEMINI_MODEL,
+    ASSISTANT_DAILY_TOKEN_CAP,
     RATE_LIMIT_SALT: getSecret('RATE_LIMIT_SALT'),
   });
 }

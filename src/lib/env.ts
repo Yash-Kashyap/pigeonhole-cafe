@@ -22,6 +22,11 @@ export const serverEnvSchema = publicEnvSchema.extend({
   SUPABASE_SERVICE_KEY: key.startsWith('sb_secret_'),
   GEMINI_API_KEY: z.string().min(12).optional(),
   GEMINI_MODEL: z.string().min(1).optional(),
+  ASSISTANT_DAILY_TOKEN_CAP: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(5_000_000),
   RATE_LIMIT_SALT: z.string().min(24).optional(),
 });
 

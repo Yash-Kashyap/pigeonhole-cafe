@@ -3,6 +3,7 @@ import {
   bookingRangesOverlap,
   canCancelBooking,
   classifyParty,
+  getCafeHours,
   getBookableDates,
   getBookableTimes,
   getBookingHoldUntil,
@@ -27,6 +28,23 @@ import {
 const atIst = (value: string) => new Date(`${value}+05:30`);
 
 describe('opening rules', () => {
+  it('returns reusable hours and last-order times for a local date', () => {
+    expect(getCafeHours('2026-11-16')).toEqual({
+      date: '2026-11-16',
+      closed: true,
+      opensAt: null,
+      closesAt: null,
+      lastOrdersAt: null,
+    });
+    expect(getCafeHours('2026-11-22')).toEqual({
+      date: '2026-11-22',
+      closed: false,
+      opensAt: '07:00',
+      closesAt: '23:00',
+      lastOrdersAt: '22:30',
+    });
+    expect(getCafeHours('2026-02-30')).toBeNull();
+  });
   it('closes every Monday', () =>
     expect(getOpenState(atIst('2026-11-16T12:00:00')).state).toBe('closed'));
   it('reports weekday opening and last orders', () => {

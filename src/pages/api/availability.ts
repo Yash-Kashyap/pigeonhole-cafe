@@ -3,10 +3,12 @@ import {
   saltedRateLimitKey,
   type PlaceOrderDependencies,
 } from '../../lib/orders/place-order';
+import { type AvailabilityRow } from '../../lib/bookings/bookings';
 import {
-  validateAvailabilityQuery,
-  type AvailabilityRow,
-} from '../../lib/bookings/bookings';
+  availabilityInputSchema,
+  checkBookingAvailability,
+} from '../../lib/bookings/availability';
+import { getBookableDates } from '../../lib/rules';
 import { readServerEnv } from '../../lib/server-env';
 import { createServerSupabaseClient } from '../../lib/supabase/server';
 
@@ -51,11 +53,13 @@ export const GET: APIRoute = async ({ request }) => {
     keys.some((key) => key !== 'date' && key !== 'party')
   )
     return json({ message: 'Send one date and one party size.' }, 400);
-  const query = validateAvailabilityQuery(
-    { date: search.get('date') ?? '', party: search.get('party') ?? '' },
-    new Date(),
-  );
-  if (!query)
+  const party = Number(search.get('party'));
+  const now = new Date();
+  const input = availabilityInputSchema.safeParse({
+    date: search.get('date') ?? '',
+    partySize: party,
+  });
+  if (!input.success || !getBookableDates(now).includes(input.data.date))
     return json({ message: 'Choose a valid date and party size.' }, 400);
 
   try {
@@ -76,19 +80,19 @@ export const GET: APIRoute = async ({ request }) => {
       return json({ message: 'Please wait before checking again.' }, 429, {
         'Retry-After': '60',
       });
-    const { data, error } = await client.rpc('get_availability', {
-      p_date: query.date,
-      p_party: query.party,
-    });
-    if (error) throw error;
-    const rows = (data ?? []) as AvailabilityRow[];
-    return json({
-      times: rows.map((row) => ({
-        time: row.start_time.slice(0, 5),
-        remaining: row.remaining,
-        requestable: row.requestable,
-      })),
-    });
+    const availability = await checkBookingAvailability(
+      input.data,
+      now,
+      async (date, partySize) => {
+        const { data, error } = await client.rpc('get_availability', {
+          p_date: date,
+          p_party: partySize,
+        });
+        if (error) throw error;
+        return (data ?? []) as AvailabilityRow[];
+      },
+    );
+    return json({ times: availability.times });
   } catch {
     return json({ message: 'Availability is unavailable.' }, 500);
   }

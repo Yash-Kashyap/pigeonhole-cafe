@@ -24,6 +24,14 @@ export type OpenState = {
   nextOpensAt?: string;
 };
 
+export type CafeHours = {
+  date: string;
+  closed: boolean;
+  opensAt: string | null;
+  closesAt: string | null;
+  lastOrdersAt: string | null;
+};
+
 export type PartyClass = 'confirmed' | 'requested' | 'handoff';
 
 export type RuleResult = { valid: true } | { valid: false; errors: string[] };
@@ -119,6 +127,31 @@ function formatClock(minutes: number): string {
   const suffix = hour >= 12 ? 'PM' : 'AM';
   const displayHour = hour % 12 || 12;
   return `${displayHour}:${String(minute).padStart(2, '0')} ${suffix}`;
+}
+
+function formatTimeValue(minutes: number): string {
+  return `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+}
+
+export function getCafeHours(date: string): CafeHours | null {
+  const parsed = parseDate(date);
+  if (!parsed) return null;
+  const hours = hoursFor(istDate(parsed.year, parsed.month, parsed.day));
+  if (!hours)
+    return {
+      date,
+      closed: true,
+      opensAt: null,
+      closesAt: null,
+      lastOrdersAt: null,
+    };
+  return {
+    date,
+    closed: false,
+    opensAt: formatTimeValue(hours.open),
+    closesAt: formatTimeValue(hours.close),
+    lastOrdersAt: formatTimeValue(hours.close - 30),
+  };
 }
 
 function nextOpen(now: Date): Date {
