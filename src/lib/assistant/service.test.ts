@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { loadMenu } from '../menu-data';
 import {
   ALLERGY_EMERGENCY_TERMS,
+  isComplaintMessage,
   isAllergyEmergencyMessage,
   runAssistant,
   type ModelUsage,
@@ -67,6 +68,54 @@ describe('assistant model loop', () => {
     expect(result.text).not.toMatch(/\bsafe\b/i);
     expect(result.actions).toContainEqual({ type: 'handoff' });
     expect(callModel).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    'I have a complaint about the cafe.',
+    'I want to complain about yesterday.',
+    'I need a refund.',
+    'The server was rude.',
+    'I am unhappy with my visit.',
+    'We had terrible service.',
+    'I think this is food poisoning.',
+    'I was overcharged.',
+    'You gave me the wrong order.',
+  ])('recognizes the complaint phrase in: %s', (text) => {
+    expect(isComplaintMessage(text)).toBe(true);
+  });
+
+  it.each([
+    'Is the biscuit complimentary?',
+    'Are your ingredients compliant with local rules?',
+    'Can I order food for pickup?',
+    'Which dishes would make someone happy?',
+    'Is table service available today?',
+    'Do you refund train tickets?',
+  ])('does not classify the near-miss phrase in: %s', (text) => {
+    expect(isComplaintMessage(text)).toBe(false);
+  });
+
+  it('returns a deterministic complaint handoff and logs the topic', async () => {
+    const callModel = vi.fn();
+    const logUnanswered = vi.fn().mockResolvedValue(undefined);
+    const complaint = "I want to complain about yesterday's service.";
+    const deps = { ...base(), callModel, logUnanswered };
+    const result = await runAssistant(
+      {
+        ...request,
+        messages: [{ role: 'user', text: complaint }],
+      },
+      deps,
+    );
+
+    expect(result.text).toMatch(/sorry|team/i);
+    expect(result.actions).toEqual([{ type: 'handoff' }]);
+    expect(result.logged).toBe(true);
+    expect(result.unansweredTopic).toBe(complaint);
+    expect(logUnanswered).toHaveBeenCalledWith(complaint);
+    expect(callModel).not.toHaveBeenCalled();
+    expect(deps.recordUsage).not.toHaveBeenCalled();
+    expect(deps.onPromptSize).not.toHaveBeenCalled();
   });
 
   it('returns proposal actions with menu prices and matching function results', async () => {
@@ -140,12 +189,13 @@ describe('assistant model loop', () => {
     const result = await runAssistant(request, { ...base(), callModel });
     expect(callModel).toHaveBeenCalledTimes(4);
     expect(result.actions).toEqual([{ type: 'handoff' }]);
+    expect(result.fallback).toBe('tool_limit');
   });
 
   it('does not start another model call after the total budget is spent', async () => {
     let currentTime = 0;
     const callModel = vi.fn().mockImplementation(async () => {
-      currentTime = 25_001;
+      currentTime = 40_001;
       return {
         content: {
           role: 'model',
@@ -166,13 +216,13 @@ describe('assistant model loop', () => {
         ...base(),
         callModel,
         clock: () => currentTime,
-        totalBudgetMs: 25_000,
+        totalBudgetMs: 40_000,
       }),
     ).rejects.toMatchObject({ kind: 'budget' });
     expect(callModel).toHaveBeenCalledTimes(1);
     expect(callModel.mock.calls[0]?.[0]).toMatchObject({
-      timeoutMs: 12_000,
-      budgetMs: 25_000,
+      timeoutMs: 20_000,
+      budgetMs: 40_000,
     });
   });
 
@@ -245,7 +295,7 @@ describe('assistant model loop', () => {
       const result = await runAssistant(
         {
           ...request,
-          messages: [{ role: 'user', text: 'Do you refund train tickets?' }],
+          messages: [{ role: 'user', text: 'Do you sell train tickets?' }],
         },
         {
           ...base(),
@@ -258,12 +308,11 @@ describe('assistant model loop', () => {
       );
 
       expect(logUnanswered).toHaveBeenCalledOnce();
-      expect(logUnanswered).toHaveBeenCalledWith(
-        'Do you refund train tickets?',
-      );
+      expect(logUnanswered).toHaveBeenCalledWith('Do you sell train tickets?');
       expect(result).toMatchObject({
         logged: true,
-        unansweredTopic: 'Do you refund train tickets?',
+        unansweredTopic: 'Do you sell train tickets?',
+        fallback: 'model',
       });
     },
   );
@@ -308,7 +357,7 @@ describe('assistant model loop', () => {
     const result = await runAssistant(
       {
         ...request,
-        messages: [{ role: 'user', text: 'Add menu item PH9999 to my cart.' }],
+        messages: [{ role: 'user', text: 'Tell me about PH0001.' }],
       },
       {
         ...base(),
@@ -317,7 +366,7 @@ describe('assistant model loop', () => {
             role: 'model',
             parts: [
               {
-                text: "I couldn't find an item with code PH9999 on our menu. Try PH0001.",
+                text: 'We have PH0001 on the menu. Try PH0002.',
               },
             ],
           },
@@ -326,8 +375,77 @@ describe('assistant model loop', () => {
       },
     );
 
+    expect(result.text).toContain('PH0001');
+    expect(result.text).not.toContain('PH0002');
+  });
+
+  it('returns deterministic message when guest message contains unknown menu id', async () => {
+    const callModel = vi.fn();
+    const result = await runAssistant(
+      {
+        ...request,
+        messages: [{ role: 'user', text: 'Add menu item PH9999 to my cart.' }],
+      },
+      { ...base(), callModel },
+    );
+    expect(result.text).toContain('not on the menu');
     expect(result.text).toContain('PH9999');
-    expect(result.text).not.toContain('PH0001');
+    expect(result.text).toMatch(/similar/i);
+    expect(callModel).not.toHaveBeenCalled();
+  });
+
+  it('returns deterministic message when guest message contains unavailable menu id', async () => {
+    const callModel = vi.fn();
+    const menu = base().menu.map((item) =>
+      item.id === 'PH0001' ? { ...item, available: false } : item,
+    );
+    const result = await runAssistant(
+      {
+        ...request,
+        messages: [{ role: 'user', text: 'Add menu item PH0001 to my cart.' }],
+      },
+      { ...base(), menu, callModel },
+    );
+    expect(result.text).toContain('not available');
+    expect(result.text).toContain('PH0001');
+    expect(result.text).toMatch(/similar/i);
+    expect(callModel).not.toHaveBeenCalled();
+  });
+
+  it('proceeds to model call when guest message contains a valid available menu id', async () => {
+    const callModel = vi.fn().mockResolvedValue({
+      content: { role: 'model', parts: [{ text: 'PH0001 is available.' }] },
+      usage,
+    });
+    const result = await runAssistant(
+      {
+        ...request,
+        messages: [{ role: 'user', text: 'Tell me about PH0001.' }],
+      },
+      { ...base(), callModel },
+    );
+    expect(callModel).toHaveBeenCalled();
+    expect(result.text).toContain('PH0001');
+  });
+
+  it('sets fallback to model when model chooses the stock phrase', async () => {
+    const result = await runAssistant(
+      {
+        ...request,
+        messages: [{ role: 'user', text: 'Do you sell train tickets?' }],
+      },
+      {
+        ...base(),
+        callModel: vi.fn().mockResolvedValue({
+          content: {
+            role: 'model',
+            parts: [{ text: "I'll check with the team." }],
+          },
+          usage,
+        }),
+      },
+    );
+    expect(result.fallback).toBe('model');
   });
 
   it('has no order or booking creation path', () => {

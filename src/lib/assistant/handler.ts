@@ -11,7 +11,7 @@ import {
   type ModelUsage,
 } from './service';
 import type { ToolDeclaration } from './tools';
-import type { AssistantResponse } from './types';
+import type { AssistantFallbackKind, AssistantResponse } from './types';
 import type { AvailabilityRow } from '../bookings/bookings';
 
 export const ASSISTANT_GLOBAL_DAILY_CAP = 200;
@@ -118,12 +118,16 @@ const localDayFormatter = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Asia/Kolkata',
 });
 
-const limitedResponse = (text: string): AssistantResponse => ({
+const limitedResponse = (
+  text: string,
+  fallback?: AssistantFallbackKind,
+): AssistantResponse => ({
   text,
   actions: [],
   ids: [],
   logged: false,
   resting: true,
+  ...(fallback ? { fallback } : {}),
 });
 
 function cleanToolCalls(
@@ -174,7 +178,10 @@ export async function handleAssistantRequest(
     if (!(await deps.hitRateLimit(ipKey, 600, 20)))
       return {
         status: 429,
-        body: limitedResponse('Please wait before sending another message.'),
+        body: limitedResponse(
+          'Please wait before sending another message.',
+          'quota',
+        ),
         retryAfter: 600,
       };
     const sessionKey = await saltedRateLimitKey(
@@ -185,7 +192,10 @@ export async function handleAssistantRequest(
     if (!(await deps.hitRateLimit(sessionKey, 86_400, 60)))
       return {
         status: 429,
-        body: limitedResponse('This chat has reached its daily message limit.'),
+        body: limitedResponse(
+          'This chat has reached its daily message limit.',
+          'quota',
+        ),
         retryAfter: 86_400,
       };
     const globalKey = await saltedRateLimitKey(
@@ -196,12 +206,12 @@ export async function handleAssistantRequest(
     if (
       !(await deps.hitRateLimit(globalKey, 86_400, ASSISTANT_GLOBAL_DAILY_CAP))
     ) {
-      const response = limitedResponse(RESTING_TEXT);
+      const response = limitedResponse(RESTING_TEXT, 'quota');
       await logResult(request, response, [], undefined, deps);
       return { status: 200, body: response };
     }
     if ((await deps.readDailyTokens(day)) >= deps.dailyTokenCap) {
-      const response = limitedResponse(RESTING_TEXT);
+      const response = limitedResponse(RESTING_TEXT, 'quota');
       await logResult(request, response, [], undefined, deps);
       return { status: 200, body: response };
     }
@@ -212,7 +222,10 @@ export async function handleAssistantRequest(
     const question = request.messages.at(-1)?.text ?? '';
     if (!deps.configured) {
       deps.warnFallback({ kind: 'not_configured' });
-      const response = assistantFallback(question, now);
+      const response: AssistantResponse = {
+        ...assistantFallback(question, now),
+        fallback: 'unavailable',
+      };
       await logResult(request, response, [], undefined, deps);
       return { status: 200, body: response };
     }
@@ -238,6 +251,7 @@ export async function handleAssistantRequest(
         ids: result.ids,
         logged: result.logged,
         ...(result.resting ? { resting: true } : {}),
+        ...(result.fallback ? { fallback: result.fallback } : {}),
       };
       await logResult(
         request,
@@ -248,8 +262,18 @@ export async function handleAssistantRequest(
       );
       return { status: 200, body: response };
     } catch (error) {
-      deps.warnFallback(assistantFallbackDiagnostic(error));
-      const response = assistantFallback(question, now);
+      const diagnostic = assistantFallbackDiagnostic(error);
+      deps.warnFallback(diagnostic);
+      const fallbackKind: AssistantFallbackKind =
+        diagnostic.kind === 'quota'
+          ? 'quota'
+          : diagnostic.kind === 'timeout' || diagnostic.kind === 'budget'
+            ? 'timeout'
+            : 'unavailable';
+      const response: AssistantResponse = {
+        ...assistantFallback(question, now),
+        fallback: fallbackKind,
+      };
       await logResult(request, response, [], undefined, deps);
       return { status: 200, body: response };
     }

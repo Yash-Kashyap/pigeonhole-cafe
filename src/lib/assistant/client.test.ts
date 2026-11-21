@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
-import { callProvider, type ProviderFetch } from '@assistant-provider';
+import {
+  callProvider,
+  PROVIDER_CALL_TIMEOUT_MS,
+  PROVIDER_MIN_RETRY_TIME_MS,
+  PROVIDER_TOTAL_BUDGET_MS,
+  type ProviderFetch,
+} from '@assistant-provider';
 
 const input = {
   apiKey: 'test-key-not-a-secret',
@@ -27,6 +33,11 @@ const successResponse = () =>
   );
 
 describe('assistant REST client', () => {
+  it('uses the 20 second call timeout and 40 second total budget', () => {
+    expect(PROVIDER_CALL_TIMEOUT_MS).toBe(20_000);
+    expect(PROVIDER_TOTAL_BUDGET_MS).toBe(40_000);
+  });
+
   it('sends the documented request shape and parses calls and usage', async () => {
     const fetchFn = vi.fn<ProviderFetch>().mockResolvedValue(
       new Response(
@@ -129,7 +140,9 @@ describe('assistant REST client', () => {
     await expect(
       callProvider(input, fetchFn, {
         timeoutMs: 5,
-        budgetMs: 50,
+        // Generous total budget: on a loaded machine a tight one runs out before
+        // the retry starts, which would test CPU speed instead of the retry.
+        budgetMs: 2000,
         retryDelayMs: 0,
       }),
     ).resolves.toMatchObject({ content: { role: 'model' } });
@@ -144,5 +157,26 @@ describe('assistant REST client', () => {
       callProvider(input, fetchFn, { retryDelayMs: 0 }),
     ).rejects.toMatchObject({ kind: 'unavailable', status: 503 });
     expect(fetchFn).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not retry without the minimum useful request time remaining', async () => {
+    let currentTime = 0;
+    const fetchFn = vi.fn<ProviderFetch>().mockImplementation(async () => {
+      currentTime = 1_301;
+      return new Response('{}', { status: 503 });
+    });
+    const sleep = vi.fn().mockResolvedValue(undefined);
+
+    await expect(
+      callProvider(input, fetchFn, {
+        budgetMs: 3_000,
+        retryDelayMs: 700,
+        now: () => currentTime,
+        sleep,
+      }),
+    ).rejects.toMatchObject({ kind: 'unavailable', status: 503 });
+    expect(PROVIDER_MIN_RETRY_TIME_MS).toBe(1_000);
+    expect(fetchFn).toHaveBeenCalledTimes(1);
+    expect(sleep).not.toHaveBeenCalled();
   });
 });

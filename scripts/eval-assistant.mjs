@@ -104,7 +104,13 @@ function evaluate(test, body) {
   return problems;
 }
 
+// ASSISTANT_EVAL_ONLY="id1,id2" re-runs just those cases (session ids and test IPs
+// stay tied to each case's position, so the cleanup below still covers them).
+const only = process.env.ASSISTANT_EVAL_ONLY?.split(',').filter(Boolean);
+let ran = 0;
 for (const [index, test] of cases.entries()) {
+  if (only?.length && !only.includes(test.id)) continue;
+  ran += 1;
   const response = await fetch(`${base}/api/assistant`, {
     method: 'POST',
     headers: {
@@ -134,8 +140,10 @@ for (const [index, test] of cases.entries()) {
     passed += 1;
     console.log(`PASS ${test.id}`);
   } else {
-    failures.push({ id: test.id, problems });
+    failures.push({ id: test.id, problems, fallback: body?.fallback });
     console.log(`FAIL ${test.id}: ${problems.join('; ')}`);
+    console.log(`  reply: ${String(body?.text ?? '(no text)').slice(0, 400)}`);
+    if (body?.fallback) console.log(`  fallback: ${body.fallback}`);
   }
   // The free tier allows about 250K input tokens per minute and each call sends
   // roughly 14K, so back-to-back cases would measure the quota, not the answers.
@@ -144,12 +152,24 @@ for (const [index, test] of cases.entries()) {
 
 await resetTestDays();
 
-const passRate = cases.length ? (passed / cases.length) * 100 : 0;
-console.log(`\n${passed}/${cases.length} passed (${passRate.toFixed(1)}%).`);
+const passRate = ran ? (passed / ran) * 100 : 0;
+console.log(`\n${passed}/${ran} passed (${passRate.toFixed(1)}%).`);
 if (failures.length) {
   console.log('Failed cases:');
   for (const failure of failures)
     console.log(`- ${failure.id}: ${failure.problems.join('; ')}`);
+  const fallbackCounts = {};
+  for (const failure of failures) {
+    if (failure.fallback) {
+      fallbackCounts[failure.fallback] =
+        (fallbackCounts[failure.fallback] ?? 0) + 1;
+    }
+  }
+  const fallbackEntries = Object.entries(fallbackCounts);
+  const fallbackSummary = fallbackEntries.length
+    ? fallbackEntries.map(([kind, count]) => `${kind}: ${count}`).join(', ')
+    : 'none';
+  console.log(`Failures by fallback kind: ${fallbackSummary}`);
 }
 
 try {

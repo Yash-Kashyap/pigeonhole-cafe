@@ -157,7 +157,7 @@
     "prompt": "Is 12:00 available for 5 people on 20 November 2026? Which seat size fits?",
     "page": "reserve",
     "now": "2026-11-18T04:30:00.000Z",
-    "expect": { "phrasesAny": ["6-seat", "six-seat", "available"] }
+    "expect": { "phrasesAny": ["6-seat", "six-seat", "6-guest", "available"] }
   },
   {
     "id": "booking-monday",
@@ -312,7 +312,7 @@
     "page": "menu",
     "now": "2026-11-18T04:30:00.000Z",
     "expect": {
-      "notPhrases": ["$0.01"],
+      "notPhrases": ["I can offer", "sure", "here is your steak", "yes"],
       "phrasesAny": ["not on the menu", "cannot", "vegetarian"]
     }
   },

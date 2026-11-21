@@ -7,7 +7,11 @@ import {
   type ToolExecution,
   type ToolDeclaration,
 } from './tools';
-import type { AssistantAction, AssistantResponse } from './types';
+import type {
+  AssistantAction,
+  AssistantFallbackKind,
+  AssistantResponse,
+} from './types';
 
 export type ModelPart = {
   text?: string;
@@ -54,8 +58,8 @@ export type AssistantServiceDependencies = AssistantToolContext & {
   totalBudgetMs?: number;
 };
 
-export const ASSISTANT_TOTAL_BUDGET_MS = 25_000;
-export const ASSISTANT_CALL_TIMEOUT_MS = 12_000;
+export const ASSISTANT_TOTAL_BUDGET_MS = 40_000;
+export const ASSISTANT_CALL_TIMEOUT_MS = 20_000;
 export const ALLERGY_EMERGENCY_TERMS = [
   'emergency',
   'anaphylaxis',
@@ -75,6 +79,24 @@ export const ALLERGY_EMERGENCY_TERMS = [
 export function isAllergyEmergencyMessage(value: string): boolean {
   const normalized = value.toLowerCase().replaceAll('’', "'");
   return ALLERGY_EMERGENCY_TERMS.some((term) => normalized.includes(term));
+}
+
+const COMPLAINT_PATTERNS = [
+  /\bcomplaints?\b/,
+  /\bcomplain\b/,
+  /\b(?:i|we)\s+(?:want|need|demand|expect|would\s+like)\s+(?:a|my|our)\s+refund\b/,
+  /\bmy\s+refund\b/,
+  /\brude\b/,
+  /\bunhappy\b/,
+  /\bterrible\s+service\b/,
+  /\bfood\s+poisoning\b/,
+  /\bovercharged\b/,
+  /\bwrong\s+order\b/,
+] as const;
+
+export function isComplaintMessage(value: string): boolean {
+  const normalized = value.toLowerCase().replaceAll('’', "'");
+  return COMPLAINT_PATTERNS.some((pattern) => pattern.test(normalized));
 }
 
 export class AssistantBudgetError extends Error {
@@ -113,7 +135,7 @@ function collectIds(value: unknown, ids: Set<string>): void {
 
 function cleanReply(value: string, guestIds: ReadonlySet<string>): string {
   return value
-    .replace(/\s*\(?(PH\d{4})\)?/gi, (match, id: string) =>
+    .replace(/\s*\(?(PH\d+)\)?/gi, (match, id: string) =>
       guestIds.has(id.toUpperCase()) ? match : '',
     )
     .replace(/\s+/g, ' ')
@@ -140,8 +162,49 @@ export async function runAssistant(
       toolCalls: [],
     };
 
+  if (isComplaintMessage(latestUserMessage)) {
+    await deps.logUnanswered(latestUserMessage);
+    return {
+      text: "I'm sorry about that. I'll hand this to the team.",
+      actions: [{ type: 'handoff' }],
+      ids: [],
+      logged: true,
+      unansweredTopic: latestUserMessage,
+      toolCalls: [],
+    };
+  }
+
+  const extractedPhIds = latestUserMessage.match(/PH\d+/gi);
+  if (extractedPhIds) {
+    const menuById = new Map(
+      deps.menu.map((item) => [item.id.toUpperCase(), item]),
+    );
+    for (const rawId of extractedPhIds) {
+      const id = rawId.toUpperCase();
+      const menuItem = menuById.get(id);
+      if (!menuItem) {
+        return {
+          text: `Item ${id} is not on the menu. I can help you find something similar if you would like.`,
+          actions: [],
+          ids: [],
+          logged: false,
+          toolCalls: [],
+        };
+      }
+      if (!menuItem.available) {
+        return {
+          text: `Item ${id} is not available right now. I can help you find something similar if you would like.`,
+          actions: [],
+          ids: [],
+          logged: false,
+          toolCalls: [],
+        };
+      }
+    }
+  }
+
   const guestIds = new Set(
-    (latestUserMessage.match(/PH\d{4}/gi) ?? []).map((id) => id.toUpperCase()),
+    (latestUserMessage.match(/PH\d+/gi) ?? []).map((id) => id.toUpperCase()),
   );
   const dynamicContext = JSON.stringify({
     page: request.page,
@@ -178,8 +241,14 @@ export async function runAssistant(
   const finalResponse = async (
     text: string,
     responseActions: AssistantAction[] = [...actions.values()],
+    fallback?: AssistantFallbackKind,
   ) => {
-    if (/^I'll check with the team\.?$/.test(text) && !logged) {
+    let resolvedFallback = fallback;
+    const isStockPhrase = /^I'll check with the team\.?$/.test(text);
+    if (isStockPhrase && !resolvedFallback) {
+      resolvedFallback = 'model';
+    }
+    if (isStockPhrase && !logged) {
       const topic = request.messages.at(-1)?.text ?? '';
       await deps.logUnanswered(topic);
       logged = true;
@@ -192,6 +261,7 @@ export async function runAssistant(
       logged,
       toolCalls,
       ...(unansweredTopic ? { unansweredTopic } : {}),
+      ...(resolvedFallback ? { fallback: resolvedFallback } : {}),
     };
   };
 
@@ -222,7 +292,11 @@ export async function runAssistant(
       (call) => !toolResults.has(toolCallKey(call.name, call.args)),
     );
     if (hasNewCall && toolRounds >= 3)
-      return finalResponse("I'll check with the team.", [{ type: 'handoff' }]);
+      return finalResponse(
+        "I'll check with the team.",
+        [{ type: 'handoff' }],
+        'tool_limit',
+      );
     if (hasNewCall) toolRounds += 1;
     contents.push(result.content);
     const responseParts: ModelPart[] = [];
@@ -251,5 +325,9 @@ export async function runAssistant(
     contents.push({ role: 'user', parts: responseParts });
   }
 
-  return finalResponse("I'll check with the team.", [{ type: 'handoff' }]);
+  return finalResponse(
+    "I'll check with the team.",
+    [{ type: 'handoff' }],
+    'tool_limit',
+  );
 }

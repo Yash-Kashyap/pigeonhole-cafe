@@ -67,6 +67,10 @@ export type ProviderCallOptions = {
   sleep?: (milliseconds: number) => Promise<void>;
 };
 
+export const PROVIDER_CALL_TIMEOUT_MS = 20_000;
+export const PROVIDER_TOTAL_BUDGET_MS = 40_000;
+export const PROVIDER_MIN_RETRY_TIME_MS = 1_000;
+
 const functionCallSchema = z
   .object({
     id: z.string().optional(),
@@ -122,8 +126,8 @@ export async function callProvider(
   fetchFn: ProviderFetch = fetch,
   options: ProviderCallOptions = {},
 ): Promise<ProviderResult> {
-  const timeoutMs = options.timeoutMs ?? 12_000;
-  const budgetMs = options.budgetMs ?? 25_000;
+  const timeoutMs = options.timeoutMs ?? PROVIDER_CALL_TIMEOUT_MS;
+  const budgetMs = options.budgetMs ?? PROVIDER_TOTAL_BUDGET_MS;
   const retryDelayMs = options.retryDelayMs ?? 700;
   const now = options.now ?? Date.now;
   const sleep =
@@ -206,7 +210,8 @@ export async function callProvider(
         error instanceof ProviderRequestError &&
         (error.kind === 'timeout' || error.kind === 'unavailable');
       if (!retryable || attempt === 1) throw error;
-      if (budgetMs - (now() - startedAt) <= retryDelayMs) throw error;
+      const remainingAfterDelay = budgetMs - (now() - startedAt) - retryDelayMs;
+      if (remainingAfterDelay < PROVIDER_MIN_RETRY_TIME_MS) throw error;
       await sleep(retryDelayMs);
     }
   }

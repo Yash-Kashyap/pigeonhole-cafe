@@ -98,7 +98,7 @@ describe('assistant request handler', () => {
       deps,
     );
     expect(result.status).toBe(200);
-    expect(result.body).toMatchObject({ resting: true });
+    expect(result.body).toMatchObject({ resting: true, fallback: 'quota' });
     expect(deps.callModel).not.toHaveBeenCalled();
     expect(ASSISTANT_GLOBAL_DAILY_CAP).toBe(200);
     expect(deps.hitRateLimit).toHaveBeenNthCalledWith(
@@ -122,17 +122,17 @@ describe('assistant request handler', () => {
       }),
     });
     const result = await handleAssistantRequest(
-      request('Call 9876543210 about train refunds'),
+      request('Call 9876543210 about train timetables'),
       '198.51.100.30',
       now,
       deps,
     );
 
-    expect(result.body).toMatchObject({ logged: true });
+    expect(result.body).toMatchObject({ logged: true, fallback: 'model' });
     expect(logUnanswered).toHaveBeenCalledOnce();
     expect(logUnanswered).toHaveBeenCalledWith(
       'session-1234',
-      'Call [phone removed] about train refunds',
+      'Call [phone removed] about train timetables',
     );
   });
 
@@ -147,7 +147,7 @@ describe('assistant request handler', () => {
       now,
       deps,
     );
-    expect(result.body).toMatchObject({ resting: true });
+    expect(result.body).toMatchObject({ resting: true, fallback: 'quota' });
     expect(deps.callModel).not.toHaveBeenCalled();
   });
 
@@ -160,16 +160,23 @@ describe('assistant request handler', () => {
       deps,
     );
     expect(result.status).toBe(200);
-    expect(result.body).toMatchObject({ resting: true });
+    expect(result.body).toMatchObject({
+      resting: true,
+      fallback: 'unavailable',
+    });
     expect(JSON.stringify(result.body)).toContain('/reserve');
     expect(deps.callModel).not.toHaveBeenCalled();
   });
 
-  it.each(['quota', 'server failure', 'timeout'])(
+  it.each([
+    ['quota', { kind: 'quota' }, 'quota'],
+    ['timeout', { kind: 'timeout' }, 'timeout'],
+    ['server failure', new Error('internal detail'), 'unavailable'],
+  ] as const)(
     'falls back without an error response on %s',
-    async () => {
+    async (_label, error, expectedFallback) => {
       const deps = dependencies({
-        callModel: vi.fn().mockRejectedValue(new Error('internal detail')),
+        callModel: vi.fn().mockRejectedValue(error),
       });
       const result = await handleAssistantRequest(
         request('Show me the menu'),
@@ -178,7 +185,10 @@ describe('assistant request handler', () => {
         deps,
       );
       expect(result.status).toBe(200);
-      expect(result.body).toMatchObject({ resting: true });
+      expect(result.body).toMatchObject({
+        resting: true,
+        fallback: expectedFallback,
+      });
       expect(JSON.stringify(result.body)).not.toContain('internal detail');
     },
   );
@@ -229,7 +239,7 @@ describe('assistant request handler', () => {
       now,
       deps,
     );
-    expect(result.body).toMatchObject({ resting: true });
+    expect(result.body).toMatchObject({ resting: true, fallback: 'timeout' });
     expect(warnFallback).toHaveBeenCalledWith({ kind: 'budget' });
   });
 
