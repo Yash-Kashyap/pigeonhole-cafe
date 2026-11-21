@@ -59,6 +59,23 @@ describe('assistant facts', () => {
     expect(load).toHaveBeenCalledTimes(2);
   });
 
+  it('reloads owner-written answers immediately after cache invalidation', async () => {
+    let answer = 'First';
+    const load = vi.fn(async () => [{ question: 'Where?', answer }]);
+    expect(await getKnowledgeOverrides(load, 1_000)).toEqual([
+      { question: 'Where?', answer: 'First' },
+    ]);
+    answer = 'Updated';
+    expect(await getKnowledgeOverrides(load, 2_000)).toEqual([
+      { question: 'Where?', answer: 'First' },
+    ]);
+    clearKnowledgeOverrideCache();
+    expect(await getKnowledgeOverrides(load, 2_001)).toEqual([
+      { question: 'Where?', answer: 'Updated' },
+    ]);
+    expect(load).toHaveBeenCalledTimes(2);
+  });
+
   it('labels owner answers and dynamic context as data', () => {
     const prompt = buildAssistantPrompt(
       loadMenu().slice(0, 1),

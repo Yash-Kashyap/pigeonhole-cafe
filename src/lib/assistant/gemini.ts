@@ -153,8 +153,12 @@ export async function callProvider(
           body: JSON.stringify({
             systemInstruction: { parts: [{ text: input.systemInstruction }] },
             contents: input.contents,
-            tools: [{ functionDeclarations: input.tools }],
-            toolConfig: { functionCallingConfig: { mode: 'AUTO' } },
+            ...(input.tools.length
+              ? {
+                  tools: [{ functionDeclarations: input.tools }],
+                  toolConfig: { functionCallingConfig: { mode: 'AUTO' } },
+                }
+              : {}),
             generationConfig: { temperature: 0.2, maxOutputTokens: 500 },
           }),
         },

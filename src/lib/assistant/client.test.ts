@@ -94,6 +94,15 @@ describe('assistant REST client', () => {
     });
   });
 
+  it('omits function calling configuration when the caller has no tools', async () => {
+    const fetchFn = vi.fn<ProviderFetch>().mockResolvedValue(successResponse());
+    await callProvider({ ...input, tools: [] }, fetchFn);
+    const [, init] = fetchFn.mock.calls[0]!;
+    const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+    expect(body).not.toHaveProperty('tools');
+    expect(body).not.toHaveProperty('toolConfig');
+  });
+
   it.each([
     ['bad request', 400, 'upstream'],
     ['unauthorized', 401, 'auth'],

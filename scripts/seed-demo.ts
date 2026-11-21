@@ -317,14 +317,22 @@ const logs = await Promise.all(
     session_id: `demo-session-${String(Math.floor(index / 2) + 1).padStart(2, '0')}`,
     role: index % 2 === 0 ? 'user' : 'assistant',
     content:
-      index < 8
-        ? `Fictional unanswered demo question ${index + 1}.`
+      index % 2 === 1 && index < 16
+        ? `Fictional unanswered demo question ${Math.floor(index / 2) + 1}.`
         : `Fictional demo conversation message ${index + 1}.`,
-    answered: index >= 8,
-    unanswered_topic: index < 8 ? `Demo topic ${index + 1}` : null,
+    answered: !(index % 2 === 1 && index < 16),
+    unanswered_topic:
+      index % 2 === 1 && index < 16
+        ? `Fictional unanswered demo question ${Math.floor(index / 2) + 1}.`
+        : null,
     handled: false,
     tool_calls: null,
     seeded: true,
+    created_at: new Date(
+      now.getTime() -
+        Math.floor((Math.floor(index / 2) * 29) / 19) * 86_400_000 -
+        (index % 2 === 0 ? 60_000 : 0),
+    ).toISOString(),
   })),
 );
 await insertChunks('assistant_logs', logs);
