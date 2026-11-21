@@ -319,13 +319,16 @@ export default function OwnerToday({ supabaseUrl, supabaseAnonKey }: Props) {
             <p className="mt-1 text-xs text-ink-2">From 5:00 PM onward</p>
           </div>
 
-          <div className="border border-ink bg-card p-4 shadow-ledger">
+          <a
+            href="/owner/app/questions"
+            className="block border border-ink bg-card p-4 shadow-ledger text-inherit no-underline transition-colors hover:bg-paper-2"
+          >
             <p className="ph-label text-brass-text">Unanswered questions</p>
             <p className="mt-2 font-display text-3xl sm:text-4xl">
               {loading && !data ? '—' : (data?.stats.unansweredQuestions ?? 0)}
             </p>
             <p className="mt-1 text-xs text-ink-2">Logged for later review</p>
-          </div>
+          </a>
         </div>
       </section>
 

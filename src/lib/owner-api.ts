@@ -65,18 +65,21 @@ export async function ownerGetJson<T>(
 
 export async function ownerWriteJson<T>(
   path: string,
-  method: 'POST' | 'PATCH',
-  body: object,
+  method: 'POST' | 'PATCH' | 'DELETE',
+  body?: object,
 ): Promise<OwnerApiResult<T>> {
   try {
+    const headers: Record<string, string> = {
+      Accept: 'application/json',
+    };
+    if (body !== undefined) {
+      headers['Content-Type'] = 'application/json';
+    }
     const response = await fetch(path, {
       method,
       credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify(body),
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
     });
     let payload: unknown = null;
     try {

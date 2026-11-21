@@ -1,0 +1,16 @@
+---
+import OwnerQuestions from '../../../components/owner/OwnerQuestions';
+import OwnerLayout from '../../../layouts/OwnerLayout.astro';
+import { getOwnerRealtimeProps } from '../../../lib/owner-page-props';
+
+export const prerender = false;
+const realtime = getOwnerRealtimeProps();
+---
+
+<OwnerLayout title="Questions" active="questions">
+  <OwnerQuestions
+    client:load
+    supabaseUrl={realtime.supabaseUrl}
+    supabaseAnonKey={realtime.supabaseAnonKey}
+  />
+</OwnerLayout>
