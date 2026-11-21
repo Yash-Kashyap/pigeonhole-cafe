@@ -1,7 +1,8 @@
 ---
-import AssistantWidget from '../components/AssistantWidget.astro';
+import AssistantWidget from '../components/AssistantWidget';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
+import { mapPathToPage } from '../lib/assistant-ui';
 import '../styles/global.css';
 
 interface Props {
@@ -22,6 +23,9 @@ const canonical = new URL(
   Astro.url.pathname,
   import.meta.env.PUBLIC_SITE_URL || Astro.url.origin,
 );
+const isOwnerRoute = Astro.url.pathname.startsWith('/owner');
+const shouldShowAssistant = showAssistant && !isOwnerRoute;
+const assistantPage = mapPathToPage(Astro.url.pathname);
 ---
 
 <!doctype html>
@@ -46,6 +50,8 @@ const canonical = new URL(
       <slot />
     </main>
     <SiteFooter />
-    {showAssistant && <AssistantWidget />}
+    {shouldShowAssistant && (
+      <AssistantWidget client:idle page={assistantPage} />
+    )}
   </body>
 </html>

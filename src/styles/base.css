@@ -199,11 +199,15 @@
 }
 
 /* Cart peek assistant lift (Phase 2) */
-body[data-cart-peek='true'] aside[aria-label='Café assistant preview'] {
+body[data-cart-peek='true'] aside[aria-label='Café assistant preview'],
+body[data-cart-peek='true'] aside[data-assistant-widget],
+body[data-cart-peek='true'] aside[aria-label='Café assistant'] {
   bottom: 5.5rem;
 }
 @media (min-width: 40rem) {
-  body[data-cart-peek='true'] aside[aria-label='Café assistant preview'] {
+  body[data-cart-peek='true'] aside[aria-label='Café assistant preview'],
+  body[data-cart-peek='true'] aside[data-assistant-widget],
+  body[data-cart-peek='true'] aside[aria-label='Café assistant'] {
     bottom: 1.5rem;
   }
 }
