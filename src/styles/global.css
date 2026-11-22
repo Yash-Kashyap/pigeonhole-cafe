@@ -5,3 +5,14 @@
 @import 'tailwindcss';
 @import './tokens.css';
 @import './base.css';
+
+@layer components {
+  .booking-timeline-grid {
+    grid-template-columns: 124px repeat(34, minmax(34px, 1fr));
+  }
+
+  .booking-time-columns {
+    grid-column: 2 / span 34;
+    grid-template-columns: repeat(34, minmax(34px, 1fr));
+  }
+}

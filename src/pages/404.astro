@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+---
+
+<BaseLayout
+  title="Page not found | The Pigeonhole CafÃ©"
+  description="This page is not in the pigeonholes."
+  noindex
+>
+  <section class="mx-auto grid min-h-[60vh] max-w-3xl content-center gap-5 px-4 py-16">
+    <p class="ph-label text-stamp">404 · Misfiled</p>
+    <h1 class="font-serif text-4xl sm:text-5xl">
+      That page slipped out of its slot.
+    </h1>
+    <p class="max-w-xl text-ink-2">
+      The address may be old, or the page may have moved.
+    </p>
+    <div class="flex flex-wrap gap-3">
+      <Button href="/">Back to the café</Button>
+      <Button href="/menu" variant="outline">
+        Browse the menu
+      </Button>
+    </div>
+  </section>
+</BaseLayout>

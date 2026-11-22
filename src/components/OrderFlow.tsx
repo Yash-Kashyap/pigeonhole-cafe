@@ -440,7 +440,7 @@ export default function OrderFlow({ items }: Props) {
         </p>
       </div>
 
-      {isClosed && (
+      {pickupReady && isClosed && (
         <div
           className="mt-6 border border-warn bg-paper-2 p-4 text-ink"
           role="status"
@@ -826,7 +826,7 @@ export default function OrderFlow({ items }: Props) {
               </legend>
               <div className="space-y-3">
                 {/* ASAP Option */}
-                {!isClosed && (
+                {pickupReady && !isClosed && (
                   <label className="flex items-start gap-3 border border-ink/30 bg-paper p-3 cursor-pointer">
                     <input
                       type="radio"

@@ -19,18 +19,17 @@ function PostmarkIcon() {
     >
       <circle cx="12" cy="12" r="9" strokeDasharray="3 2" />
       <circle cx="12" cy="12" r="6" />
-      <text
-        x="12"
-        y="14"
-        textAnchor="middle"
-        fontSize="6"
-        fontWeight="bold"
-        fontFamily="DM Mono, monospace"
-        fill="currentColor"
-        stroke="none"
-      >
-        PH
-      </text>
+      <path
+        d="M9.5 9.5h1.8a1.2 1.2 0 0 1 0 2.4H9.5m0-2.4v4.5"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M13.5 9.5v4.5m0-2.2h2.2m0-2.3v4.5"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }

@@ -200,7 +200,7 @@ try {
 
   // Cart button count in header
   const headerCartCount = await menuPage
-    .locator('header a[aria-label^="Cart with"]')
+    .locator('header a[aria-label^="Cart "]')
     .first()
     .innerText();
   ok(

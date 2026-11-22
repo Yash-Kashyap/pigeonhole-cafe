@@ -20,7 +20,7 @@ export default function CartButton() {
     <a
       className="inline-flex min-h-11 items-center border border-ink px-4 font-semibold no-underline transition hover:bg-ink hover:text-paper"
       href="/order"
-      aria-label={`Cart with ${count} items`}
+      aria-label={`Cart ${count} items`}
     >
       Cart <span className="ml-2 font-mono text-sm">{count}</span>
     </a>

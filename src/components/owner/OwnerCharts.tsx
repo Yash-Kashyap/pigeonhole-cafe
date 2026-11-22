@@ -120,17 +120,7 @@ export function OrdersPerDayChart({
       </svg>
 
       {/* Screen reader table */}
-      <div
-        className="sr-only"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: 1,
-          height: 1,
-          overflow: 'hidden',
-        }}
-      >
+      <div className="sr-only">
         <table className="sr-only">
           <caption>Orders per day</caption>
           <thead>
@@ -175,7 +165,7 @@ export function TopItemsChart({ data }: { data: TopItemCount[] }) {
       <svg
         viewBox={`0 0 ${width} ${totalHeight + 10}`}
         className="w-full overflow-hidden"
-        style={{ minHeight: `${totalHeight}px` }}
+        height={totalHeight + 10}
         role="img"
         aria-label="Top 10 ordered items chart"
       >
@@ -219,17 +209,7 @@ export function TopItemsChart({ data }: { data: TopItemCount[] }) {
       </svg>
 
       {/* Screen reader table */}
-      <div
-        className="sr-only"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: 1,
-          height: 1,
-          overflow: 'hidden',
-        }}
-      >
+      <div className="sr-only">
         <table className="sr-only">
           <caption>Top ordered items</caption>
           <thead>
@@ -343,17 +323,7 @@ export function OrdersByHourChart({ data }: { data: HourCount[] }) {
       </svg>
 
       {/* Screen reader table */}
-      <div
-        className="sr-only"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: 1,
-          height: 1,
-          overflow: 'hidden',
-        }}
-      >
+      <div className="sr-only">
         <table className="sr-only">
           <caption>Orders by hour of day</caption>
           <thead>
@@ -450,17 +420,7 @@ export function BookingsByPartySizeChart({ data }: { data: PartySizeCount[] }) {
       </svg>
 
       {/* Screen reader table */}
-      <div
-        className="sr-only"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: 1,
-          height: 1,
-          overflow: 'hidden',
-        }}
-      >
+      <div className="sr-only">
         <table className="sr-only">
           <caption>Bookings by party size</caption>
           <thead>

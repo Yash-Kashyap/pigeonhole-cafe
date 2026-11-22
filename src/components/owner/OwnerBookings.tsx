@@ -830,12 +830,7 @@ export default function OwnerBookings({ supabaseUrl, supabaseAnonKey }: Props) {
         ) : (
           <div className="mt-3 overflow-x-auto pb-2">
             <div className="min-w-[1180px]">
-              <div
-                className="grid border-b border-ink/25 pb-1.5"
-                style={{
-                  gridTemplateColumns: `124px repeat(${timeline.columns.length}, minmax(34px, 1fr))`,
-                }}
-              >
+              <div className="booking-timeline-grid grid border-b border-ink/25 pb-1.5">
                 <div className="ph-label px-2 text-ink-2">Slot</div>
                 {timeline.columns.map((column, index) => (
                   <div
@@ -851,10 +846,7 @@ export default function OwnerBookings({ supabaseUrl, supabaseAnonKey }: Props) {
                 {timeline.rows.map((row) => (
                   <div
                     key={row.id}
-                    className="grid items-stretch"
-                    style={{
-                      gridTemplateColumns: `124px repeat(${timeline.columns.length}, minmax(34px, 1fr))`,
-                    }}
+                    className="booking-timeline-grid grid items-stretch"
                   >
                     <div className="flex min-h-11 flex-col justify-center bg-paper-2/40 px-2 py-1">
                       <span className="font-mono text-xs font-medium text-ink">
@@ -865,39 +857,39 @@ export default function OwnerBookings({ supabaseUrl, supabaseAnonKey }: Props) {
                       </span>
                     </div>
 
-                    <div
-                      className="relative col-span-full col-start-2 grid min-h-11 items-center"
-                      style={{
-                        gridTemplateColumns: `repeat(${timeline.columns.length}, minmax(34px, 1fr))`,
-                      }}
-                    >
-                      {timeline.columns.map((column) => (
-                        <div
-                          key={column}
-                          className="h-full border-l border-ink/10"
-                          aria-hidden="true"
-                        />
-                      ))}
-
-                      {row.blocks.map((block) => {
+                    <div className="booking-time-columns col-span-34 col-start-2 grid min-h-11 items-center">
+                      {timeline.columns.map((column, columnIndex) => {
+                        const block = row.blocks.find(
+                          (candidate) =>
+                            columnIndex >= candidate.startColumn &&
+                            columnIndex <
+                              candidate.startColumn + candidate.columnSpan,
+                        );
+                        if (!block) {
+                          return (
+                            <div
+                              key={column}
+                              className="h-full border-l border-ink/10"
+                              aria-hidden="true"
+                            />
+                          );
+                        }
                         const isSelected =
                           selectedBookingId === block.bookingId;
                         return (
                           <button
-                            key={`${row.id}-${block.bookingId}`}
+                            key={`${row.id}-${column}-${block.bookingId}`}
                             type="button"
                             onClick={() =>
                               setSelectedBookingId(block.bookingId)
                             }
-                            style={{
-                              gridColumn: `${block.startColumn + 1} / span ${block.columnSpan}`,
-                              gridRow: 1,
-                            }}
-                            className={`z-10 mx-0.5 my-1 flex min-h-9 items-center justify-between gap-1 overflow-hidden border px-1.5 text-left font-mono text-[10px] font-medium transition-colors ${timelineBlockClass(block.status, isSelected)}`}
+                            className={`mx-0.5 my-1 flex min-h-9 min-w-0 items-center justify-center overflow-hidden border px-1 text-left font-mono text-[10px] font-medium transition-colors ${timelineBlockClass(block.status, isSelected)}`}
                             title={`${block.code} (${block.partySize} guests, ${block.status})`}
+                            aria-label={`${block.code}, party of ${block.partySize}, ${block.status}`}
                           >
-                            <span className="truncate">{block.code}</span>
-                            <span className="shrink-0">{block.partySize}p</span>
+                            {columnIndex === block.startColumn ? (
+                              <span className="truncate">{block.code}</span>
+                            ) : null}
                           </button>
                         );
                       })}

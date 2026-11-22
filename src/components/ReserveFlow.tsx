@@ -878,9 +878,12 @@ export default function ReserveFlow({ items }: Props) {
                     >
                       {week.map((day) => {
                         const isSelected = day.bookable && day.date === date;
+                        const baseLabel = formatReserveDateLong(day.date);
                         const label = day.bookable
-                          ? formatReserveDateLong(day.date)
-                          : `${formatReserveDateLong(day.date)} — ${day.disabledReason ?? 'Unavailable'}`;
+                          ? day.isToday
+                            ? `${day.dayNumber} Now - ${baseLabel}`
+                            : baseLabel
+                          : `${baseLabel} — ${day.disabledReason ?? 'Unavailable'}`;
 
                         return (
                           <button
@@ -930,7 +933,7 @@ export default function ReserveFlow({ items }: Props) {
                               }`}
                             >
                               {day.dayNumber}
-                            </span>
+                            </span>{' '}
                             {day.dayNumber === 1 && (
                               <span className="mt-0.5 font-mono text-[9px] uppercase leading-none">
                                 {day.monthShort}

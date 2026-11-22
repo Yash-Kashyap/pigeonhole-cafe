@@ -39,7 +39,7 @@ const assistantPage = mapPathToPage(Astro.url.pathname);
     <link rel="canonical" href={canonical} />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
-    <script is:inline>
+    <script>
       history.scrollRestoration = 'manual';
       window.scrollTo(0, 0);
     </script>

@@ -43,7 +43,7 @@ const navItems: ReadonlyArray<{
     <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>{title} | Owner Counter | The Pigeonhole Café (demo)</title>
-    <script is:inline>
+    <script>
       history.scrollRestoration = 'manual';
       window.scrollTo(0, 0);
     </script>
@@ -153,14 +153,15 @@ const navItems: ReadonlyArray<{
           );
         })}
       </nav>
-      <script is:inline>
+      <script>
         // Seven tabs do not fit in 360 px, so bring the current tab into view
         // (centred) when the page loads. Only the bar scrolls, never the page.
         (function () {
           const nav = document.querySelector(
             'nav[aria-label="Mobile owner navigation"]',
           );
-          const current = nav && nav.querySelector('[aria-current="page"]');
+          const current =
+            nav && nav.querySelector<HTMLElement>('[aria-current="page"]');
           if (nav && current) {
             nav.scrollLeft =
               current.offsetLeft - (nav.clientWidth - current.offsetWidth) / 2;

@@ -73,7 +73,28 @@ export default defineConfig({
       }),
     },
   },
-  security: { checkOrigin: true },
+  security: {
+    checkOrigin: true,
+    csp: {
+      scriptDirective: { resources: ["'self'"] },
+      styleDirective: {
+        resources: [
+          { resource: "'self'", kind: 'element' },
+          { resource: "'none'", kind: 'attribute' },
+        ],
+      },
+      directives: [
+        "default-src 'self'",
+        "base-uri 'self'",
+        "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+        "font-src 'self'",
+        "form-action 'self'",
+        "img-src 'self' data:",
+        "object-src 'none'",
+      ],
+    },
+  },
+  markdown: { syntaxHighlight: false },
   vite: {
     plugins: [tailwindcss()],
     resolve: { alias: { '@assistant-provider': assistantProvider } },

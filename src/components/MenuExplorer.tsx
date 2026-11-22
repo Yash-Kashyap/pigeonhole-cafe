@@ -284,6 +284,7 @@ export default function MenuExplorer({ items }: Props) {
   const [queryInput, setQueryInput] = useState('');
   const [hydrated, setHydrated] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [allRendered, setAllRendered] = useState(false);
   const [unavailable, setUnavailable] = useState<Set<string>>(new Set());
   const [cart, setCart] = useState<CartItem[]>([]);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -298,6 +299,18 @@ export default function MenuExplorer({ items }: Props) {
       window.removeEventListener('ph-cart-change', sync);
     };
   }, []);
+
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setFiltersOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [filtersOpen]);
 
   const cartQuantities = useMemo(
     () => new Map(cart.map((c) => [c.id, c.quantity])),
@@ -340,20 +353,54 @@ export default function MenuExplorer({ items }: Props) {
     read();
     setHydrated(true);
     window.addEventListener('popstate', read);
-    fetch('/api/menu/availability')
-      .then((response) => (response.ok ? response.json() : Promise.reject()))
-      .then((data: unknown) => {
-        if (
-          data &&
-          typeof data === 'object' &&
-          Array.isArray((data as { unavailableIds?: unknown }).unavailableIds)
-        )
-          setUnavailable(
-            new Set((data as { unavailableIds: string[] }).unavailableIds),
-          );
-      })
-      .catch(() => setUnavailable(new Set()));
-    return () => window.removeEventListener('popstate', read);
+    const fetchAvailability = () => {
+      fetch('/api/menu/availability')
+        .then((response) => (response.ok ? response.json() : Promise.reject()))
+        .then((data: unknown) => {
+          if (
+            data &&
+            typeof data === 'object' &&
+            Array.isArray((data as { unavailableIds?: unknown }).unavailableIds)
+          )
+            setUnavailable(
+              new Set((data as { unavailableIds: string[] }).unavailableIds),
+            );
+        })
+        .catch(() => setUnavailable(new Set()));
+    };
+
+    let idleId: number | undefined;
+    let timerId: ReturnType<typeof setTimeout> | undefined;
+    const win =
+      typeof window !== 'undefined'
+        ? (window as unknown as {
+            requestIdleCallback?: (
+              cb: () => void,
+              opts?: { timeout: number },
+            ) => number;
+            cancelIdleCallback?: (id: number) => void;
+          })
+        : undefined;
+
+    if (win && typeof win.requestIdleCallback === 'function') {
+      idleId = win.requestIdleCallback(fetchAvailability, { timeout: 1500 });
+    } else {
+      timerId = setTimeout(fetchAvailability, 200);
+    }
+
+    return () => {
+      window.removeEventListener('popstate', read);
+      if (
+        idleId !== undefined &&
+        win &&
+        typeof win.cancelIdleCallback === 'function'
+      ) {
+        win.cancelIdleCallback(idleId);
+      }
+      if (timerId !== undefined) {
+        clearTimeout(timerId);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -387,6 +434,30 @@ export default function MenuExplorer({ items }: Props) {
     window.addEventListener('keydown', key);
     return () => window.removeEventListener('keydown', key);
   }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    const win =
+      typeof window !== 'undefined'
+        ? (window as unknown as {
+            requestIdleCallback?: (
+              cb: () => void,
+              opts?: { timeout: number },
+            ) => number;
+            cancelIdleCallback?: (id: number) => void;
+          })
+        : undefined;
+
+    if (win && typeof win.requestIdleCallback === 'function') {
+      const id = win.requestIdleCallback(() => setAllRendered(true), {
+        timeout: 800,
+      });
+      return () => win.cancelIdleCallback?.(id);
+    } else {
+      const id = setTimeout(() => setAllRendered(true), 200);
+      return () => clearTimeout(id);
+    }
+  }, [hydrated]);
 
   const categoryCounts = useMemo(
     () =>
@@ -430,7 +501,9 @@ export default function MenuExplorer({ items }: Props) {
     ? MENU_CATEGORIES.map((category) => ({
         category,
         items: visible.filter((item) => item.category === category),
-      })).filter((group) => group.items.length)
+      }))
+        .filter((group) => group.items.length)
+        .slice(0, allRendered ? undefined : 2)
     : [{ category: state.category || 'Matches', items: visible }];
   return (
     <div>

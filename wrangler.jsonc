@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pigeonhole-cafe",
+  "compatibility_date": "2026-11-17",
+  "assets": {
+    "binding": "ASSETS",
+    "run_worker_first": true,
+  },
+}

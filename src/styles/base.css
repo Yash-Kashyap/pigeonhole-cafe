@@ -147,6 +147,8 @@
     margin-top: 16px;
   }
   .menu-card {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 240px;
     min-width: 0;
     border: 1px solid var(--ink);
     background: var(--card);

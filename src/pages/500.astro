@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+---
+
+<BaseLayout
+  title="Something went wrong | The Pigeonhole CafÃ©"
+  description="The page could not be served just now."
+  noindex
+>
+  <section class="mx-auto grid min-h-[60vh] max-w-3xl content-center gap-5 px-4 py-16">
+    <p class="ph-label text-stamp">500 · A pause at the counter</p>
+    <h1 class="font-serif text-4xl sm:text-5xl">
+      This page needs another moment.
+    </h1>
+    <p class="max-w-xl text-ink-2">
+      Please try again, or browse the menu while we put things right.
+    </p>
+    <div class="flex flex-wrap gap-3">
+      <Button href="/">Back to the café</Button>
+      <Button href="/menu" variant="outline">
+        Browse the menu
+      </Button>
+    </div>
+  </section>
+</BaseLayout>

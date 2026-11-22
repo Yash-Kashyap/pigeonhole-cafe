@@ -1,19 +1,7 @@
 import { defineMiddleware } from 'astro:middleware';
 import { verifyOwnerRequest } from './lib/owner/auth';
 import { jsonResponse } from './lib/owner/http';
-
-const contentSecurityPolicy = [
-  "default-src 'self'",
-  "base-uri 'self'",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
-  "font-src 'self'",
-  "form-action 'self'",
-  "frame-ancestors 'none'",
-  "img-src 'self' data:",
-  "object-src 'none'",
-  "script-src 'self' 'unsafe-inline'",
-  "style-src 'self' 'unsafe-inline'",
-].join('; ');
+import { applySecurityHeaders } from './lib/security-headers';
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const pathname = context.url.pathname;
@@ -49,15 +37,26 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   const headers = new Headers(response.headers);
-  headers.set('Content-Security-Policy', contentSecurityPolicy);
-  headers.set('Cross-Origin-Opener-Policy', 'same-origin');
-  headers.set(
-    'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=(), payment=()',
-  );
-  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  headers.set('X-Content-Type-Options', 'nosniff');
-  headers.set('X-Frame-Options', 'DENY');
+  const contentType = headers.get('Content-Type') ?? '';
+  if (contentType.includes('text/html')) {
+    const html = await response.text();
+    const cspMeta = html.match(
+      /<meta\s+http-equiv="content-security-policy"\s+content="([^"]+)"\s*\/?\s*>/i,
+    );
+    const generatedPolicy = cspMeta?.[1];
+    if (generatedPolicy) {
+      headers.set(
+        'Content-Security-Policy',
+        `${generatedPolicy.replaceAll('&amp;', '&')}; frame-ancestors 'none'`,
+      );
+    }
+    response = new Response(html, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
+  }
+  applySecurityHeaders(headers, pathname);
   if (ownerPage || ownerApi) {
     headers.set('Cache-Control', 'no-store');
     headers.set('X-Robots-Tag', 'noindex, nofollow');
