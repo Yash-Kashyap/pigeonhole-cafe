@@ -15,12 +15,22 @@ const decorativeGridCells = [
   { index: 11, label: 'Book', icon: 'book' as const },
   { index: 18, label: 'Tea jar', icon: 'jar' as const },
 ];
+const storyJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: 'Our story | The Pigeonhole Café (demo)',
+  description:
+    'A café in a former post office sorting room, with a wall of 48 pigeonholes and tables called slots. A fictional demo café.',
+  inLanguage: 'en',
+};
+const safeJsonLd = JSON.stringify(storyJsonLd).replaceAll('<', '\\u003c');
 ---
 
 <BaseLayout
   title="Our story | The Pigeonhole Café (demo)"
   description="A café in a former post office sorting room, with a wall of 48 pigeonholes and tables called slots. A fictional demo café."
 >
+  <script type="application/ld+json" set:html={safeJsonLd} />
   <!-- 1. Opening -->
   <header class="border-b border-ink/20 py-12 md:py-20">
     <div class="ph-container space-y-6">

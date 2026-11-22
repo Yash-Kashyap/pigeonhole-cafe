@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { robotsText, sitemapXml } from './seo';
+import { robotsText, sitemapXml, socialMetaTags } from './seo';
 
 describe('SEO endpoints', () => {
   it('fails closed in robots when indexing is not exactly enabled', () => {
@@ -30,5 +30,35 @@ describe('SEO endpoints', () => {
     expect(output).toContain('https://cafe.example/menu');
     expect(output).not.toContain('/owner');
     expect(output).not.toContain('/api');
+  });
+});
+
+describe('social meta tags', () => {
+  const tags = socialMetaTags({
+    title: 'Menu | The Pigeonhole Café (demo)',
+    description: 'Browse the menu.',
+    pageUrl: 'https://cafe.example/menu/',
+    siteUrl: 'https://cafe.example/base/',
+  });
+  const value = (key: string) => tags.find((tag) => tag.key === key)?.content;
+
+  it('uses absolute URLs for the page and the share image', () => {
+    expect(value('og:url')).toBe('https://cafe.example/menu/');
+    expect(value('og:image')).toBe(
+      'https://cafe.example/img/mood/mug-wall.jpg',
+    );
+    expect(value('twitter:image')).toBe(value('og:image'));
+  });
+
+  it('carries the page title and description into both card formats', () => {
+    expect(value('og:title')).toBe('Menu | The Pigeonhole Café (demo)');
+    expect(value('twitter:title')).toBe(value('og:title'));
+    expect(value('og:description')).toBe('Browse the menu.');
+    expect(value('twitter:card')).toBe('summary_large_image');
+  });
+
+  it('describes the image for people who cannot see it', () => {
+    expect(value('og:image:alt')).toBeTruthy();
+    expect(value('twitter:image:alt')).toBe(value('og:image:alt'));
   });
 });

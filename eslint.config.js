@@ -9,6 +9,7 @@ export default [
       'node_modules/**',
       '.astro/**',
       '.checks/**',
+      '.wrangler/**',
       'design-prototype/**',
       'functions/**',
     ],

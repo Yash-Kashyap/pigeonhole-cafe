@@ -3,6 +3,7 @@ import AssistantWidget from '../components/AssistantWidget';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import { mapPathToPage } from '../lib/assistant-ui';
+import { socialMetaTags } from '../lib/seo';
 import '../styles/global.css';
 
 interface Props {
@@ -23,6 +24,12 @@ const canonical = new URL(
   Astro.url.pathname,
   import.meta.env.PUBLIC_SITE_URL || Astro.url.origin,
 );
+const socialTags = socialMetaTags({
+  title,
+  description,
+  pageUrl: canonical,
+  siteUrl: import.meta.env.PUBLIC_SITE_URL || Astro.url.origin,
+});
 const isOwnerRoute = Astro.url.pathname.startsWith('/owner');
 const shouldShowAssistant = showAssistant && !isOwnerRoute;
 const assistantPage = mapPathToPage(Astro.url.pathname);
@@ -37,6 +44,9 @@ const assistantPage = mapPathToPage(Astro.url.pathname);
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     {shouldNoindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
+    {socialTags.map((tag) => (
+      <meta {...{ [tag.attribute]: tag.key }} content={tag.content} />
+    ))}
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <script>
